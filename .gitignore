@@ -8,3 +8,7 @@ poster_cache.json
 tmdb_id_cache.json
 providers_cache.json
 ratings_cache.json
+
+# OMDb API key (build-time secret, never committed/deployed)
+.omdb_key
+omdb_cache.json

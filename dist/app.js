@@ -368,6 +368,49 @@ function makeRationale(rec) {
   return `${lead}${middle}. ${ratingNote}`;
 }
 
+/* ----------------------------------------------------- reception -------- */
+/* The AQ already folds these in; we surface them so the score story is legible.
+   Audience (IMDb 0–10) is present for every title; critic scores (Metacritic
+   /100, Rotten Tomatoes %) appear only where a professional verdict exists.   */
+function receptionBlock(rec) {
+  function cell(label, valNode, src) {
+    return el('div', { class: 'rc-cell' }, [
+      el('span', { class: 'rc-label', text: label }),
+      el('span', { class: 'rc-val' }, valNode),
+      el('span', { class: 'rc-src', text: src }),
+    ]);
+  }
+  const cells = [
+    cell('Audience', [
+      el('b', { text: rec.rating.toFixed(1) }),
+      el('span', { class: 'rc-unit', text: '/10' }),
+    ], 'IMDb'),
+  ];
+  if (rec.mc != null) {
+    cells.push(cell('Critic', [
+      el('b', { text: String(rec.mc) }),
+      el('span', { class: 'rc-unit', text: '/100' }),
+    ], 'Metacritic'));
+  }
+  if (rec.rt != null) {
+    cells.push(cell('Critic', [
+      el('b', { text: String(rec.rt) }),
+      el('span', { class: 'rc-unit', text: '%' }),
+    ], 'Rotten Tomatoes'));
+  }
+  const row = el('div', { class: 'reception-row' }, cells);
+  if (rec.mc == null && rec.rt == null) {
+    row.appendChild(el('span', { class: 'rc-empty', text: 'No critic score yet.' }));
+  }
+  return el('div', { class: 'reception' }, [
+    el('div', { class: 'reception-head' }, [
+      el('h3', { text: 'Reception' }),
+      el('span', { class: 'reception-note', text: 'folded into the AQ' }),
+    ]),
+    row,
+  ]);
+}
+
 /* ====================================================================== */
 /* SEARCH — ranked, typo-tolerant autocomplete shared across pages         */
 /* ====================================================================== */
@@ -534,11 +577,13 @@ function injectAttribution() {
   if (!footer || footer.querySelector('.attrib-credit')) return;
   const tmdbLink = el('a', { class: 'attrib-link', href: 'https://www.themoviedb.org/', target: '_blank', rel: 'noopener noreferrer', text: 'TMDB' });
   const imdbLink = el('a', { class: 'attrib-link', href: 'https://www.imdb.com/interfaces/', target: '_blank', rel: 'noopener noreferrer', text: 'IMDb' });
+  const omdbLink = el('a', { class: 'attrib-link', href: 'https://www.omdbapi.com/', target: '_blank', rel: 'noopener noreferrer', text: 'OMDb' });
   const block = el('div', { class: 'attrib-credit' }, [
     el('div', { class: 'attrib-inner' }, [
       // verbatim TMDB attribution wording (TMDB term-of-use requirement)
       el('p', { class: 'attrib-line' }, ['This product uses the ', tmdbLink, ' API but is not endorsed or certified by TMDB.']),
       el('p', { class: 'attrib-line' }, ['Title data from ', imdbLink, '. For non-commercial use.']),
+      el('p', { class: 'attrib-line' }, ['Reception scores via ', omdbLink, ' (Metacritic, Rotten Tomatoes, IMDb).']),
     ]),
   ]);
   footer.appendChild(block);
@@ -1501,6 +1546,9 @@ function initTitle() {
       requestAnimationFrame(() => row.querySelector('.dim-fill').style.setProperty('--w', v + '%'));
     });
     right.appendChild(dims);
+
+    // reception — audience (always) + critic (when available); the AQ folds these in
+    right.appendChild(receptionBlock(rec));
 
     right.appendChild(el('div', { class: 'rationale' }, [
       el('h3', { text: 'Why this score' }),

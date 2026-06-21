@@ -613,6 +613,20 @@ select.sort {
 .rationale h3 { font-family: var(--sans); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--muted-2); margin-bottom: 10px; }
 .rationale p { margin: 0; font-size: 1.05rem; color: var(--text); }
 
+/* reception — audience + critic scores; the AQ already folds these in */
+.reception { margin: 26px 0; }
+.reception-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.reception-head h3 { font-family: var(--sans); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--muted-2); margin: 0; }
+.reception-note { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.04em; color: var(--muted-2); }
+.reception-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+.rc-cell { flex: 1 1 130px; min-width: 120px; display: flex; flex-direction: column; gap: 6px; padding: 13px 15px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.rc-label { font-family: var(--mono); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted-2); }
+.rc-val { font-family: var(--mono); color: var(--text); display: flex; align-items: baseline; gap: 3px; }
+.rc-val b { font-size: 1.55rem; font-weight: 600; line-height: 1; }
+.rc-unit { font-size: 0.78rem; color: var(--muted); }
+.rc-src { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.05em; color: var(--muted); }
+.rc-empty { font-family: var(--mono); font-size: 0.74rem; color: var(--muted-2); align-self: center; padding: 4px 2px; }
+
 .watch-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .svc-chip { display: inline-flex; align-items: center; gap: 8px; font-size: 0.82rem; padding: 6px 13px 6px 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); color: var(--text); }
 .svc-chip .svc-logo { width: 20px; height: 20px; }
@@ -742,7 +756,8 @@ a.svc-chip:hover { color: var(--accent-hi); border-color: var(--accent-line); ba
 /* ===================================================== detail poster ==== */
 .detail-media { display: flex; flex-direction: column; gap: 14px; }
 .detail-poster {
-  width: 100%; border-radius: 18px; border: 1px solid var(--line);
+  width: 100%; max-width: 340px; height: auto; align-self: start; display: block;
+  border-radius: 18px; border: 1px solid var(--line);
   box-shadow: var(--shadow); aspect-ratio: 2 / 3; object-fit: cover; background: #0c0d11;
 }
 .detail-score {

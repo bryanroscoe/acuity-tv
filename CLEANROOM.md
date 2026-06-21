@@ -558,3 +558,72 @@ methodology, and kids all return 200; every page carries a single `<footer>` tar
 `app.js`, so the injected TMDB+IMDb credit lines render on all five; methodology contains the
 Sources & credits block and the verbatim TMDB line. Posters remain `image.tmdb.org` hotlinks.
 Server stopped after checks.
+
+### Implementer attestation (v11 — favicon + title poster fix)
+
+Date: 2026-06-21. I confirm no reference-product access: I did not read
+`/Users/bryanroscoe/Developer/tvintelligentsia`, did not fetch `tvintelligentsia.com`,
+and ran no web search for any reference product. Work was done solely from `dist/`.
+
+Changes:
+- FIX 1 (favicon): Added `<link rel="icon" type="image/svg+xml" href="./favicon.svg">`
+  to the `<head>` of all five pages (index.html, explore.html, title.html,
+  methodology.html, kids.html), referencing the existing Acuity logo mark at
+  `dist/favicon.svg` via a relative path. No stale favicon tags existed to remove.
+- FIX 2 (title poster cropped/zoomed): The `.detail-poster` img carried HTML
+  `height="750"` (a presentational hint) that overrode `aspect-ratio: 2/3`, making the
+  box 320×750 (taller than 2:3) so `object-fit: cover` zoomed and cropped the poster
+  sides. Fixed in `styles.css` `.detail-poster`: added `max-width: 340px; height: auto;
+  align-self: start; display: block;` so the height-hint is overridden and the box
+  resolves to a true 2:3 at ~320px wide, top-aligned in the column (not stretched to the
+  text column height). Kept `object-fit: cover` (TMDB w500 posters are 2:3). Poster
+  remains a `image.tmdb.org/t/p/w500` hotlink with the hatched fallback when `p` is null;
+  responsive stacking unchanged (grid collapses to 1 column ≤820px). CSS-only fix;
+  app.js untouched.
+
+Self-verify: served `dist/` on :8921; all five pages + `favicon.svg` returned 200; every
+page references `./favicon.svg`. Rendered `title.html?t=schindlers-list-1993` in headless
+Chrome at 1400×1000 — before the fix the poster showed a zoomed, side-cropped hand; after
+the fix the full "Schindler's List" artwork displays at 2:3 (title text at top, complete
+composition, no crop or distortion), top-aligned with the score box below. `node --check
+app.js` passes; no inline `<script>`/`on*=` handlers. Server stopped after checks.
+
+### Implementer attestation (v12 — reception scores UI + methodology + OMDb attribution)
+
+Date: 2026-06-21. I confirm no reference-product access: I did not read
+`/Users/bryanroscoe/Developer/tvintelligentsia`, did not fetch `tvintelligentsia.com`,
+and ran no web search for any reference product. Work was done solely from `dist/`.
+
+Changes:
+- TASK 1 (Reception block on title.html): Added a `receptionBlock(rec)` helper in
+  `dist/app.js` and wired it into `renderTitle()` between the Depth/Insight/Craft
+  dimension bars and the "Why this score" rationale, so it reads as part of the score
+  story. It renders an "Reception — folded into the AQ" header plus mono-number cells:
+  an always-present Audience cell (IMDb `rating` as "9.0 /10"), and Critic cells for
+  Metacritic (`mc` as "95 /100") and Rotten Tomatoes (`rt` as "98 %") when present. When
+  both `mc` and `rt` are null it shows a subtle "No critic score yet." The existing AQ
+  number, tier, percentile, dimension bars, rationale, actions, and where-to-watch are
+  untouched. Added matching CSS (`.reception`, `.rc-cell`, `.rc-label`, `.rc-val`,
+  `.rc-unit`, `.rc-src`, `.rc-empty`, etc.) in `dist/styles.css` using the Acuity idiom:
+  IBM Plex Mono numerals, muted uppercase labels, hairline `--surface`/`--line` cards.
+- TASK 2 (methodology copy): In `dist/methodology.html` reframed the lede and the
+  "One scale, three dimensions" intro so cognitive value is the core, then added a new
+  "Three inputs, one number" section explaining the AQ is a blend of (1) cognitive value
+  across Depth/Insight/Craft, (2) audience reception (IMDb users), and (3) critic
+  reception (Metacritic / Rotten Tomatoes), combined onto the 0–200 flattened scale.
+  Noted critic coverage is strongest for popular titles and that others lean on cognitive
+  + audience. Kept the verbatim "flatter than a normal distribution" framing and the
+  tier-colored histogram. Updated "Where the facts come from" and "Sources & credits" to
+  credit OMDb / Metacritic / Rotten Tomatoes.
+- TASK 3 (attribution): Extended `injectAttribution()` in `dist/app.js` with a third
+  footer line — "Reception scores via OMDb (Metacritic, Rotten Tomatoes, IMDb)." with an
+  OMDb link — so it renders on every page from the shared helper.
+
+Self-verification: `node --check dist/app.js` passes; no inline `<script>` bodies and no
+inline `on*=` handlers in any HTML; served `dist/` on :8922 (all five pages 200). Headless
+Chrome rendered `title.html?t=schindlers-list-1993` → Reception shows "Audience 9.0 /10
+IMDb · Critic 95 /100 Metacritic · Critic 98 % Rotten Tomatoes"; `title.html?t=cosmos-1980`
+(no critic) → "Audience 9.3 /10 IMDb · No critic score yet." Methodology renders the
+"Three inputs, one number" section (audience + critic) with the flattened-curve framing
+and histogram intact. Footer on title and methodology pages shows "Reception scores via
+OMDb (Metacritic, Rotten Tomatoes, IMDb)." Server stopped after checks.
