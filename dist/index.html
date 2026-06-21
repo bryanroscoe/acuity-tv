@@ -3,113 +3,237 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Acuity — an Acuity Score for everything you watch</title>
-  <meta name="description" content="Acuity rates film and television on cognitive value — how much a title actually enriches your mind — on one fixed Acuity Score, computed by a transparent method.">
+  <title>Acuity — the Acuity Quotient for everything you watch</title>
+  <meta name="description" content="Acuity rates film and television on cognitive value — how much a title actually returns to your mind — on one fixed Acuity Quotient (AQ), scored the same way for every title.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body data-page="home">
-  <a class="skip" href="#main">Skip to content</a>
+  <a class="skip" href="#curve">Skip to content</a>
 
-  <header class="nav">
-    <div class="nav-inner">
-      <a class="brand" href="./index.html">Acuity<span class="dot">.</span><span class="glyph">AS</span></a>
-      <nav class="nav-links" aria-label="Primary">
-        <a href="./explore.html">Catalog</a>
-        <a href="./kids.html">Kids</a>
-        <a href="./compare.html">Compare</a>
-        <a href="./methodology.html">Methodology</a>
-      </nav>
-      <span class="nav-spacer"></span>
-      <a class="nav-cta desktop" href="./explore.html">Browse the index</a>
-      <button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
-    </div>
-    <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile" hidden>
-      <a href="./explore.html">Catalog</a>
-      <a href="./kids.html">Kids</a>
-      <a href="./compare.html">Compare</a>
-      <a href="./methodology.html">Methodology</a>
+  <main class="acu-home" id="top">
+
+    <!-- NAV -->
+    <nav class="acu-nav">
+      <a href="#top" style="display:flex; align-items:center; gap:11px; color:var(--text);">
+        <svg width="26" height="26" viewBox="0 0 28 28" style="display:block;" aria-hidden="true">
+          <line x1="14" y1="14" x2="14" y2="5" stroke="var(--acc)" stroke-width="1.3" opacity="0.55"></line>
+          <line x1="14" y1="14" x2="5.5" y2="22" stroke="var(--acc)" stroke-width="1.3" opacity="0.55"></line>
+          <line x1="14" y1="14" x2="22.5" y2="22" stroke="var(--acc)" stroke-width="1.3" opacity="0.55"></line>
+          <line x1="14" y1="5" x2="5.5" y2="22" stroke="var(--acc)" stroke-width="1.3" opacity="0.26"></line>
+          <line x1="5.5" y1="22" x2="22.5" y2="22" stroke="var(--acc)" stroke-width="1.3" opacity="0.26"></line>
+          <line x1="22.5" y1="22" x2="14" y2="5" stroke="var(--acc)" stroke-width="1.3" opacity="0.26"></line>
+          <circle cx="14" cy="5" r="2.4" fill="var(--acc)"></circle>
+          <circle cx="5.5" cy="22" r="2.4" fill="var(--acc)"></circle>
+          <circle cx="22.5" cy="22" r="2.4" fill="var(--acc)"></circle>
+          <circle cx="14" cy="14" r="3" fill="#b9acff"></circle>
+        </svg>
+        <span style="font-family:var(--serif); font-size:27px; letter-spacing:0.3px; line-height:1;">Acuity</span>
+        <span style="font-family:var(--mono); font-size:9.5px; letter-spacing:1.5px; color:#8f8a9e; border:1px solid var(--line-strong); padding:2px 5px; border-radius:3px; margin-top:2px;">AQ</span>
+      </a>
+      <div style="display:flex; align-items:center; gap:30px;">
+        <a class="acu-navlink" href="./explore.html">Catalog</a>
+        <a class="acu-navlink" href="./kids.html">Kids</a>
+        <a class="acu-navlink" href="#method">Methodology</a>
+        <a class="acu-navcta" href="./explore.html">Browse the index</a>
+      </div>
     </nav>
-  </header>
 
-  <main id="main">
-    <section class="hero wrap">
-      <p class="eyebrow">Cognitive-value ratings</p>
-      <h1>An <em>Acuity Score</em> for everything you watch.</h1>
-      <p class="sub">Most apps measure how long they can keep you watching. Acuity measures something better: how much a film or series actually feeds your mind. One honest number, scored the same way for every title.</p>
-      <form class="hero-search" data-hero-search role="search" aria-label="Search the catalog">
-        <input type="search" placeholder="Search 15,883 titles — try “Chernobyl”…" aria-label="Search titles">
-        <button class="btn btn-primary" type="submit">Search</button>
-      </form>
-      <div class="hero-actions">
-        <a class="btn btn-ghost" href="./methodology.html">How scoring works</a>
-        <a class="btn btn-ghost" href="./compare.html">Compare two titles</a>
+    <!-- HERO -->
+    <section style="position:relative; overflow:hidden;">
+      <div aria-hidden="true" data-marq-wrap style="position:absolute; top:-22%; left:-12%; right:-12%; bottom:-22%; z-index:0; display:flex; gap:14px; justify-content:center; transform:rotate(-8deg) scale(1.2); opacity:0.5; pointer-events:none;">
+        <div class="acu-marq-col" data-marq-col style="animation:acuUp 50s linear infinite;"></div>
+        <div class="acu-marq-col" data-marq-col style="animation:acuDown 62s linear infinite;"></div>
+        <div class="acu-marq-col" data-marq-col style="animation:acuUp 54s linear infinite;"></div>
+        <div class="acu-marq-col" data-marq-col style="animation:acuDown 48s linear infinite;"></div>
+        <div class="acu-marq-col" data-marq-col style="animation:acuUp 58s linear infinite;"></div>
+        <div class="acu-marq-col" data-marq-col style="animation:acuDown 66s linear infinite;"></div>
       </div>
-    </section>
+      <div aria-hidden="true" style="position:absolute; inset:0; z-index:1; pointer-events:none; background:linear-gradient(95deg, rgba(13,12,18,0.98) 0%, rgba(13,12,18,0.9) 32%, rgba(13,12,18,0.6) 70%, rgba(13,12,18,0.82) 100%), linear-gradient(0deg, rgba(13,12,18,0.96) 0%, rgba(13,12,18,0) 26%, rgba(13,12,18,0) 72%, rgba(13,12,18,0.9) 100%);"></div>
 
-    <section class="statband">
-      <div class="wrap">
-        <div class="statband-grid" data-statband aria-label="Catalog at a glance"></div>
-      </div>
-    </section>
+      <div style="position:relative; z-index:2; max-width:1240px; margin:0 auto; padding:74px 32px 64px; display:flex; flex-wrap:wrap; gap:56px; align-items:center;">
+        <div style="flex:1.15; min-width:380px;">
+          <div style="display:flex; align-items:center; gap:9px; margin-bottom:26px;">
+            <span style="width:7px; height:7px; border-radius:50%; background:var(--acc); animation:acuPulse 1.8s ease-in-out infinite;"></span>
+            <span style="font-family:var(--mono); font-size:11px; letter-spacing:2.4px; color:#8f8a9e; text-transform:uppercase;">The Acuity Quotient · a fixed 0&ndash;200 scale</span>
+          </div>
+          <h1 style="font-family:var(--serif); font-weight:400; font-size:68px; line-height:0.99; letter-spacing:-0.5px; margin:0 0 24px; color:var(--text-bright); text-wrap:balance;">Every title gives<br>something back.<br><span style="font-style:italic; color:var(--acc);">Acuity</span> tells you how&nbsp;much.</h1>
+          <p style="font-size:17px; line-height:1.62; color:var(--muted); max-width:520px; margin:0 0 32px;">Streaming is built to measure one thing: how long it can hold you. Acuity measures the opposite &mdash; how much a film or series actually returns to your mind. One honest number, scored the same way for every title, so an evening of your attention is never spent on noise.</p>
 
-    <section class="section wrap">
-      <div class="section-head">
-        <div>
-          <h2>The top of the curve</h2>
-          <p>The highest cognitive-value titles in the index — where ideas, knowledge, and craft all run high at once.</p>
+          <div style="position:relative; max-width:480px; margin-bottom:22px;">
+            <div style="display:flex; align-items:center; gap:11px; background:var(--surface-2); border:1px solid var(--line-strong); border-radius:9px; padding:13px 15px;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8f8a9e" stroke-width="2" style="flex:none;" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg>
+              <input data-hero-input type="search" placeholder="Search any title — Severance, Arrival, The Wire…" aria-label="Search titles" autocomplete="off" style="flex:1; background:transparent; border:none; outline:none; color:var(--text); font-family:var(--sans); font-size:14.5px;">
+              <span style="font-family:var(--mono); font-size:10px; letter-spacing:1px; color:var(--muted-2); border:1px solid var(--line-strong); padding:3px 6px; border-radius:4px; flex:none;">AQ</span>
+            </div>
+            <div data-hero-results role="listbox" aria-label="Search results" hidden style="position:absolute; top:calc(100% + 8px); left:0; right:0; z-index:30; background:#13111b; border:1px solid var(--line-strong); border-radius:10px; padding:6px; box-shadow:0 24px 60px rgba(0,0,0,0.55); overflow:hidden;"></div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+            <a href="#method" style="font-size:14px; font-weight:600; color:#0d0c12; background:var(--acc); padding:13px 22px; border-radius:7px;">How scoring works</a>
+            <a href="./explore.html" style="font-size:14px; font-weight:500; color:#c8c3d4; background:transparent; border:1px solid var(--line-strong); padding:13px 22px; border-radius:7px;">Browse the catalog</a>
+          </div>
+          <p data-hero-tagline style="font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--muted-2); margin:24px 0 0;">&nbsp;</p>
         </div>
-        <a class="link" href="./explore.html">See the full catalog →</a>
+
+        <!-- INSTRUMENT -->
+        <div style="flex:1; min-width:330px;">
+          <div style="background:linear-gradient(180deg,var(--surface-3),#131019); border:1px solid var(--line-strong); border-radius:16px; padding:20px; box-shadow:0 40px 90px rgba(0,0,0,0.55);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+              <span style="font-family:var(--mono); font-size:10px; letter-spacing:2px; color:#8f8a9e; text-transform:uppercase;">Acuity Instrument</span>
+            </div>
+            <div style="display:flex; gap:18px;">
+              <div data-inst-poster style="position:relative; width:128px; flex:none; aspect-ratio:2/3; border-radius:8px; overflow:hidden; border:1px solid var(--line-strong); background:#100e18;"></div>
+              <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+                <a data-inst-title href="#" style="font-family:var(--serif); font-size:23px; line-height:1.05; color:var(--text-bright); text-decoration:none;"></a>
+                <span data-inst-meta style="font-family:var(--mono); font-size:10.5px; letter-spacing:1px; color:#8f8a9e; margin-top:4px;"></span>
+                <div style="display:flex; align-items:baseline; gap:8px; margin-top:14px;">
+                  <span data-inst-aq style="font-family:var(--mono); font-size:52px; font-weight:600; line-height:0.85;"></span>
+                  <span style="font-family:var(--mono); font-size:12px; color:var(--muted-2);">/200</span>
+                </div>
+                <span data-inst-tier style="align-self:flex-start; margin-top:9px; font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase; border:1px solid currentColor; padding:3px 8px; border-radius:4px;"></span>
+                <div style="height:5px; border-radius:3px; background:rgba(190,180,235,0.11); margin-top:14px; overflow:hidden;">
+                  <div data-inst-bar style="height:100%; width:0; border-radius:3px;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:18px; display:flex; flex-direction:column; gap:11px;">
+              <div>
+                <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:10.5px; letter-spacing:1px; color:var(--muted); margin-bottom:5px;"><span>DEPTH</span><span data-inst-depth-v style="color:var(--acc);"></span></div>
+                <div style="height:4px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div data-inst-depth-bar style="height:100%; width:0; background:var(--acc);"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:10.5px; letter-spacing:1px; color:var(--muted); margin-bottom:5px;"><span>INSIGHT</span><span data-inst-insight-v style="color:var(--acc);"></span></div>
+                <div style="height:4px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div data-inst-insight-bar style="height:100%; width:0; background:var(--acc);"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:10.5px; letter-spacing:1px; color:var(--muted); margin-bottom:5px;"><span>CRAFT</span><span data-inst-craft-v style="color:var(--acc);"></span></div>
+                <div style="height:4px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div data-inst-craft-bar style="height:100%; width:0; background:var(--acc);"></div></div>
+              </div>
+            </div>
+
+            <div data-inst-chips style="margin-top:18px; padding-top:15px; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; gap:6px; align-items:center;"></div>
+          </div>
+          <p style="font-family:var(--mono); font-size:10px; letter-spacing:0.8px; color:var(--muted-2); margin:12px 4px 0; text-align:center;">Click a genre or search above to focus the instrument.</p>
+        </div>
       </div>
-      <div class="grid" data-featured aria-busy="true"></div>
     </section>
 
-    <section class="section wrap">
-      <div class="cta-band">
-        <p class="eyebrow">Watch on purpose</p>
-        <h2>Audit your watchlist, not your attention.</h2>
-        <p>One short letter a week: a few titles worth your evening, a number you can trust, and nothing engineered to keep you scrolling. No noise.</p>
-        <form class="cta-form" data-newsletter aria-label="Newsletter signup">
-          <input type="email" required placeholder="you@example.com" aria-label="Email address">
-          <button class="btn btn-primary" type="submit">Join the list</button>
-        </form>
-        <p class="cta-note">A demonstration build. Your address never leaves your browser.</p>
+    <!-- TOP OF THE CURVE -->
+    <section id="curve" style="max-width:1240px; margin:0 auto; padding:60px 32px 70px;">
+      <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:34px;">
+        <div>
+          <span style="font-family:var(--mono); font-size:11px; letter-spacing:2.4px; color:var(--acc); text-transform:uppercase;">The top of the curve</span>
+          <h2 style="font-family:var(--serif); font-weight:400; font-size:44px; line-height:1.04; margin:12px 0 0; color:var(--text-bright);">Where ideas, knowledge,<br>and craft all run high at once.</h2>
+        </div>
+        <a href="./explore.html" style="font-size:13.5px; color:var(--muted); border-bottom:1px solid var(--line-strong); padding-bottom:3px;">See the full catalog &rarr;</a>
+      </div>
+      <div data-feat style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:18px;"></div>
+    </section>
+
+    <!-- METHODOLOGY -->
+    <section id="method" style="border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:#0a0910;">
+      <div style="max-width:1240px; margin:0 auto; padding:72px 32px;">
+        <span style="font-family:var(--mono); font-size:11px; letter-spacing:2.4px; color:var(--acc); text-transform:uppercase;">The method · consistent for every title</span>
+        <h2 style="font-family:var(--serif); font-weight:400; font-size:46px; line-height:1.02; margin:14px 0 8px; color:var(--text-bright);">Three lenses.<br>One honest number.</h2>
+        <p style="font-size:16px; color:var(--muted); max-width:560px; line-height:1.6; margin:0 0 44px;">Every score reads how much a title gives back across three lenses, then resolves to a single number on a fixed 0&ndash;200 scale. The same three lenses, applied to every title &mdash; no editorial gospel, no studio thumb on the scale.</p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin-bottom:34px;">
+          <div style="background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:22px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between;"><span style="font-family:var(--serif); font-size:26px; color:var(--text-bright);">Depth</span><span style="font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--acc); text-transform:uppercase;">Primary</span></div>
+            <p style="font-size:14px; line-height:1.55; color:#948fa3; margin:12px 0 0;">How much the work asks of your attention &mdash; ideas, ambiguity, structure, the thinking it demands while you watch.</p>
+          </div>
+          <div style="background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:22px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between;"><span style="font-family:var(--serif); font-size:26px; color:var(--text-bright);">Insight</span><span style="font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--acc); text-transform:uppercase;">Secondary</span></div>
+            <p style="font-size:14px; line-height:1.55; color:#948fa3; margin:12px 0 0;">What you carry out of it &mdash; knowledge, perspective, a way of seeing the world you didn't have going in.</p>
+          </div>
+          <div style="background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:22px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between;"><span style="font-family:var(--serif); font-size:26px; color:var(--text-bright);">Craft</span><span style="font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--acc); text-transform:uppercase;">Supporting</span></div>
+            <p style="font-size:14px; line-height:1.55; color:#948fa3; margin:12px 0 0;">How well it's made &mdash; writing, performance, image and sound working in service of the idea, not decorating it.</p>
+          </div>
+        </div>
+
+        <div style="background:var(--surface); border:1px solid var(--line-strong); border-radius:11px; padding:20px 22px; margin-bottom:46px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+          <span style="font-family:var(--mono); font-size:10px; letter-spacing:2px; color:var(--acc); text-transform:uppercase; border:1px solid var(--accent-line); padding:5px 10px; border-radius:5px; flex:none;">Calibrated, not published</span>
+          <span style="font-size:14.5px; color:var(--muted); line-height:1.55; flex:1; min-width:240px;">The three lenses are weighted and combined into one number, tuned against thousands of titles. We keep the exact weighting in-house &mdash; a score you can trust shouldn't be a one-line equation anyone can reverse-engineer or game.</span>
+        </div>
+
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:20px;">
+          <div style="max-width:580px;">
+            <span style="font-family:var(--mono); font-size:10.5px; letter-spacing:2px; color:#8f8a9e; text-transform:uppercase;">The distribution</span>
+            <h3 style="font-family:var(--serif); font-weight:400; font-size:36px; line-height:1.04; margin:10px 0 12px; color:var(--text-bright);">A deliberately flattened curve.</h3>
+            <p style="font-size:15px; color:#948fa3; line-height:1.6; margin:0;">Most rating sites pile every title into a tall spike at the middle and call it a bell. Acuity keeps a single hump centered on a median of 100, but flattens it &mdash; pushing real weight out toward the ends, so the Profound few and the Idle many are both easy to find.</p>
+          </div>
+          <div style="display:flex; gap:30px;">
+            <div><div data-plotted style="font-family:var(--mono); font-size:30px; font-weight:600; color:var(--text-bright); line-height:1;">&mdash;</div><div style="font-family:var(--mono); font-size:10px; letter-spacing:1.4px; color:#8f8a9e; text-transform:uppercase; margin-top:6px;">Titles plotted</div></div>
+            <div><div data-tailpct style="font-family:var(--mono); font-size:30px; font-weight:600; color:var(--acc); line-height:1;">&mdash;</div><div style="font-family:var(--mono); font-size:10px; letter-spacing:1.4px; color:#8f8a9e; text-transform:uppercase; margin-top:6px;">Out in the tails</div></div>
+          </div>
+        </div>
+
+        <div style="position:relative; background:var(--surface); border:1px solid var(--line-strong); border-radius:14px; padding:26px 22px 16px;">
+          <div data-curve-tip hidden style="position:absolute; top:12px; transform:translateX(-50%); z-index:5; background:var(--bg); border:1px solid var(--acc); border-radius:8px; padding:7px 11px; pointer-events:none; white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,0.5);"></div>
+          <div data-curve style="display:flex; align-items:flex-end; gap:2px; height:228px;"></div>
+          <div style="display:flex; justify-content:space-between; margin-top:11px; padding:0 1px;">
+            <span style="font-family:var(--mono); font-size:10px; color:var(--muted-2);">0</span>
+            <span style="font-family:var(--mono); font-size:10px; color:var(--muted-2);">50</span>
+            <span style="font-family:var(--mono); font-size:10px; color:var(--muted-2);">100</span>
+            <span style="font-family:var(--mono); font-size:10px; color:var(--muted-2);">150</span>
+            <span style="font-family:var(--mono); font-size:10px; color:var(--muted-2);">200</span>
+          </div>
+        </div>
+
+        <div data-legend style="display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; align-items:center;">
+          <span style="font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--muted-2); text-transform:uppercase; margin-right:4px;">Tiers</span>
+        </div>
+        <p style="font-family:var(--mono); font-size:10.5px; letter-spacing:0.4px; color:var(--muted-2); margin:14px 0 0;">Hover any bar for its count · click a tier to isolate it.</p>
       </div>
     </section>
+
+    <!-- STATS -->
+    <section style="border-top:1px solid var(--line); background:#0a0910;">
+      <div style="max-width:1240px; margin:0 auto; padding:56px 32px; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:24px;">
+        <div style="text-align:center;"><div data-stat-titles style="font-family:var(--mono); font-size:46px; font-weight:600; color:var(--text-bright); line-height:1;">&mdash;</div><div style="font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:#8f8a9e; text-transform:uppercase; margin-top:8px;">Titles scored</div></div>
+        <div style="text-align:center;"><div style="font-family:var(--mono); font-size:46px; font-weight:600; color:var(--text-bright); line-height:1;">3</div><div style="font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:#8f8a9e; text-transform:uppercase; margin-top:8px;">Weighted lenses</div></div>
+        <div style="text-align:center;"><div style="font-family:var(--mono); font-size:46px; font-weight:600; color:var(--text-bright); line-height:1;">9</div><div style="font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:#8f8a9e; text-transform:uppercase; margin-top:8px;">Sub-signals</div></div>
+        <div style="text-align:center;"><div style="font-family:var(--mono); font-size:46px; font-weight:600; color:var(--acc); line-height:1;">100%</div><div style="font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:#8f8a9e; text-transform:uppercase; margin-top:8px;">Reproducible</div></div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer style="border-top:1px solid var(--line); background:#0a0910;">
+      <div style="max-width:1240px; margin:0 auto; padding:54px 32px 40px; display:flex; flex-wrap:wrap; gap:44px; justify-content:space-between;">
+        <div style="max-width:320px;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+            <svg width="24" height="24" viewBox="0 0 28 28" aria-hidden="true"><line x1="14" y1="14" x2="14" y2="5" stroke="var(--acc)" stroke-width="1.3" opacity="0.55"></line><line x1="14" y1="14" x2="5.5" y2="22" stroke="var(--acc)" stroke-width="1.3" opacity="0.55"></line><line x1="14" y1="14" x2="22.5" y2="22" stroke="var(--acc)" stroke-width="1.3" opacity="0.55"></line><circle cx="14" cy="5" r="2.4" fill="var(--acc)"></circle><circle cx="5.5" cy="22" r="2.4" fill="var(--acc)"></circle><circle cx="22.5" cy="22" r="2.4" fill="var(--acc)"></circle><circle cx="14" cy="14" r="3" fill="#b9acff"></circle></svg>
+            <span style="font-family:var(--serif); font-size:24px; color:var(--text-bright);">Acuity</span>
+          </div>
+          <p style="font-family:var(--serif); font-style:italic; font-size:19px; color:var(--acc); margin:0 0 12px;">Watch what gives back.</p>
+          <p style="font-size:13px; line-height:1.6; color:#8f8a9e; margin:0;">Cognitive-value ratings for film and television. A deliberate alternative to the autoplay feed.</p>
+        </div>
+        <div style="display:flex; gap:56px; flex-wrap:wrap;">
+          <div>
+            <div style="font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--muted-2); text-transform:uppercase; margin-bottom:14px;">Explore</div>
+            <a class="acu-navlink" style="display:block; margin-bottom:9px;" href="./explore.html">Full catalog</a>
+            <a class="acu-navlink" style="display:block; margin-bottom:9px;" href="./kids.html">Kids &amp; family</a>
+            <a class="acu-navlink" style="display:block;" href="#method">Methodology</a>
+          </div>
+          <div>
+            <div style="font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--muted-2); text-transform:uppercase; margin-bottom:14px;">The method</div>
+            <a class="acu-navlink" style="display:block; margin-bottom:9px;" href="#method">How we score</a>
+            <a class="acu-navlink" style="display:block; margin-bottom:9px;" href="./methodology.html">The five tiers</a>
+            <a class="acu-navlink" style="display:block;" href="./methodology.html">The AQ curve</a>
+          </div>
+        </div>
+      </div>
+      <div style="max-width:1240px; margin:0 auto; padding:0 32px 40px;">
+        <p style="font-family:var(--mono); font-size:10.5px; line-height:1.7; color:var(--muted-2); margin:0; border-top:1px solid var(--line); padding-top:22px;">© 2026 Acuity. An independent, clean-room demonstration. Scores are computed, not editorial gospel. Title facts from public datasets · availability is illustrative.</p>
+      </div>
+    </footer>
+
   </main>
-
-  <footer class="footer">
-    <div class="wrap">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a class="brand" href="./index.html">Acuity<span class="dot">.</span></a>
-          <p class="footer-tag">Cognitive-value ratings for film and television. A deliberate alternative to the autoplay feed.</p>
-        </div>
-        <div>
-          <h4>Explore</h4>
-          <div class="footer-links">
-            <a href="./explore.html">Full catalog</a>
-            <a href="./compare.html">Compare titles</a>
-            <a href="./methodology.html">Methodology</a>
-          </div>
-        </div>
-        <div>
-          <h4>The method</h4>
-          <div class="footer-links">
-            <a href="./methodology.html">How we score</a>
-            <a href="./methodology.html#tiers">The five tiers</a>
-            <a href="./methodology.html#curve">The score curve</a>
-          </div>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span>© 2026 Acuity. An independent, clean-room demonstration. Scores are computed, not editorial gospel.</span>
-        <span>Title facts from public IMDb datasets · availability is illustrative.</span>
-      </div>
-    </div>
-  </footer>
 
   <script src="./app.js"></script>
 </body>

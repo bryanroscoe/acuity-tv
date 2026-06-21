@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Methodology — Acuity</title>
-  <meta name="description" content="How Acuity scores cognitive value: three 0–100 dimensions blended onto a wide, IQ-style Acuity Score scale (median 100, up to ~200) that recalibrates as the catalog grows, plus five named tiers.">
+  <meta name="description" content="How Acuity scores cognitive value: three 0–100 dimensions blended onto a wide, IQ-style Acuity Quotient scale (median 100, up to ~200) that recalibrates as the catalog grows, plus five named tiers.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body data-page="methodology">
@@ -15,11 +15,10 @@
 
   <header class="nav">
     <div class="nav-inner">
-      <a class="brand" href="./index.html">Acuity<span class="dot">.</span><span class="glyph">AS</span></a>
+      <a class="brand" href="./index.html">Acuity<span class="dot">.</span><span class="glyph">AQ</span></a>
       <nav class="nav-links" aria-label="Primary">
         <a href="./explore.html">Catalog</a>
         <a href="./kids.html">Kids</a>
-        <a href="./compare.html">Compare</a>
         <a href="./methodology.html">Methodology</a>
       </nav>
       <span class="nav-spacer"></span>
@@ -29,7 +28,6 @@
     <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile" hidden>
       <a href="./explore.html">Catalog</a>
       <a href="./kids.html">Kids</a>
-      <a href="./compare.html">Compare</a>
       <a href="./methodology.html">Methodology</a>
     </nav>
   </header>
@@ -47,31 +45,31 @@
 
       <div class="dimcard-grid">
         <div class="dimcard dim cog">
-          <h4>Cognitive load</h4>
+          <h4>Depth</h4>
           <p>How much the title asks of you — structural complexity, ambiguity, layered plotting, and ideas that reward a second pass. High scores demand attention.</p>
         </div>
         <div class="dimcard dim edu">
-          <h4>Knowledge value</h4>
+          <h4>Insight</h4>
           <p>What you carry out of it — history, science, character of a real place or person, a discipline made legible. How much you simply know that you didn't before.</p>
         </div>
         <div class="dimcard dim ent">
-          <h4>Craft &amp; execution</h4>
+          <h4>Craft</h4>
           <p>Whether the thing is actually made well — writing, performance, direction, and the cohesion that separates a considered work from a competent one.</p>
         </div>
       </div>
 
       <div class="prose">
-        <p>The three dimensions are blended into a single composite, then placed on a wide, IQ-style scale we call the <strong>Acuity Score</strong> — a deliberate nod to a familiar standardized measure. The median title sits at <strong data-stat="mean">100</strong> and the scale runs up to roughly <strong data-stat="max">200</strong>. The number is a measure of a title's cognitive value, not a ranking position — and because the scale is anchored to the whole catalog, it <em>recalibrates as the catalog grows</em>: add thousands more titles and every score is re-derived from the same method, so a 130 means the same thing tomorrow as it does today.</p>
+        <p>The three dimensions are blended into a single composite, then placed on a wide, IQ-style scale we call the <strong>Acuity Quotient</strong> — a deliberate nod to a familiar standardized measure. The median title sits at <strong data-stat="mean">100</strong> and the scale runs up to roughly <strong data-stat="max">200</strong>. The number is a measure of a title's cognitive value, not a ranking position — and because the scale is anchored to the whole catalog, it <em>recalibrates as the catalog grows</em>: add thousands more titles and every score is re-derived from the same method, so a 130 means the same thing tomorrow as it does today.</p>
 
-        <h2 id="curve">A true bell curve, on purpose</h2>
-        <p>Most rating sites drift upward until almost everything is "great" and the scale stops meaning anything. We do the opposite. The Acuity Score scale is calibrated so the catalog forms an honest normal distribution — centered at <strong data-stat="mean">100</strong>, with a standard deviation of about <strong data-stat="sd">26</strong>. Most titles land near the middle; genuine brilliance and genuine noise are both rare, and live in the thin tails where they belong.</p>
-        <p>This is the credibility test for the whole project, so we show our work. Here is the distribution of every Acuity Score in the catalog:</p>
+        <h2 id="curve">A deliberately flattened curve</h2>
+        <p>Most rating sites drift upward until almost everything is "great" and the scale stops meaning anything. We do the opposite — but we also refuse the other trap, the tall central spike that buries every title in the middle. The Acuity Quotient is calibrated into a single, bell-shaped hump centered on a median of <strong data-stat="mean">100</strong>, with a standard deviation of about <strong data-stat="sd">37</strong>. It is intentionally <em>flatter than a normal distribution</em>: we push real weight outward toward the ends, so the top and bottom of the scale are populated rather than empty. Most titles still cluster near the middle, but genuine brilliance and genuine noise both have room to live in tails that actually carry titles.</p>
+        <p>This is the credibility test for the whole project, so we show our work. Here is the distribution of every Acuity Quotient in the catalog:</p>
       </div>
 
       <div class="chart-card">
         <div class="chart-stats" data-chart-stats aria-label="Distribution statistics"></div>
         <div data-histogram></div>
-        <p class="chart-foot">Each bar is the number of titles at a given Acuity Score. A near-zero skew confirms the curve is symmetric — no thumb on the scale.</p>
+        <p class="chart-foot">Each bar is the number of titles at a given Acuity Quotient. A near-zero skew keeps the hump symmetric, while the flattened shape and weighted tails keep the ends of the scale from emptying out.</p>
       </div>
 
       <div class="prose">
@@ -86,7 +84,7 @@
         <p>Because one canonical dataset drives every page, a title's number is identical wherever you meet it — the catalog, its detail page, a head-to-head comparison. Update the data, and the whole site updates with it. There is no second, editorial set of numbers hiding behind the first.</p>
 
         <h2>What it is not</h2>
-        <p>A high Acuity Score is not a command and a low one is not an insult. Comfort viewing earns a low cognitive load by design, and that is a perfectly good reason to watch something. Acuity is a measuring instrument, not a verdict on your taste — its only job is to tell you, plainly, what a given hour is likely to give back.</p>
+        <p>A high Acuity Quotient is not a command and a low one is not an insult. Comfort viewing earns a low cognitive load by design, and that is a perfectly good reason to watch something. Acuity is a measuring instrument, not a verdict on your taste — its only job is to tell you, plainly, what a given hour is likely to give back.</p>
         <a class="btn btn-primary" href="./explore.html">See it applied — open the catalog</a>
       </div>
     </section>

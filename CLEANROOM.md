@@ -243,3 +243,187 @@ shows the score once with a non-clipped tier chip; placard tiles are 2:3; picker
 list with a "+ 197 more services" expander; sort-by-Craft reorders the top of the list vs Acuity;
 stacked dimension-min + IMDb rating/votes filters drop the count (e.g. cog≥70 → 4,844;
 +edu≥60 → 4,265; +rating≥8 → 1,150; +votes≥100k → 429). Server stopped after verification.
+
+### Implementer attestation (v5 — design implementation)
+- **Role:** Implementer (clean room). **Date:** 2026-06-21.
+- **Statement:** I had **no access to any reference product** — I did not read
+  `/Users/bryanroscoe/Developer/tvintelligentsia`, did not fetch `tvintelligentsia.com`, and ran
+  no web search for any competitor. I worked solely from the approved design mockup
+  `design/Acuity.dc.html`, the existing `dist/` files, and our own `data/catalog.json` +
+  `data/stats.json`.
+- **What changed:**
+  - **Global identity (`dist/styles.css`):** retuned `:root` to the Acuity violet system
+    (accent `#8a78ff`, bg `#0d0c12`, surfaces `#15131d`/`#16141f`/`#1a1726`, hairline borders
+    `rgba(190,180,235,…)`, text `#ece9f4`/`#f4f1fb`/muted greys). Swapped fonts to **Instrument
+    Serif** (display + wordmark), **Hanken Grotesk** (body/UI), **IBM Plex Mono** (numbers/
+    eyebrows/labels). Added the grain overlay (`.acu-grain`) and keyframes `acuGrain`/`acuPulse`/
+    `acuUp`/`acuDown`; remapped the five tier colors onto a violet scale (rose floor); added home
+    component classes (`.acu-nav/.acu-tile/.acu-res/.acu-chip/.acu-feat/.acu-bar/.acu-legend/
+    .acu-swap`). Every page inherits the new theme through the shared stylesheet.
+  - **Terminology (whole site):** "Acuity Score"/"AS" → **"Acuity Quotient"/"AQ"** (cards, detail,
+    sorts, filters, methodology, compare, brand glyph); dimensions relabeled **Depth/Insight/Craft**
+    (data fields `cog/edu/ent` and the `/200` scale unchanged). Tier names kept (Idle · Passive ·
+    Engaging · Stimulating · Profound).
+  - **Home (`dist/index.html` rebuilt + `initHome` in `dist/app.js`):** faithful static port of the
+    DSL mockup — sticky blurred nav with the network logo mark; hero with a 6-column real-poster
+    marquee (TMDB `w154`, hatched fallback), gradient masks, eyebrow/headline/subtitle copy, a live
+    autocomplete search dropdown (AQ in tier color, click → `title.html?t=slug`, typing focuses the
+    instrument), two CTAs and the real `15,883 titles scored · Method v2.0 · No studio money` line;
+    the **Acuity Instrument** focus card (poster, AQ in tier color, tier chip, AQ bar, Depth/Insight/
+    Craft bars, clickable genre chips); **Top of the curve** featured grid (real top 6, rank/tier
+    badge/AQ/mini-bars, hover lift); **Methodology** lens cards + "Calibrated, not published" callout
+    + flat-curve histogram drawn from `stats.json` (183 bars colored by tier, hover tooltip, 0–200
+    axis) + interactive tier legend + real "titles plotted" (15,883) / "out in the tails" (25%);
+    **Compare** head-to-head with DELTA and real swap-right options; **Stats** band (15,883 / 3 / 9 /
+    100%). The internal "naming study" section was **omitted** as instructed.
+  - **Other pages:** updated `explore/methodology/compare/title/kids` font links, brand glyph (AQ),
+    AQ terminology, and Depth/Insight/Craft labels (sort options, weight + dimension-minimum rows,
+    methodology lens cards) so they adopt the new identity and keep working.
+- **Engineering:** no inline `<script>` or `on*=` handlers (all listeners via `addEventListener`;
+  grain overlay injected from JS); relative paths; single `./data/catalog.json` source; `acuity_v1`
+  localStorage namespace with graceful degradation unchanged.
+- **Self-verify:** `node --check app.js` passes; served on `:8915` — all six pages + both data files
+  return **200** (server stopped after). `grep` confirms **zero** inline `on*=` handlers and that
+  "Acuity Score"/"AS"/Fraunces no longer appear; "Acuity Quotient"/"AQ" and "Depth/Insight/Craft"
+  are present. Data-path numerics validated against the real JSON (15,883 titles, 25% tail, 183
+  histogram bars max-count 244, top title Schindler's List AQ 200, search/compare/genre wiring).
+
+### Implementer attestation (v6 — Explore redesign)
+**Date:** 2026-06-21
+
+I confirm I had **no access to any reference product**: I did not read the
+`/Users/bryanroscoe/Developer/tvintelligentsia` repo, did not fetch
+`tvintelligentsia.com`, and did not web-search for any reference product. Work was done
+solely from `design/Catalog-notes.md`, `design/Acuity.dc.html`, the existing `dist/`, and
+`dist/data/*.json` (catalog/providers/stats) plus the `build/` pipeline source.
+
+**Changes made:**
+- **Tier rename/recolor (global):** the five tiers are now **Idle / Ambient / Engaging /
+  Absorbing / Profound** (data tier 0→4). Renamed `Passive`→`Ambient` and
+  `Stimulating`→`Absorbing` in the `TIERS` map in `app.js` (single source of truth — every
+  page, card, badge, methodology legend/table, filter chip, and home instrument reads from
+  it). CSS tier colors `--t0..--t4` already matched the design ramp
+  (`#c66a86 #6a6580 #6f63c4 #8a78ff #b9acff`); updated their comments to the new names.
+- **Data:** merged the `maxage` field (from MPAA/TV `cert`, via `build/catalog.json`) into
+  `dist/data/catalog.json`, keyed by IMDb id; 12,181 of 15,883 titles carry an age. Used by
+  the new Audience-age slider.
+- **`explore.html` rebuilt in the design language, feature-complete.** Sidebar (≈248px,
+  sticky, scrolls independently) is now a stack of **collapsible** groups with a "Filters /
+  Clear all" header, **streaming placed high**. Order: Tier · Type · Audience (Kids & family) ·
+  **My streaming services** (official logos, brand variants merged, majors + "+ N more"
+  search expander) · **Audience age** (NEW `maxage` slider, "suitable for age ≤ N", hides
+  higher/unknown) · Weight your priorities (Depth/Insight/Craft) · Dimension minimums ·
+  Acuity score range (0–200) · IMDb (rating ≥ / min votes) · Genre. Results header keeps the
+  ranked/typo-tolerant autocomplete + live count, and the **Sort** dropdown now offers
+  Highest Acuity, Lowest Acuity, A–Z, Newest, Oldest, Depth, Insight, Craft, IMDb rating.
+  Empty state reads "Nothing matches."
+- **`app.js`:** added `maxAge` to state + `age` URL param, the age filter in `apply()`, slider
+  wiring/sync/active-pill/reset, `year-asc` (Oldest) sort, and generic collapsible-group
+  behaviour (click + keyboard, ignores inner buttons). All listeners via `addEventListener`.
+- **`styles.css`:** filters header + collapsible chevron styles, independent-scroll sidebar,
+  age-slider row; card refinements to match the spec — grid `minmax(218px,1fr)`, hover lift
+  `translateY(-5px)`, **tier badge top-right** (tier-color bg, dark text), type tag top-left,
+  AQ bottom-left over a tier-tinted bottom gradient.
+
+**Self-verification:** `node --check app.js` passes; served on `:8916` — all six pages +
+`data/catalog.json` return **200** (server stopped). Zero inline `<script>`/`on*=` handlers.
+`explore.html?genre=Drama&tier=4` → 1,664 titles; the age slider changes the count
+(15,883 → 3,113 at ≤8 → 5,432 at ≤13); sort-by-Craft reorders vs. AQ; a provider logo URL is
+referenced (261 brands carry tmdb logos). "Ambient"/"Absorbing" present; "Passive"/"Stimulating"
+gone from app.js.
+
+### Implementer attestation (v7 — polish: cards/percentile/title page/methodology)
+
+**Date:** 2026-06-21. **Clean-room confirmed:** I did not read `tvintelligentsia/`, did not
+fetch `tvintelligentsia.com`, and ran no web searches for any reference product. Work drew
+only on `dist/`, the `design/` files, and `dist/data/`.
+
+**Changes**
+- **FIX 1 — card badge layout (no clip, baseline-aligned).** `titleCard` (`app.js`) now puts
+  the AQ score (`/200`) bottom-LEFT and the tier badge bottom-RIGHT in one absolutely-positioned
+  `.tile-foot` flex row (`space-between`, padded 11–12px) over the poster's bottom gradient, on
+  both real-poster and hatched-placard cards. The tier chip moved off the top-right corner; it
+  carries `max-width:62%` + ellipsis so it can never overflow/clip. The placard fallback now
+  shows the title in faint mono (poster-style) instead of a giant number. The home "top of the
+  curve" grid (`buildFeatured`) got the same bottom-overlay treatment (rank top-left; AQ + tier
+  on one baseline over a bottom gradient). `styles.css`: new `.tile-foot`, reworked
+  `.tile .tile-score-badge` / `.tile .tier-chip` (static in the foot), `.tile-placard`,
+  `.tile-grad` now applied to both card types.
+- **FIX 2 — percentile (`pct`).** New `pctTag()` / `pctPhrase()` / `ordinal()` helpers. Cards
+  show a small mono `.pct-tag` in the card foot — "Top {100−pct}%" when pct ≥ 90 (clamped so the
+  max reads "Top 1%"), otherwise "{n}th pct". Home featured cards append it to the meta line.
+  Detail page surfaces "In the top X% of the catalog" / "Scores better than X% of the catalog".
+- **FIX 3 — title detail page.** `renderTitle` gained the `cert` content-rating badge in the
+  meta row, plus an `.aq-strip` (percentile phrase + tier-colored AQ bar on the 0–200 scale).
+  The page already carried serif title, clickable year/type/genre links, big AQ + tier chip,
+  Depth/Insight/Craft bars, rationale, watch/watchlist actions, provider chips with logos, and a
+  similar-titles row — all retained, now in the violet language. `styles.css`: `.age-badge`,
+  `.aq-strip` family. Fixed the broken Google-Fonts `<link>` on `title.html` (and `explore.html`
+  / `methodology.html`) so Instrument Serif / Hanken / IBM Plex Mono actually load.
+- **FIX 4 — methodology copy.** Removed "A true bell curve" and all "flat curve" language
+  (also on `index.html`). Reframed as a single, bell-shaped but deliberately flattened hump,
+  flatter-than-normal with real weight pushed into the tails; numbers (median 100, sd≈37) read
+  from `stats.json` via `data-stat`. Histogram aria-label updated to match. Tier table reads
+  the new tier names/colors and current `tier_counts`.
+
+**Self-verification**
+- `node --check app.js` passes. No inline `<script>` and no inline `on*=` handlers in any HTML
+  (grep clean). Relative paths and the single `./data/catalog.json` source unchanged.
+- Served on `:8917`: index, explore, title, `title.html?t=schindlers-list-1993`, methodology,
+  kids, compare, and all three data files + app.js/styles.css return **200** (server stopped).
+- **Badge geometry, headless Chrome** (rendered a real-poster card and a hatched placeholder,
+  measured `getBoundingClientRect`): on both, the tier chip is fully inside the tile (right edge
+  12px clear of the card edge, `chipFullyInside=true`) and shares the AQ badge's baseline exactly
+  (`badgeBottom == chipBottom`, baseline delta **0.00px**). A 2× screenshot confirms "195 /200"
+  + "Profound" and "78 /200" + "Ambient" sitting on one line, neither clipped.
+- Detail screenshot confirms poster, AQ tile, "R" cert badge, "In the top 1% of the catalog",
+  full AQ bar, the three lenses, rationale, Netflix where-to-watch chip, and similar titles.
+- Methodology renders sd **37** and the five-row tier table; grep confirms no "flat curve" /
+  "true bell curve" remains anywhere.
+
+### Implementer attestation (v8 — unify card, remove LIVE/compare, search thumbnails)
+
+Date: 2026-06-21. I confirm no reference-product access during this work: I did not read
+`/Users/bryanroscoe/Developer/tvintelligentsia`, did not fetch `tvintelligentsia.com`, and ran no
+web search for any reference product. All work was done solely from `dist/` and the local dataset
+(`./data/catalog.json`, 15,883 rows).
+
+Changes:
+- **ONE canonical title card.** Rewrote `titleCard(rec, opts)` in `app.js` into the single approved
+  "top of the curve" layout and used it on every grid: home top-of-curve (`buildFeatured` now just
+  calls `titleCard(rec, {rank:i+1})`), the Explore/catalog grid, the Kids grid, and the "similar
+  titles" row. Layout: surface `#15131d`, 1px border `rgba(190,180,235,0.09)`, radius 13px, padding
+  13px, hover `translateY(-5px)` + border `rgba(138,120,255,0.45)` over `.22s`; the whole card is an
+  `<a>` to `title.html?t=<slug>`. Poster `aspect-ratio:2/3`, radius 9px, real cover (`w342`, lazy) or
+  hatched violet placard with faint mono title. Tier badge top-right ON the poster (tier-color bg,
+  `#0d0c12` text, mono ~9px uppercase, inset 9px, `max-width`+ellipsis guard — fully inside). Rank
+  pill top-left ON the poster, home top-of-curve only. Below the poster: title (Hanken Grotesk 600
+  ~15.5px `#f4f1fb`) + `YEAR · TYPE` meta (mono) + percentile tag on the left, big tier-colored AQ
+  number (mono 600 ~30px, line-height 0.8, no `/200`) on the right. Bottom: three thin Depth/Insight/
+  Craft mini-bars (`flex:1; height:3px`, track `rgba(190,180,235,0.10)`, fill `var(--acc)`). Removed
+  the old bottom-overlay AQ treatment. Added `.tcard*` rules to `styles.css`.
+- **Removed the "LIVE" notifier** — deleted the pulsing dot + "LIVE" text in the home Acuity
+  Instrument panel header (`index.html`); the panel itself is unchanged.
+- **Search dropdown thumbnails** — both instant-search dropdowns now show a mini 2:3 rounded poster
+  per row: Explore via the shared `attachAutocomplete` (already had `.ac-thumb` `w92`), and the home
+  hero search via a new `.acu-res-thumb` (`w92`, ~30px) with hatched fallback; AQ (tier color),
+  title and `year · type · tier` and keyboard nav/click→`title.html?t=slug` retained.
+- **Removed the Compare feature entirely** — deleted `dist/compare.html`; removed the Compare nav
+  links + "Compare titles"/"Compare two titles" CTAs from every page's nav/footer/hero (replaced with
+  Kids / Browse / How-scoring links); removed the home `#compare` head-to-head section; removed the
+  title-detail "Compare ↔" action; deleted the dead JS (`buildCompare`, `initCompare`, `escapeHtml`,
+  the `compare` boot dispatch). No `compare.html`/`#compare`/`data-cmp` references remain.
+
+Self-verification (served on :8918, then stopped):
+- All remaining pages return 200 (index, explore, kids, methodology, title); `compare.html` → 404;
+  `data/catalog.json` → 200.
+- Headless Chrome (`getBoundingClientRect`) on a catalog card and a home card:
+  `badgeFullyInside=true` and `badgeTopRight=true` (tier badge fully inside the poster, top-right,
+  not clipped) on BOTH; `aqBelowPoster=true` and `aqOnRight=true` (AQ number sits below the poster on
+  the right); `hasPct=true` and `barCount=3` (percentile tag + three dimension bars present);
+  `sameCardClass=true` (both grids render the identical `.tcard` component); the home card has the
+  rank pill, the catalog card does not.
+- Search dropdowns: Explore dropdown and home hero dropdown each rendered rows that all contain an
+  `<img>` thumbnail (`exploreDropdownImgs == rows`, `heroDropdownImgs == rows`).
+- `node --check app.js` passes; grep shows no `compare.html` references and no inline `on*=` handlers;
+  no "LIVE" text remains; the only `<script>` tags are `src="./app.js"`.

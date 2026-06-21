@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#0d0c12}
+  ::selection{background:rgba(138,120,255,0.34);color:#fff}
+  @keyframes acuPulse{0%,100%{opacity:1}50%{opacity:0.25}}
+  @keyframes acuGrain{0%{transform:translate(0,0)}10%{transform:translate(-3%,-2%)}30%{transform:translate(2%,-4%)}50%{transform:translate(-2%,3%)}70%{transform:translate(3%,2%)}90%{transform:translate(-1%,-3%)}}
+  @keyframes acuUp{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+  @keyframes acuDown{from{transform:translateY(-50%)}to{transform:translateY(0)}}
+</style>
+</helmet>
+<main ref="{{ rootRef }}" data-screen-label="Acuity — Home" style="--acc:#8a78ff; position:relative; background:#0d0c12; color:#ece9f4; font-family:'Hanken Grotesk',sans-serif; overflow-x:hidden; min-height:100vh; -webkit-font-smoothing:antialiased;">
+
+  <sc-if value="{{ grain }}" hint-placeholder-val="{{ true }}">
+    <div aria-hidden="true" style="position:fixed; inset:-50%; z-index:60; pointer-events:none; opacity:0.05; mix-blend-mode:soft-light; background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;); animation:acuGrain 1.1s steps(2) infinite;"></div>
+  </sc-if>
+
+  <!-- NAV -->
+  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; gap:24px; padding:16px 32px; border-bottom:1px solid rgba(190,180,235,0.09); background:rgba(13,12,18,0.74); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);">
+    <a href="#top" style="display:flex; align-items:center; gap:11px; text-decoration:none; color:#ece9f4;">
+      <svg width="26" height="26" viewBox="0 0 28 28" style="display:block;">
+        <line x1="14" y1="14" x2="14" y2="5" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.55"></line>
+        <line x1="14" y1="14" x2="5.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.55"></line>
+        <line x1="14" y1="14" x2="22.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.55"></line>
+        <line x1="14" y1="5" x2="5.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.26"></line>
+        <line x1="5.5" y1="22" x2="22.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.26"></line>
+        <line x1="22.5" y1="22" x2="14" y2="5" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.26"></line>
+        <circle cx="14" cy="5" r="2.4" fill="var(--acc,#8a78ff)"></circle>
+        <circle cx="5.5" cy="22" r="2.4" fill="var(--acc,#8a78ff)"></circle>
+        <circle cx="22.5" cy="22" r="2.4" fill="var(--acc,#8a78ff)"></circle>
+        <circle cx="14" cy="14" r="3" fill="#b9acff"></circle>
+      </svg>
+      <span style="font-family:'Instrument Serif',serif; font-size:27px; letter-spacing:0.3px; line-height:1;">Acuity</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8a9e; border:1px solid rgba(190,180,235,0.16); padding:2px 5px; border-radius:3px; margin-top:2px;">AQ</span>
+    </a>
+    <div style="display:flex; align-items:center; gap:30px;">
+      <a href="Catalog.dc.html" style="font-size:13.5px; color:#b3aec0; text-decoration:none; letter-spacing:0.2px;">Catalog</a>
+      <a href="#compare" style="font-size:13.5px; color:#b3aec0; text-decoration:none; letter-spacing:0.2px;">Compare</a>
+      <a href="#method" style="font-size:13.5px; color:#b3aec0; text-decoration:none; letter-spacing:0.2px;">Methodology</a>
+      <a href="Catalog.dc.html" style="font-size:13px; font-weight:600; color:#0d0c12; background:var(--acc,#8a78ff); padding:9px 16px; border-radius:6px; text-decoration:none; letter-spacing:0.2px;">Browse the index</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="top" style="position:relative; overflow:hidden;">
+    <div aria-hidden="true" style="position:absolute; top:-22%; left:-12%; right:-12%; bottom:-22%; z-index:0; display:flex; gap:14px; justify-content:center; transform:rotate(-8deg) scale(1.2); opacity:0.5; pointer-events:none;">
+      <div style="display:flex; flex-direction:column; gap:14px; animation:acuUp 50s linear infinite;"><sc-for list="{{ col1 }}" as="p" hint-placeholder-count="14"><div style="width:150px; flex:none; aspect-ratio:2/3; border-radius:8px; border:1px solid rgba(190,180,235,0.10); background:#15131d; background-image:repeating-linear-gradient(135deg, rgba(138,120,255,0.07) 0 9px, transparent 9px 18px); display:flex; align-items:flex-end; padding:10px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.8px; color:#6f6a80; line-height:1.4;">{{ p.t }}</span></div></sc-for></div>
+      <div style="display:flex; flex-direction:column; gap:14px; animation:acuDown 62s linear infinite;"><sc-for list="{{ col2 }}" as="p" hint-placeholder-count="14"><div style="width:150px; flex:none; aspect-ratio:2/3; border-radius:8px; border:1px solid rgba(190,180,235,0.10); background:#15131d; background-image:repeating-linear-gradient(135deg, rgba(138,120,255,0.07) 0 9px, transparent 9px 18px); display:flex; align-items:flex-end; padding:10px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.8px; color:#6f6a80; line-height:1.4;">{{ p.t }}</span></div></sc-for></div>
+      <div style="display:flex; flex-direction:column; gap:14px; animation:acuUp 54s linear infinite;"><sc-for list="{{ col3 }}" as="p" hint-placeholder-count="14"><div style="width:150px; flex:none; aspect-ratio:2/3; border-radius:8px; border:1px solid rgba(190,180,235,0.10); background:#15131d; background-image:repeating-linear-gradient(135deg, rgba(138,120,255,0.07) 0 9px, transparent 9px 18px); display:flex; align-items:flex-end; padding:10px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.8px; color:#6f6a80; line-height:1.4;">{{ p.t }}</span></div></sc-for></div>
+      <div style="display:flex; flex-direction:column; gap:14px; animation:acuDown 48s linear infinite;"><sc-for list="{{ col4 }}" as="p" hint-placeholder-count="14"><div style="width:150px; flex:none; aspect-ratio:2/3; border-radius:8px; border:1px solid rgba(190,180,235,0.10); background:#15131d; background-image:repeating-linear-gradient(135deg, rgba(138,120,255,0.07) 0 9px, transparent 9px 18px); display:flex; align-items:flex-end; padding:10px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.8px; color:#6f6a80; line-height:1.4;">{{ p.t }}</span></div></sc-for></div>
+      <div style="display:flex; flex-direction:column; gap:14px; animation:acuUp 58s linear infinite;"><sc-for list="{{ col5 }}" as="p" hint-placeholder-count="14"><div style="width:150px; flex:none; aspect-ratio:2/3; border-radius:8px; border:1px solid rgba(190,180,235,0.10); background:#15131d; background-image:repeating-linear-gradient(135deg, rgba(138,120,255,0.07) 0 9px, transparent 9px 18px); display:flex; align-items:flex-end; padding:10px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.8px; color:#6f6a80; line-height:1.4;">{{ p.t }}</span></div></sc-for></div>
+      <div style="display:flex; flex-direction:column; gap:14px; animation:acuDown 66s linear infinite;"><sc-for list="{{ col6 }}" as="p" hint-placeholder-count="14"><div style="width:150px; flex:none; aspect-ratio:2/3; border-radius:8px; border:1px solid rgba(190,180,235,0.10); background:#15131d; background-image:repeating-linear-gradient(135deg, rgba(138,120,255,0.07) 0 9px, transparent 9px 18px); display:flex; align-items:flex-end; padding:10px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.8px; color:#6f6a80; line-height:1.4;">{{ p.t }}</span></div></sc-for></div>
+    </div>
+    <div aria-hidden="true" style="position:absolute; inset:0; z-index:1; pointer-events:none; background:linear-gradient(95deg, rgba(13,12,18,0.98) 0%, rgba(13,12,18,0.9) 32%, rgba(13,12,18,0.6) 70%, rgba(13,12,18,0.82) 100%), linear-gradient(0deg, rgba(13,12,18,0.96) 0%, rgba(13,12,18,0) 26%, rgba(13,12,18,0) 72%, rgba(13,12,18,0.9) 100%);"></div>
+
+    <div style="position:relative; z-index:2; max-width:1240px; margin:0 auto; padding:74px 32px 64px; display:flex; flex-wrap:wrap; gap:56px; align-items:center;">
+      <div style="flex:1.15; min-width:380px;">
+        <div style="display:flex; align-items:center; gap:9px; margin-bottom:26px;">
+          <span style="width:7px; height:7px; border-radius:50%; background:var(--acc,#8a78ff); animation:acuPulse 1.8s ease-in-out infinite;"></span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:2.4px; color:#8f8a9e; text-transform:uppercase;">The Acuity Quotient · a fixed 0&ndash;200 scale</span>
+        </div>
+        <h1 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:68px; line-height:0.99; letter-spacing:-0.5px; margin:0 0 24px; color:#f4f1fb; text-wrap:balance;">Every title gives<br>something back.<br><span style="font-style:italic; color:var(--acc,#8a78ff);">Acuity</span> tells you how&nbsp;much.</h1>
+        <p style="font-size:17px; line-height:1.62; color:#a59fb2; max-width:520px; margin:0 0 32px;">Streaming is built to measure one thing: how long it can hold you. Acuity measures the opposite &mdash; how much a film or series actually returns to your mind. One honest number, scored the same way for every title, so an evening of your attention is never spent on noise.</p>
+
+        <div style="position:relative; max-width:480px; margin-bottom:22px;">
+          <div style="display:flex; align-items:center; gap:11px; background:#16141f; border:1px solid rgba(190,180,235,0.14); border-radius:9px; padding:13px 15px;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8f8a9e" stroke-width="2" style="flex:none;"><circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg>
+            <input value="{{ query }}" onInput="{{ onSearch }}" placeholder="Search any title — Severance, Arrival, The Wire…" style="flex:1; background:transparent; border:none; outline:none; color:#ece9f4; font-family:'Hanken Grotesk',sans-serif; font-size:14.5px;"/>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1px; color:#645f73; border:1px solid rgba(190,180,235,0.13); padding:3px 6px; border-radius:4px; flex:none;">AQ</span>
+          </div>
+          <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; top:calc(100% + 8px); left:0; right:0; z-index:30; background:#13111b; border:1px solid rgba(190,180,235,0.14); border-radius:10px; padding:6px; box-shadow:0 24px 60px rgba(0,0,0,0.55); overflow:hidden;">
+              <sc-for list="{{ results }}" as="r" hint-placeholder-count="3">
+                <button onClick="{{ r.pick }}" style="width:100%; display:flex; align-items:center; gap:12px; background:transparent; border:none; padding:10px 11px; border-radius:7px; cursor:pointer; text-align:left;" style-hover="background:rgba(138,120,255,0.12);">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:17px; font-weight:600; color:{{ r.tierColor }}; min-width:42px;">{{ r.aq }}</span>
+                  <span style="flex:1; min-width:0;">
+                    <span style="display:block; font-size:14px; color:#ece9f4; font-weight:500;">{{ r.t }}</span>
+                    <span style="display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#8f8a9e; letter-spacing:0.5px;">{{ r.y }} · {{ r.k }} · {{ r.tier }}</span>
+                  </span>
+                  <span style="font-size:12px; color:#645f73;">Inspect →</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+          <a href="#method" style="font-size:14px; font-weight:600; color:#0d0c12; background:var(--acc,#8a78ff); padding:13px 22px; border-radius:7px; text-decoration:none;">How scoring works</a>
+          <a href="#compare" style="font-size:14px; font-weight:500; color:#c8c3d4; background:transparent; border:1px solid rgba(190,180,235,0.18); padding:13px 22px; border-radius:7px; text-decoration:none;">Compare two titles</a>
+        </div>
+        <p style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:1px; color:#645f73; margin:24px 0 0;">2,412 titles scored · Method v2.0 · No studio money</p>
+      </div>
+
+      <!-- INSTRUMENT -->
+      <div style="flex:1; min-width:330px;">
+        <div style="background:linear-gradient(180deg,#1a1726,#131019); border:1px solid rgba(190,180,235,0.13); border-radius:16px; padding:20px; box-shadow:0 40px 90px rgba(0,0,0,0.55);">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; color:#8f8a9e; text-transform:uppercase;">Acuity Instrument</span>
+            <span style="display:flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1px; color:#8f8a9e;"><span style="width:6px; height:6px; border-radius:50%; background:var(--acc,#8a78ff); animation:acuPulse 1.8s ease-in-out infinite;"></span>LIVE</span>
+          </div>
+          <div style="display:flex; gap:18px;">
+            <div style="position:relative; width:128px; flex:none; aspect-ratio:2/3; border-radius:8px; overflow:hidden; border:1px solid rgba(190,180,235,0.13); background:#100e18; background-image:repeating-linear-gradient(135deg, rgba(138,120,255,0.08) 0 9px, transparent 9px 18px); display:flex; align-items:center; justify-content:center; filter:blur({{ heroBlur }}px); opacity:{{ heroOpacity }};">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:1.4px; color:#6f6a80; text-align:center; padding:0 6px; line-height:1.5;">{{ heroPoster }}</span>
+            </div>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+              <span style="font-family:'Instrument Serif',serif; font-size:23px; line-height:1.05; color:#f4f1fb;">{{ heroTitle }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:1px; color:#8f8a9e; margin-top:4px;">{{ heroYear }} · {{ heroKind }}</span>
+              <div style="display:flex; align-items:baseline; gap:8px; margin-top:14px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:52px; font-weight:600; line-height:0.85; color:{{ heroTierColor }};">{{ heroAQ }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#645f73;">/200</span>
+              </div>
+              <span style="align-self:flex-start; margin-top:9px; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:{{ heroTierColor }}; border:1px solid currentColor; padding:3px 8px; border-radius:4px;">{{ heroTier }}</span>
+              <div style="height:5px; border-radius:3px; background:rgba(190,180,235,0.11); margin-top:14px; overflow:hidden;">
+                <div style="height:100%; width:{{ heroAQPct }}; background:{{ heroTierColor }}; border-radius:3px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:18px; display:flex; flex-direction:column; gap:11px;">
+            <div>
+              <div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:1px; color:#a59fb2; margin-bottom:5px;"><span>DEPTH</span><span style="color:var(--acc,#8a78ff);">{{ lensDepth }}</span></div>
+              <div style="height:4px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div style="height:100%; width:{{ depthPct }}; background:var(--acc,#8a78ff);"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:1px; color:#a59fb2; margin-bottom:5px;"><span>INSIGHT</span><span style="color:var(--acc,#8a78ff);">{{ lensInsight }}</span></div>
+              <div style="height:4px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div style="height:100%; width:{{ insightPct }}; background:var(--acc,#8a78ff);"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:1px; color:#a59fb2; margin-bottom:5px;"><span>CRAFT</span><span style="color:var(--acc,#8a78ff);">{{ lensCraft }}</span></div>
+              <div style="height:4px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div style="height:100%; width:{{ craftPct }}; background:var(--acc,#8a78ff);"></div></div>
+            </div>
+          </div>
+
+          <div style="margin-top:18px; padding-top:15px; border-top:1px solid rgba(190,180,235,0.10); display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
+            <sc-for list="{{ chips }}" as="c" hint-placeholder-count="6">
+              <button onClick="{{ c.pick }}" style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.5px; color:#a59fb2; background:rgba(190,180,235,0.05); border:1px solid rgba(190,180,235,0.11); padding:5px 9px; border-radius:20px; cursor:pointer;" style-hover="border-color:var(--acc,#8a78ff); color:#ece9f4;">{{ c.t }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <p style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.8px; color:#645f73; margin:12px 4px 0; text-align:center;">Click a title or search above to focus the instrument.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOP OF THE CURVE -->
+  <section id="curve" style="max-width:1240px; margin:0 auto; padding:60px 32px 70px;">
+    <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:34px;">
+      <div>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:2.4px; color:var(--acc,#8a78ff); text-transform:uppercase;">The top of the curve</span>
+        <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:44px; line-height:1.04; margin:12px 0 0; color:#f4f1fb;">Where ideas, knowledge,<br>and craft all run high at once.</h2>
+      </div>
+      <a href="Catalog.dc.html" style="font-size:13.5px; color:#a59fb2; text-decoration:none; border-bottom:1px solid rgba(190,180,235,0.22); padding-bottom:3px;">See the full catalog →</a>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:18px;">
+      <sc-for list="{{ feat }}" as="f" hint-placeholder-count="6">
+        <div style="background:#15131d; border:1px solid rgba(190,180,235,0.09); border-radius:13px; padding:13px; transition:transform .25s ease, border-color .25s ease; cursor:pointer;" style-hover="transform:translateY(-5px); border-color:rgba(138,120,255,0.45);">
+          <div style="position:relative; aspect-ratio:2/3; border-radius:9px; overflow:hidden; border:1px solid rgba(190,180,235,0.10); background:#100e18; background-image:repeating-linear-gradient(135deg, rgba(138,120,255,0.07) 0 9px, transparent 9px 18px); display:flex; align-items:center; justify-content:center;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:1.4px; color:#6f6a80; text-align:center; padding:0 8px; line-height:1.6;">{{ f.poster }}</span>
+            <span style="position:absolute; top:9px; left:9px; font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8f8a9e; background:rgba(13,12,18,0.74); padding:3px 6px; border-radius:5px;">{{ f.rank }}</span>
+            <span style="position:absolute; top:9px; right:9px; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase; color:#0d0c12; background:{{ f.tierColor }}; padding:3px 7px; border-radius:5px; font-weight:600;">{{ f.tier }}</span>
+          </div>
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-top:13px;">
+            <div style="min-width:0;">
+              <div style="font-size:15.5px; font-weight:600; color:#f4f1fb; line-height:1.15;">{{ f.t }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.5px; color:#8f8a9e; margin-top:3px;">{{ f.y }} · {{ f.k }}</div>
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:30px; font-weight:600; line-height:0.8; color:{{ f.tierColor }}; flex:none;">{{ f.aq }}</div>
+          </div>
+          <div style="display:flex; gap:5px; margin-top:13px;">
+            <div style="flex:1; height:3px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div style="height:100%; width:{{ f.dPct }}; background:var(--acc,#8a78ff);"></div></div>
+            <div style="flex:1; height:3px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div style="height:100%; width:{{ f.iPct }}; background:var(--acc,#8a78ff);"></div></div>
+            <div style="flex:1; height:3px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div style="height:100%; width:{{ f.cPct }}; background:var(--acc,#8a78ff);"></div></div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- METHODOLOGY -->
+  <section id="method" style="border-top:1px solid rgba(190,180,235,0.08); border-bottom:1px solid rgba(190,180,235,0.08); background:#0a0910;">
+    <div style="max-width:1240px; margin:0 auto; padding:72px 32px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:2.4px; color:var(--acc,#8a78ff); text-transform:uppercase;">The method · consistent for every title</span>
+      <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:46px; line-height:1.02; margin:14px 0 8px; color:#f4f1fb;">Three lenses.<br>One honest number.</h2>
+      <p style="font-size:16px; color:#a59fb2; max-width:560px; line-height:1.6; margin:0 0 44px;">Every score reads how much a title gives back across three lenses, then resolves to a single number on a fixed 0&ndash;200 scale. The same three lenses, applied to every title &mdash; no editorial gospel, no studio thumb on the scale.</p>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin-bottom:34px;">
+        <div style="background:#15131d; border:1px solid rgba(190,180,235,0.09); border-radius:13px; padding:22px;">
+          <div style="display:flex; align-items:baseline; justify-content:space-between;"><span style="font-family:'Instrument Serif',serif; font-size:26px; color:#f4f1fb;">Depth</span><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:1px; color:var(--acc,#8a78ff); text-transform:uppercase;">Primary</span></div>
+          <p style="font-size:14px; line-height:1.55; color:#948fa3; margin:12px 0 0;">How much the work asks of your attention &mdash; ideas, ambiguity, structure, the thinking it demands while you watch.</p>
+        </div>
+        <div style="background:#15131d; border:1px solid rgba(190,180,235,0.09); border-radius:13px; padding:22px;">
+          <div style="display:flex; align-items:baseline; justify-content:space-between;"><span style="font-family:'Instrument Serif',serif; font-size:26px; color:#f4f1fb;">Insight</span><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:1px; color:var(--acc,#8a78ff); text-transform:uppercase;">Secondary</span></div>
+          <p style="font-size:14px; line-height:1.55; color:#948fa3; margin:12px 0 0;">What you carry out of it &mdash; knowledge, perspective, a way of seeing the world you didn't have going in.</p>
+        </div>
+        <div style="background:#15131d; border:1px solid rgba(190,180,235,0.09); border-radius:13px; padding:22px;">
+          <div style="display:flex; align-items:baseline; justify-content:space-between;"><span style="font-family:'Instrument Serif',serif; font-size:26px; color:#f4f1fb;">Craft</span><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:1px; color:var(--acc,#8a78ff); text-transform:uppercase;">Supporting</span></div>
+          <p style="font-size:14px; line-height:1.55; color:#948fa3; margin:12px 0 0;">How well it's made &mdash; writing, performance, image and sound working in service of the idea, not decorating it.</p>
+        </div>
+      </div>
+
+      <div style="background:#15131d; border:1px solid rgba(190,180,235,0.11); border-radius:11px; padding:20px 22px; margin-bottom:46px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--acc,#8a78ff); text-transform:uppercase; border:1px solid rgba(138,120,255,0.4); padding:5px 10px; border-radius:5px; flex:none;">Calibrated, not published</span>
+        <span style="font-size:14.5px; color:#a59fb2; line-height:1.55; flex:1; min-width:240px;">The three lenses are weighted and combined into one number, tuned against thousands of titles. We keep the exact weighting in-house &mdash; a score you can trust shouldn't be a one-line equation anyone can reverse-engineer or game.</span>
+      </div>
+
+      <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:20px;">
+        <div style="max-width:580px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:2px; color:#8f8a9e; text-transform:uppercase;">The distribution</span>
+          <h3 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:36px; line-height:1.04; margin:10px 0 12px; color:#f4f1fb;">We grade on a flat curve.</h3>
+          <p style="font-size:15px; color:#948fa3; line-height:1.6; margin:0;">Most rating sites pile every title into a tall spike at the middle and call it a bell. Acuity spreads titles honestly across the whole range &mdash; a deliberately flat curve with real weight in the tails, so the Profound few and the Idle many are both easy to find.</p>
+        </div>
+        <div style="display:flex; gap:30px;">
+          <div><div style="font-family:'IBM Plex Mono',monospace; font-size:30px; font-weight:600; color:#f4f1fb; line-height:1;">{{ plotted }}</div><div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1.4px; color:#8f8a9e; text-transform:uppercase; margin-top:6px;">Titles plotted</div></div>
+          <div><div style="font-family:'IBM Plex Mono',monospace; font-size:30px; font-weight:600; color:var(--acc,#8a78ff); line-height:1;">{{ tailPct }}%</div><div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1.4px; color:#8f8a9e; text-transform:uppercase; margin-top:6px;">Out in the tails</div></div>
+        </div>
+      </div>
+
+      <div style="position:relative; background:#15131d; border:1px solid rgba(190,180,235,0.10); border-radius:14px; padding:26px 22px 16px;">
+        <sc-if value="{{ hasTip }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; top:12px; left:{{ tipLeft }}; transform:translateX(-50%); z-index:5; background:#0d0c12; border:1px solid {{ tipColor }}; border-radius:8px; padding:7px 11px; pointer-events:none; white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:{{ tipColor }}; font-weight:600;">AQ {{ tipScore }} · {{ tipTier }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8f8a9e; margin-top:2px;">{{ tipCount }} titles</div>
+          </div>
+        </sc-if>
+        <div onMouseLeave="{{ onLeave }}" style="display:flex; align-items:flex-end; gap:2px; height:228px;">
+          <sc-for list="{{ bars }}" as="b" hint-placeholder-count="70">
+            <div onMouseEnter="{{ b.enter }}" style="flex:1; min-width:0; height:{{ b.h }}; background:{{ b.color }}; opacity:{{ b.op }}; border-radius:2px 2px 0 0; transition:opacity .15s ease; cursor:crosshair;"></div>
+          </sc-for>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:11px; padding:0 1px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#645f73;">0</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#645f73;">50</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#645f73;">100</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#645f73;">150</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#645f73;">200</span>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; align-items:center;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1.5px; color:#645f73; text-transform:uppercase; margin-right:4px;">Tiers</span>
+        <sc-for list="{{ legend }}" as="t" hint-placeholder-count="5">
+          <button onClick="{{ t.onClick }}" style="display:flex; align-items:center; gap:7px; font-size:12.5px; padding:6px 12px; border-radius:20px; cursor:pointer; transition:all .15s; border:1px solid {{ t.bc }}; background:{{ t.bg }}; color:{{ t.fg }};"><span style="width:8px; height:8px; border-radius:50%; background:{{ t.color }}; flex:none;"></span>{{ t.label }}<span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8f8a9e; margin-left:2px;">{{ t.range }}</span></button>
+        </sc-for>
+      </div>
+      <p style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.4px; color:#645f73; margin:14px 0 0;">Hover any bar for its count · click a tier to isolate it.</p>
+    </div>
+  </section>
+
+  <!-- COMPARE -->
+  <section id="compare" style="max-width:1240px; margin:0 auto; padding:74px 32px;">
+    <div style="text-align:center; margin-bottom:40px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:2.4px; color:var(--acc,#8a78ff); text-transform:uppercase;">Head to head</span>
+      <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:46px; line-height:1.02; margin:12px 0 0; color:#f4f1fb;">Two titles. One scale.</h2>
+    </div>
+
+    <div style="display:flex; flex-wrap:wrap; gap:18px; align-items:stretch; justify-content:center;">
+      <div style="flex:1; min-width:280px; max-width:380px; background:#15131d; border:1px solid rgba(138,120,255,0.32); border-radius:15px; padding:22px;">
+        <div style="display:flex; gap:16px;">
+          <div style="width:96px; flex:none; aspect-ratio:2/3; border-radius:8px; overflow:hidden; border:1px solid rgba(190,180,235,0.10); background:#100e18; background-image:repeating-linear-gradient(135deg, rgba(138,120,255,0.07) 0 9px, transparent 9px 18px); display:flex; align-items:center; justify-content:center;"><span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:1px; color:#6f6a80; text-align:center; padding:0 5px; line-height:1.5;">{{ cmpLeft.poster }}</span></div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:'Instrument Serif',serif; font-size:24px; color:#f4f1fb; line-height:1.05;">{{ cmpLeft.t }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8f8a9e; letter-spacing:0.5px; margin-top:4px;">{{ cmpLeft.y }} · {{ cmpLeft.k }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:46px; font-weight:600; color:{{ cmpLeft.tierColor }}; line-height:0.9; margin-top:10px;">{{ cmpLeft.aq }}</div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:1.5px; text-transform:uppercase; color:{{ cmpLeft.tierColor }};">{{ cmpLeft.tier }}</span>
+          </div>
+        </div>
+        <div style="margin-top:18px; display:flex; flex-direction:column; gap:9px;">
+          <div><div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10px; color:#948fa3; margin-bottom:4px;"><span>DEPTH</span><span>{{ cmpLeft.d }}</span></div><div style="height:4px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div style="height:100%; width:{{ cmpLeft.dPct }}; background:var(--acc,#8a78ff);"></div></div></div>
+          <div><div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10px; color:#948fa3; margin-bottom:4px;"><span>INSIGHT</span><span>{{ cmpLeft.i }}</span></div><div style="height:4px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div style="height:100%; width:{{ cmpLeft.iPct }}; background:var(--acc,#8a78ff);"></div></div></div>
+          <div><div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10px; color:#948fa3; margin-bottom:4px;"><span>CRAFT</span><span>{{ cmpLeft.c }}</span></div><div style="height:4px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div style="height:100%; width:{{ cmpLeft.cPct }}; background:var(--acc,#8a78ff);"></div></div></div>
+        </div>
+      </div>
+
+      <div style="flex:none; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 6px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; color:#645f73;">DELTA</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:34px; font-weight:600; color:{{ cmpDiffColor }}; line-height:1; margin:6px 0;">{{ cmpDiff }}</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#645f73;">AQ</span>
+      </div>
+
+      <div style="flex:1; min-width:280px; max-width:380px; background:#15131d; border:1px solid rgba(190,180,235,0.10); border-radius:15px; padding:22px;">
+        <div style="display:flex; gap:16px;">
+          <div style="width:96px; flex:none; aspect-ratio:2/3; border-radius:8px; overflow:hidden; border:1px solid rgba(190,180,235,0.10); background:#100e18; background-image:repeating-linear-gradient(135deg, rgba(138,120,255,0.07) 0 9px, transparent 9px 18px); display:flex; align-items:center; justify-content:center;"><span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:1px; color:#6f6a80; text-align:center; padding:0 5px; line-height:1.5;">{{ cmpRight.poster }}</span></div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:'Instrument Serif',serif; font-size:24px; color:#f4f1fb; line-height:1.05;">{{ cmpRight.t }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8f8a9e; letter-spacing:0.5px; margin-top:4px;">{{ cmpRight.y }} · {{ cmpRight.k }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:46px; font-weight:600; color:{{ cmpRight.tierColor }}; line-height:0.9; margin-top:10px;">{{ cmpRight.aq }}</div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:1.5px; text-transform:uppercase; color:{{ cmpRight.tierColor }};">{{ cmpRight.tier }}</span>
+          </div>
+        </div>
+        <div style="margin-top:18px; display:flex; flex-direction:column; gap:9px;">
+          <div><div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10px; color:#948fa3; margin-bottom:4px;"><span>DEPTH</span><span>{{ cmpRight.d }}</span></div><div style="height:4px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div style="height:100%; width:{{ cmpRight.dPct }}; background:var(--acc,#8a78ff);"></div></div></div>
+          <div><div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10px; color:#948fa3; margin-bottom:4px;"><span>INSIGHT</span><span>{{ cmpRight.i }}</span></div><div style="height:4px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div style="height:100%; width:{{ cmpRight.iPct }}; background:var(--acc,#8a78ff);"></div></div></div>
+          <div><div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10px; color:#948fa3; margin-bottom:4px;"><span>CRAFT</span><span>{{ cmpRight.c }}</span></div><div style="height:4px; border-radius:2px; background:rgba(190,180,235,0.10); overflow:hidden;"><div style="height:100%; width:{{ cmpRight.cPct }}; background:var(--acc,#8a78ff);"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:26px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1.5px; color:#645f73; margin-right:4px;">SWAP RIGHT:</span>
+      <sc-for list="{{ cmpOptions }}" as="o" hint-placeholder-count="4">
+        <button onClick="{{ o.pick }}" style="font-size:12.5px; color:#c8c3d4; background:rgba(190,180,235,0.05); border:1px solid rgba(190,180,235,0.13); padding:8px 14px; border-radius:20px; cursor:pointer;" style-hover="border-color:var(--acc,#8a78ff);">{{ o.name }}</button>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section ref="{{ statsRef }}" style="border-top:1px solid rgba(190,180,235,0.08); background:#0a0910;">
+    <div style="max-width:1240px; margin:0 auto; padding:56px 32px; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:24px;">
+      <div style="text-align:center;"><div style="font-family:'IBM Plex Mono',monospace; font-size:46px; font-weight:600; color:#f4f1fb; line-height:1;">{{ titles }}</div><div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:1.5px; color:#8f8a9e; text-transform:uppercase; margin-top:8px;">Titles scored</div></div>
+      <div style="text-align:center;"><div style="font-family:'IBM Plex Mono',monospace; font-size:46px; font-weight:600; color:#f4f1fb; line-height:1;">{{ lenses }}</div><div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:1.5px; color:#8f8a9e; text-transform:uppercase; margin-top:8px;">Weighted lenses</div></div>
+      <div style="text-align:center;"><div style="font-family:'IBM Plex Mono',monospace; font-size:46px; font-weight:600; color:#f4f1fb; line-height:1;">{{ signals }}</div><div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:1.5px; color:#8f8a9e; text-transform:uppercase; margin-top:8px;">Sub-signals</div></div>
+      <div style="text-align:center;"><div style="font-family:'IBM Plex Mono',monospace; font-size:46px; font-weight:600; color:var(--acc,#8a78ff); line-height:1;">{{ repro }}%</div><div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:1.5px; color:#8f8a9e; text-transform:uppercase; margin-top:8px;">Reproducible</div></div>
+    </div>
+  </section>
+
+  <!-- NAMING STUDY -->
+  <section style="max-width:1240px; margin:0 auto; padding:72px 32px;">
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:2.4px; color:#8f8a9e; text-transform:uppercase;">Internal · naming study</span>
+    <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:40px; line-height:1.04; margin:12px 0 8px; color:#f4f1fb;">If not Acuity.</h2>
+    <p style="font-size:15px; color:#948fa3; max-width:560px; line-height:1.6; margin:0 0 34px;">The page above runs on <strong style="color:#c8c3d4; font-weight:600;">Acuity</strong> as the working name. Three alternates, each carrying the same idea &mdash; a sharp mind applied to what you watch.</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px;">
+      <div style="background:#15131d; border:1px solid rgba(138,120,255,0.42); border-radius:13px; padding:22px; position:relative;">
+        <span style="position:absolute; top:14px; right:14px; font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:1.2px; color:#0d0c12; background:var(--acc,#8a78ff); padding:3px 7px; border-radius:4px; font-weight:600;">WORKING NAME</span>
+        <svg width="24" height="24" viewBox="0 0 28 28" style="display:block; margin-bottom:14px;"><line x1="14" y1="14" x2="14" y2="5" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.55"></line><line x1="14" y1="14" x2="5.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.55"></line><line x1="14" y1="14" x2="22.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.55"></line><line x1="14" y1="5" x2="5.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.26"></line><line x1="5.5" y1="22" x2="22.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.26"></line><line x1="22.5" y1="22" x2="14" y2="5" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.26"></line><circle cx="14" cy="5" r="2.4" fill="var(--acc,#8a78ff)"></circle><circle cx="5.5" cy="22" r="2.4" fill="var(--acc,#8a78ff)"></circle><circle cx="22.5" cy="22" r="2.4" fill="var(--acc,#8a78ff)"></circle><circle cx="14" cy="14" r="3" fill="#b9acff"></circle></svg>
+        <div style="font-family:'Instrument Serif',serif; font-size:34px; color:#f4f1fb; line-height:1;">Acuity</div>
+        <p style="font-family:'IBM Plex Mono',monospace; font-size:11px; line-height:1.6; color:#8f8a9e; margin:12px 0 0; letter-spacing:0.3px;">Sharpness of mind and sight. Reads as a measure and a promise at once.</p>
+      </div>
+      <div style="background:#15131d; border:1px solid rgba(190,180,235,0.09); border-radius:13px; padding:22px;">
+        <svg width="24" height="24" viewBox="0 0 28 28" style="display:block; margin-bottom:14px;"><circle cx="14" cy="14" r="10" fill="none" stroke="#8f8a9e" stroke-width="1.4"></circle><circle cx="14" cy="14" r="3.4" fill="#8f8a9e"></circle></svg>
+        <div style="font-family:'Instrument Serif',serif; font-size:34px; color:#f4f1fb; line-height:1;">Fovea</div>
+        <p style="font-family:'IBM Plex Mono',monospace; font-size:11px; line-height:1.6; color:#8f8a9e; margin:12px 0 0; letter-spacing:0.3px;">The eye's point of sharpest focus. Clinical, distinctive, ownable.</p>
+      </div>
+      <div style="background:#15131d; border:1px solid rgba(190,180,235,0.09); border-radius:13px; padding:22px;">
+        <svg width="24" height="24" viewBox="0 0 28 28" style="display:block; margin-bottom:14px;"><circle cx="14" cy="14" r="10" fill="none" stroke="#8f8a9e" stroke-width="1.4"></circle><path d="M14 6 A8 8 0 0 1 14 22" fill="none" stroke="#8f8a9e" stroke-width="1.4"></path><circle cx="14" cy="14" r="1.8" fill="#8f8a9e"></circle></svg>
+        <div style="font-family:'Instrument Serif',serif; font-size:34px; color:#f4f1fb; line-height:1;">Lucid</div>
+        <p style="font-family:'IBM Plex Mono',monospace; font-size:11px; line-height:1.6; color:#8f8a9e; margin:12px 0 0; letter-spacing:0.3px;">Clarity, calm, consumer-friendly. The easiest of the four to say.</p>
+      </div>
+      <div style="background:#15131d; border:1px solid rgba(190,180,235,0.09); border-radius:13px; padding:22px;">
+        <svg width="24" height="24" viewBox="0 0 28 28" style="display:block; margin-bottom:14px;"><circle cx="14" cy="14" r="10" fill="none" stroke="#8f8a9e" stroke-width="1.4"></circle><line x1="8" y1="14" x2="20" y2="14" stroke="#8f8a9e" stroke-width="1.4"></line><line x1="14" y1="8" x2="14" y2="20" stroke="#8f8a9e" stroke-width="1.4"></line></svg>
+        <div style="font-family:'Instrument Serif',serif; font-size:34px; color:#f4f1fb; line-height:1;">Acumen</div>
+        <p style="font-family:'IBM Plex Mono',monospace; font-size:11px; line-height:1.6; color:#8f8a9e; margin:12px 0 0; letter-spacing:0.3px;">Sharpness of judgment. Serious and premium; leans intellectual.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section style="border-top:1px solid rgba(190,180,235,0.08); background:linear-gradient(180deg,#0a0910,#16121f);">
+    <div style="max-width:760px; margin:0 auto; padding:80px 32px; text-align:center;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:2.4px; color:var(--acc,#8a78ff); text-transform:uppercase;">Watch on purpose</span>
+      <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:50px; line-height:1.02; margin:14px 0 16px; color:#f4f1fb;">Audit your watchlist,<br>not your attention.</h2>
+      <p style="font-size:16px; color:#a59fb2; line-height:1.6; max-width:520px; margin:0 auto 30px;">One short letter a week: a few titles worth your evening, a number you can trust, and nothing engineered to keep you scrolling.</p>
+      <div style="display:flex; gap:10px; max-width:440px; margin:0 auto; flex-wrap:wrap; justify-content:center;">
+        <input placeholder="you@example.com" style="flex:1; min-width:220px; background:#16141f; border:1px solid rgba(190,180,235,0.15); border-radius:8px; padding:14px 16px; color:#ece9f4; font-family:'Hanken Grotesk',sans-serif; font-size:14.5px; outline:none;"/>
+        <button style="font-size:14px; font-weight:600; color:#0d0c12; background:var(--acc,#8a78ff); border:none; padding:14px 24px; border-radius:8px; cursor:pointer;" style-hover="opacity:0.9;">Join the list</button>
+      </div>
+      <p style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.8px; color:#645f73; margin:18px 0 0;">A demonstration build · your address never leaves your browser.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="border-top:1px solid rgba(190,180,235,0.08); background:#0a0910;">
+    <div style="max-width:1240px; margin:0 auto; padding:54px 32px 40px; display:flex; flex-wrap:wrap; gap:44px; justify-content:space-between;">
+      <div style="max-width:320px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <svg width="24" height="24" viewBox="0 0 28 28"><line x1="14" y1="14" x2="14" y2="5" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.55"></line><line x1="14" y1="14" x2="5.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.55"></line><line x1="14" y1="14" x2="22.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.55"></line><line x1="14" y1="5" x2="5.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.26"></line><line x1="5.5" y1="22" x2="22.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.26"></line><line x1="22.5" y1="22" x2="14" y2="5" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.26"></line><circle cx="14" cy="5" r="2.4" fill="var(--acc,#8a78ff)"></circle><circle cx="5.5" cy="22" r="2.4" fill="var(--acc,#8a78ff)"></circle><circle cx="22.5" cy="22" r="2.4" fill="var(--acc,#8a78ff)"></circle><circle cx="14" cy="14" r="3" fill="#b9acff"></circle></svg>
+          <span style="font-family:'Instrument Serif',serif; font-size:24px; color:#f4f1fb;">Acuity</span>
+        </div>
+        <p style="font-family:'Instrument Serif',serif; font-style:italic; font-size:19px; color:var(--acc,#8a78ff); margin:0 0 12px;">Watch what gives back.</p>
+        <p style="font-size:13px; line-height:1.6; color:#8f8a9e; margin:0;">Cognitive-value ratings for film and television. A deliberate alternative to the autoplay feed.</p>
+      </div>
+      <div style="display:flex; gap:56px; flex-wrap:wrap;">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1.5px; color:#645f73; text-transform:uppercase; margin-bottom:14px;">Explore</div>
+          <a href="Catalog.dc.html" style="display:block; font-size:13.5px; color:#a59fb2; text-decoration:none; margin-bottom:9px;">Full catalog</a>
+          <a href="#compare" style="display:block; font-size:13.5px; color:#a59fb2; text-decoration:none; margin-bottom:9px;">Compare titles</a>
+          <a href="#method" style="display:block; font-size:13.5px; color:#a59fb2; text-decoration:none;">Methodology</a>
+        </div>
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1.5px; color:#645f73; text-transform:uppercase; margin-bottom:14px;">The method</div>
+          <a href="#method" style="display:block; font-size:13.5px; color:#a59fb2; text-decoration:none; margin-bottom:9px;">How we score</a>
+          <a href="#method" style="display:block; font-size:13.5px; color:#a59fb2; text-decoration:none; margin-bottom:9px;">The five tiers</a>
+          <a href="#method" style="display:block; font-size:13.5px; color:#a59fb2; text-decoration:none;">The AQ curve</a>
+        </div>
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1.5px; color:#645f73; text-transform:uppercase; margin-bottom:14px;">Company</div>
+          <a href="#" style="display:block; font-size:13.5px; color:#a59fb2; text-decoration:none; margin-bottom:9px;">About</a>
+          <a href="#" style="display:block; font-size:13.5px; color:#a59fb2; text-decoration:none; margin-bottom:9px;">Newsletter</a>
+          <a href="#" style="display:block; font-size:13.5px; color:#a59fb2; text-decoration:none;">Request a score</a>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1240px; margin:0 auto; padding:0 32px 40px;">
+      <p style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; line-height:1.7; color:#645f73; margin:0; border-top:1px solid rgba(190,180,235,0.07); padding-top:22px;">© 2026 Acuity. An independent, clean-room demonstration. Scores are computed, not editorial gospel. Title facts from public datasets · availability is illustrative.</p>
+    </div>
+  </footer>
+
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:900},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#8a78ff&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;grain&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;motion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  statsRef = React.createRef();
+
+  state = { aq:0, focus:0, idx:0, query:'', picked:null, titles:0, lenses:0, signals:0, repro:0, statsDone:false, cmp:'The Office', hoverIdx:null, activeTier:null };
+
+  catalog = [
+    { t:'The Wire', y:2002, k:'Series', d:98, i:92, c:96 },
+    { t:'Chernobyl', y:2019, k:'Series', d:95, i:96, c:92 },
+    { t:'2001: A Space Odyssey', y:1968, k:'Film', d:97, i:88, c:97 },
+    { t:'Severance', y:2022, k:'Series', d:96, i:84, c:95 },
+    { t:'Oppenheimer', y:2023, k:'Film', d:90, i:86, c:92 },
+    { t:'Arrival', y:2016, k:'Film', d:92, i:82, c:90 },
+    { t:'Breaking Bad', y:2008, k:'Series', d:90, i:72, c:92 },
+    { t:'Mad Men', y:2007, k:'Series', d:86, i:78, c:90 },
+    { t:'Succession', y:2018, k:'Series', d:87, i:72, c:92 },
+    { t:'Better Call Saul', y:2015, k:'Series', d:85, i:72, c:90 },
+    { t:'The Bear', y:2022, k:'Series', d:84, i:70, c:90 },
+    { t:'Dark', y:2017, k:'Series', d:88, i:74, c:86 },
+    { t:'Andor', y:2022, k:'Series', d:85, i:76, c:88 },
+    { t:'The Leftovers', y:2014, k:'Series', d:89, i:70, c:90 },
+    { t:'True Detective', y:2014, k:'Series', d:82, i:68, c:88 },
+    { t:'The Office', y:2005, k:'Series', d:55, i:48, c:70 },
+    { t:'Emily in Paris', y:2020, k:'Series', d:32, i:28, c:52 },
+    { t:'The Bachelor', y:2002, k:'Series', d:24, i:22, c:46 }
+  ];
+
+  aqOf(x){ return Math.round((x.d * 0.45 + x.i * 0.30 + x.c * 0.25) * 2); }
+  tierOf(a){ return a >= 160 ? 'Profound' : a >= 130 ? 'Absorbing' : a >= 100 ? 'Engaging' : a >= 70 ? 'Ambient' : 'Idle'; }
+  tierColorOf(a){ return a >= 160 ? '#b9acff' : a >= 130 ? '#8a78ff' : a >= 100 ? '#6f63c4' : a >= 70 ? '#6a6580' : '#c66a86'; }
+
+  featuredTop(){
+    if(this._ft) return this._ft;
+    this._ft = [...this.catalog].sort((a,b)=>this.aqOf(b)-this.aqOf(a)).slice(0,6);
+    return this._ft;
+  }
+  currentTitle(){ return this.state.picked || this.featuredTop()[this.state.idx % this.featuredTop().length]; }
+
+  wallCols(){
+    if(this._cols) return this._cols;
+    const ts = this.catalog.map(x=>({ t:x.t }));
+    const mk = (off)=>{ const a=[]; for(let n=0;n<7;n++){ a.push(ts[(off+n)%ts.length]); } return a.concat(a); };
+    this._cols = { col1:mk(0), col2:mk(4), col3:mk(8), col4:mk(11), col5:mk(2), col6:mk(14) };
+    return this._cols;
+  }
+
+  buildCurve(){
+    if(this._cv) return this._cv;
+    const N = 70, arr = [];
+    for(let i=0;i<N;i++){
+      const s = Math.round(((i+0.5)/N)*200);
+      const z = (s-100)/46;
+      const bell = Math.exp(-0.5*z*z);
+      const flat = Math.pow(bell, 0.6);            // flatten the dome
+      const tail = Math.pow(Math.abs(s-100)/100, 2) * 0.30;  // lift the edges
+      const r = Math.sin(i*12.9898)*43758.5453;
+      const jit = ((r - Math.floor(r)) - 0.5) * 0.06;        // organic histogram noise
+      let v = flat*0.8 + tail + 0.05 + jit;
+      if(v < 0.04) v = 0.04;
+      arr.push({ s, v, tier:this.tierOf(s), color:this.tierColorOf(s) });
+    }
+    const peak = Math.max.apply(null, arr.map(a=>a.v));
+    arr.forEach(a=>{ a.base = a.v/peak; a.count = Math.max(1, Math.round(a.base*44)); });
+    this._cv = arr;
+    return arr;
+  }
+
+  curveVals(){
+    const cv = this.buildCurve();
+    const hi = this.state.hoverIdx, at = this.state.activeTier;
+    const bars = cv.map((a,i)=>({
+      h: (8 + a.base*92).toFixed(1) + '%',
+      color: a.color,
+      op: (at && a.tier !== at) ? '0.16' : '1',
+      enter: ()=>this.setState({ hoverIdx:i })
+    }));
+    const total = cv.reduce((s,a)=>s+a.count, 0);
+    const tailCount = cv.filter(a=>a.tier==='Idle' || a.tier==='Profound').reduce((s,a)=>s+a.count, 0);
+    const tip = (hi != null) ? cv[hi] : null;
+    const TINFO = [['Profound','#b9acff','160+'],['Absorbing','#8a78ff','130+'],['Engaging','#6f63c4','100+'],['Ambient','#6a6580','70+'],['Idle','#c66a86','<70']];
+    const legend = TINFO.map(([name,color,range])=>{
+      const a = at === name;
+      return { label:name, color, range,
+        onClick:()=>this.setState(s=>({ activeTier: s.activeTier===name ? null : name })),
+        bc: a ? 'var(--acc,#8a78ff)' : 'rgba(190,180,235,0.14)',
+        bg: a ? 'rgba(138,120,255,0.16)' : 'transparent',
+        fg: a ? '#ece9f4' : '#b3aec0' };
+    });
+    return {
+      bars, legend,
+      plotted: '2,412',
+      tailPct: Math.round(tailCount/total*100),
+      hasTip: tip != null,
+      tipLeft: tip ? (((hi+0.5)/cv.length)*100).toFixed(1)+'%' : '0%',
+      tipScore: tip ? tip.s : '',
+      tipTier: tip ? tip.tier : '',
+      tipCount: tip ? tip.count : '',
+      tipColor: tip ? tip.color : '#8a78ff',
+      onLeave: ()=>this.setState({ hoverIdx:null })
+    };
+  }
+
+  componentDidMount(){
+    this.applyAccent();
+    const motion = this.props.motion !== false;
+    if(motion){
+      this.playTitle();
+      this._timer = setInterval(()=>{
+        if(this.state.picked) return;
+        this.setState(s=>({ idx: s.idx + 1 }), ()=>this.playTitle());
+      }, 4800);
+      const el = this.statsRef.current;
+      if(el && 'IntersectionObserver' in window){
+        this._io = new IntersectionObserver((es)=>{
+          es.forEach(e=>{
+            if(e.isIntersecting && !this.state.statsDone){
+              this.runStats();
+              this.setState({ statsDone:true });
+              this._io.disconnect();
+            }
+          });
+        }, { threshold:0.35 });
+        this._io.observe(el);
+      } else { this.runStats(); }
+    } else {
+      const t = this.currentTitle();
+      this.setState({ aq:this.aqOf(t), focus:1, titles:2412, lenses:3, signals:9, repro:100, statsDone:true });
+    }
+  }
+  componentDidUpdate(prev){ if(prev.accent !== this.props.accent) this.applyAccent(); }
+  componentWillUnmount(){ if(this._timer) clearInterval(this._timer); if(this._io) this._io.disconnect(); }
+
+  applyAccent(){ const r = this.rootRef.current; if(r) r.style.setProperty('--acc', this.props.accent || '#8a78ff'); }
+
+  animateNum(key, target, dur){
+    const s = performance.now();
+    const step = (n)=>{
+      const t = Math.min(1, (n - s) / dur);
+      const e = 1 - Math.pow(1 - t, 3);
+      this.setState({ [key]: Math.round(target * e) });
+      if(t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  runStats(){
+    this.animateNum('titles', 2412, 1500);
+    this.animateNum('lenses', 3, 900);
+    this.animateNum('signals', 9, 1100);
+    this.animateNum('repro', 100, 1300);
+  }
+  playTitle(){
+    const t = this.currentTitle();
+    const target = this.aqOf(t);
+    if(this.props.motion === false){ this.setState({ aq:target, focus:1 }); return; }
+    const s = performance.now();
+    const dur = 1100;
+    this.setState({ aq:0, focus:0 });
+    const step = (n)=>{
+      const k = Math.min(1, (n - s) / dur);
+      const e = 1 - Math.pow(1 - k, 3);
+      this.setState({ aq: Math.round(target * e), focus: e });
+      if(k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  onSearch = (e)=>{ this.setState({ query: e.target.value }); };
+  onPick = (name)=>{ const t = this.catalog.find(x=>x.t === name); if(t) this.setState({ picked:t, query:'' }, ()=>this.playTitle()); };
+  onCmp = (name)=>{ this.setState({ cmp: name }); };
+
+  renderVals(){
+    const motion = this.props.motion !== false;
+    const ct = this.currentTitle();
+    const ctAq = this.aqOf(ct);
+    const focus = motion ? this.state.focus : 1;
+    const aqShown = motion ? this.state.aq : ctAq;
+    const lensF = (v)=>Math.round(v * focus);
+
+    const feat = this.featuredTop().map((x,i)=>{
+      const aq = this.aqOf(x);
+      return {
+        rank: String(i+1).padStart(2,'0'),
+        t:x.t, y:x.y, k:x.k, aq,
+        tier:this.tierOf(aq), tierColor:this.tierColorOf(aq),
+        dPct:x.d+'%', iPct:x.i+'%', cPct:x.c+'%',
+        poster:'POSTER · '+x.t.toUpperCase()
+      };
+    });
+
+    const chips = this.featuredTop().map(x=>({ t:x.t, active: ct.t === x.t, pick:()=>this.onPick(x.t) }));
+
+    const q = this.state.query.trim().toLowerCase();
+    const results = q ? this.catalog.filter(x=>x.t.toLowerCase().includes(q)).slice(0,6).map(x=>{
+      const aq = this.aqOf(x);
+      return { t:x.t, y:x.y, k:x.k, aq, tier:this.tierOf(aq), tierColor:this.tierColorOf(aq), pick:()=>this.onPick(x.t) };
+    }) : [];
+
+    const left = this.catalog.find(x=>x.t === 'Severance');
+    const right = this.catalog.find(x=>x.t === this.state.cmp) || this.catalog[0];
+    const mk = (x)=>{
+      const aq = this.aqOf(x);
+      return {
+        t:x.t, y:x.y, k:x.k, aq, d:x.d, i:x.i, c:x.c,
+        tier:this.tierOf(aq), tierColor:this.tierColorOf(aq),
+        dPct:x.d+'%', iPct:x.i+'%', cPct:x.c+'%',
+        poster:'POSTER · '+x.t.toUpperCase()
+      };
+    };
+    const cmpLeft = mk(left), cmpRight = mk(right);
+    const dd = cmpLeft.aq - cmpRight.aq;
+    const cols = this.wallCols();
+
+    return {
+      grain: this.props.grain !== false,
+      ...this.curveVals(),
+      col1: cols.col1, col2: cols.col2, col3: cols.col3, col4: cols.col4, col5: cols.col5, col6: cols.col6,
+      heroTitle: ct.t, heroYear: ct.y, heroKind: ct.k,
+      heroAQ: aqShown, heroTier: this.tierOf(ctAq), heroTierColor: this.tierColorOf(ctAq),
+      heroPoster: 'POSTER · ' + ct.t.toUpperCase(),
+      heroBlur: ((1 - focus) * 16).toFixed(2),
+      heroOpacity: (0.4 + 0.6 * focus).toFixed(3),
+      heroAQPct: (aqShown / 200 * 100).toFixed(1) + '%',
+      lensDepth: lensF(ct.d), lensInsight: lensF(ct.i), lensCraft: lensF(ct.c),
+      depthPct: (ct.d * focus).toFixed(1) + '%',
+      insightPct: (ct.i * focus).toFixed(1) + '%',
+      craftPct: (ct.c * focus).toFixed(1) + '%',
+      chips,
+      query: this.state.query, onSearch: this.onSearch, results, hasResults: results.length > 0,
+      feat,
+      titles: this.state.titles, lenses: this.state.lenses, signals: this.state.signals, repro: this.state.repro,
+      cmpLeft, cmpRight,
+      cmpOptions: ['The Office','The Bachelor','Emily in Paris','Breaking Bad'].map(n=>({ name:n, active:this.state.cmp===n, pick:()=>this.onCmp(n) })),
+      cmpDiff: (dd > 0 ? '+' : '') + dd,
+      cmpDiffColor: dd >= 0 ? '#8a78ff' : '#c66a86'
+    };
+  }
+}
+</script>
+</body>
+</html>

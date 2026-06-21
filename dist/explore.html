@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Catalog — Acuity</title>
-  <meta name="description" content="Search and filter 15,883 films and series by Acuity Score, tier, genre, type, audience, and the streaming services you actually subscribe to.">
+  <meta name="description" content="Search and filter 15,883 films and series by Acuity Quotient, tier, genre, type, audience, and the streaming services you actually subscribe to.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body data-page="explore">
@@ -15,21 +15,19 @@
 
   <header class="nav">
     <div class="nav-inner">
-      <a class="brand" href="./index.html">Acuity<span class="dot">.</span><span class="glyph">AS</span></a>
+      <a class="brand" href="./index.html">Acuity<span class="dot">.</span><span class="glyph">AQ</span></a>
       <nav class="nav-links" aria-label="Primary">
         <a href="./explore.html">Catalog</a>
         <a href="./kids.html">Kids</a>
-        <a href="./compare.html">Compare</a>
         <a href="./methodology.html">Methodology</a>
       </nav>
       <span class="nav-spacer"></span>
-      <a class="nav-cta desktop" href="./compare.html">Compare titles</a>
+      <a class="nav-cta desktop" href="./methodology.html">How scoring works</a>
       <button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
     </div>
     <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile" hidden>
       <a href="./explore.html">Catalog</a>
       <a href="./kids.html">Kids</a>
-      <a href="./compare.html">Compare</a>
       <a href="./methodology.html">Methodology</a>
     </nav>
   </header>
@@ -45,97 +43,124 @@
       <div class="explore-layout">
 
         <aside class="filters" id="filterPanel" aria-label="Filters">
-          <div class="filter-block weight-block" id="weightBlock">
-            <h3>Weight your priorities <button class="reset-link" id="weightReset" type="button" hidden>Reset</button></h3>
-            <p class="filter-hint">Score what <em>you</em> care about. We recompute every Acuity Score and re-rank the catalog live.</p>
-            <label class="svc-opt weight-on" for="weightOn">
-              <input type="checkbox" id="weightOn">
-              <span>Use my priorities</span>
-            </label>
-            <div class="weights" id="weightControls">
-              <div class="weight-row dim cog">
-                <div class="wr-top"><span class="wr-name">Cognitive load</span><span class="wr-pct" data-pct="cog">40%</span></div>
-                <input type="range" min="0" max="100" step="5" value="40" id="wCog" aria-label="Cognitive load weight">
-              </div>
-              <div class="weight-row dim edu">
-                <div class="wr-top"><span class="wr-name">Knowledge value</span><span class="wr-pct" data-pct="edu">25%</span></div>
-                <input type="range" min="0" max="100" step="5" value="25" id="wEdu" aria-label="Knowledge value weight">
-              </div>
-              <div class="weight-row dim ent">
-                <div class="wr-top"><span class="wr-name">Craft &amp; execution</span><span class="wr-pct" data-pct="ent">35%</span></div>
-                <input type="range" min="0" max="100" step="5" value="35" id="wEnt" aria-label="Craft and execution weight">
-              </div>
-            </div>
+          <div class="filters-head">
+            <span class="filters-label">Filters</span>
+            <button class="reset-link" id="resetFilters" type="button">Clear all</button>
           </div>
-          <div class="filter-block">
-            <h3>Tier</h3>
+
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Tier</h3>
             <div class="chips" id="tierChips" role="group" aria-label="Filter by tier"></div>
           </div>
-          <div class="filter-block">
-            <h3>Type</h3>
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Type</h3>
             <div class="chips" id="typeChips" role="group" aria-label="Filter by type"></div>
           </div>
-          <div class="filter-block">
-            <h3>Audience</h3>
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Audience</h3>
             <div class="chips" id="audienceChips" role="group" aria-label="Filter by audience">
               <button class="chip" id="kidsToggle" type="button" aria-pressed="false">Kids &amp; family only</button>
             </div>
           </div>
-          <div class="filter-block">
-            <h3>Acuity Score range</h3>
-            <div class="range-row">
-              <input type="number" id="iqMin" min="0" max="200" placeholder="0" aria-label="Minimum Acuity Score" inputmode="numeric">
+
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">My streaming services <span class="count-tag" id="svcCount"></span></h3>
+            <div class="fb-body">
+              <p class="filter-hint">Pick what you subscribe to — we remember it and hide the rest. Ad-supported and channel variants are merged into one brand.</p>
+              <div class="svc-search" id="svcSearchWrap" hidden>
+                <input type="search" id="svcSearch" placeholder="Search services…" aria-label="Search streaming services" autocomplete="off">
+              </div>
+              <div class="svc-list" id="svcList" role="group" aria-label="Filter by streaming service"></div>
+              <button class="reset-link svc-show-all" id="svcShowAll" type="button" hidden>Show all services</button>
+            </div>
+          </div>
+
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Audience age</h3>
+            <div class="fb-body">
+              <p class="filter-hint">Show only titles suitable for a viewer of this age (from the content rating). Higher-rated or unrated titles are hidden.</p>
+              <div class="dimmin-row age-row">
+                <div class="dm-top"><span class="dm-name">Suitable for age</span><span class="dm-val" id="maxAgeVal">any</span></div>
+                <input type="range" min="0" max="19" step="1" value="19" id="maxAge" aria-label="Maximum audience age">
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-block collapsible weight-block" id="weightBlock">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Weight your priorities <button class="reset-link" id="weightReset" type="button" hidden>Reset</button></h3>
+            <div class="fb-body">
+              <p class="filter-hint">Score what <em>you</em> care about. We recompute every Acuity Quotient and re-rank the catalog live.</p>
+              <label class="svc-opt weight-on" for="weightOn">
+                <input type="checkbox" id="weightOn">
+                <span>Use my priorities</span>
+              </label>
+              <div class="weights" id="weightControls">
+                <div class="weight-row dim cog">
+                  <div class="wr-top"><span class="wr-name">Depth</span><span class="wr-pct" data-pct="cog">40%</span></div>
+                  <input type="range" min="0" max="100" step="5" value="40" id="wCog" aria-label="Depth weight">
+                </div>
+                <div class="weight-row dim edu">
+                  <div class="wr-top"><span class="wr-name">Insight</span><span class="wr-pct" data-pct="edu">25%</span></div>
+                  <input type="range" min="0" max="100" step="5" value="25" id="wEdu" aria-label="Insight weight">
+                </div>
+                <div class="weight-row dim ent">
+                  <div class="wr-top"><span class="wr-name">Craft</span><span class="wr-pct" data-pct="ent">35%</span></div>
+                  <input type="range" min="0" max="100" step="5" value="35" id="wEnt" aria-label="Craft and execution weight">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Dimension minimums</h3>
+            <div class="fb-body">
+              <p class="filter-hint">Require a floor on any of the three score dimensions (0–100).</p>
+              <div class="dimmin-row dim cog">
+                <div class="dm-top"><span class="dm-name">Depth</span><span class="dm-val" id="minCogVal">any</span></div>
+                <input type="range" min="0" max="100" step="5" value="0" id="minCog" aria-label="Minimum depth">
+              </div>
+              <div class="dimmin-row dim edu">
+                <div class="dm-top"><span class="dm-name">Insight</span><span class="dm-val" id="minEduVal">any</span></div>
+                <input type="range" min="0" max="100" step="5" value="0" id="minEdu" aria-label="Minimum insight">
+              </div>
+              <div class="dimmin-row dim ent">
+                <div class="dm-top"><span class="dm-name">Craft</span><span class="dm-val" id="minEntVal">any</span></div>
+                <input type="range" min="0" max="100" step="5" value="0" id="minEnt" aria-label="Minimum craft">
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Acuity score range</h3>
+            <div class="range-row fb-body">
+              <input type="number" id="iqMin" min="0" max="200" placeholder="0" aria-label="Minimum Acuity Quotient" inputmode="numeric">
               <span>to</span>
-              <input type="number" id="iqMax" min="0" max="200" placeholder="200" aria-label="Maximum Acuity Score" inputmode="numeric">
+              <input type="number" id="iqMax" min="0" max="200" placeholder="200" aria-label="Maximum Acuity Quotient" inputmode="numeric">
             </div>
           </div>
-          <div class="filter-block">
-            <h3>Dimension minimums</h3>
-            <p class="filter-hint">Require a floor on any of the three score dimensions (0–100).</p>
-            <div class="dimmin-row dim cog">
-              <div class="dm-top"><span class="dm-name">Cognitive load</span><span class="dm-val" id="minCogVal">any</span></div>
-              <input type="range" min="0" max="100" step="5" value="0" id="minCog" aria-label="Minimum cognitive load">
-            </div>
-            <div class="dimmin-row dim edu">
-              <div class="dm-top"><span class="dm-name">Knowledge value</span><span class="dm-val" id="minEduVal">any</span></div>
-              <input type="range" min="0" max="100" step="5" value="0" id="minEdu" aria-label="Minimum knowledge value">
-            </div>
-            <div class="dimmin-row dim ent">
-              <div class="dm-top"><span class="dm-name">Craft &amp; execution</span><span class="dm-val" id="minEntVal">any</span></div>
-              <input type="range" min="0" max="100" step="5" value="0" id="minEnt" aria-label="Minimum craft and execution">
+
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">IMDb</h3>
+            <div class="fb-body">
+              <div class="dimmin-row">
+                <div class="dm-top"><span class="dm-name">Rating</span><span class="dm-val" id="minRatingVal">any</span></div>
+                <input type="range" min="0" max="10" step="0.5" value="0" id="minRating" aria-label="Minimum IMDb rating">
+              </div>
+              <label class="votes-label" for="minVotes">Minimum votes</label>
+              <select class="sort votes-select" id="minVotes" aria-label="Minimum IMDb votes">
+                <option value="0">Any</option>
+                <option value="1000">1k+</option>
+                <option value="10000">10k+</option>
+                <option value="50000">50k+</option>
+                <option value="100000">100k+</option>
+                <option value="500000">500k+</option>
+              </select>
             </div>
           </div>
-          <div class="filter-block">
-            <h3>IMDb confidence</h3>
-            <div class="dimmin-row">
-              <div class="dm-top"><span class="dm-name">Rating</span><span class="dm-val" id="minRatingVal">any</span></div>
-              <input type="range" min="0" max="10" step="0.5" value="0" id="minRating" aria-label="Minimum IMDb rating">
-            </div>
-            <label class="votes-label" for="minVotes">Minimum votes</label>
-            <select class="sort votes-select" id="minVotes" aria-label="Minimum IMDb votes">
-              <option value="0">Any</option>
-              <option value="1000">1k+</option>
-              <option value="10000">10k+</option>
-              <option value="50000">50k+</option>
-              <option value="100000">100k+</option>
-              <option value="500000">500k+</option>
-            </select>
-          </div>
-          <div class="filter-block">
-            <h3>My streaming services <span class="count-tag" id="svcCount"></span></h3>
-            <p class="filter-hint">Pick what you subscribe to — we remember it and hide the rest. Ad-supported and channel variants are merged into one brand.</p>
-            <div class="svc-search" id="svcSearchWrap" hidden>
-              <input type="search" id="svcSearch" placeholder="Search services…" aria-label="Search streaming services" autocomplete="off">
-            </div>
-            <div class="svc-list" id="svcList" role="group" aria-label="Filter by streaming service"></div>
-            <button class="reset-link svc-show-all" id="svcShowAll" type="button" hidden>Show all services</button>
-          </div>
-          <div class="filter-block">
-            <h3>Genre</h3>
+
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Genre</h3>
             <div class="chips" id="genreChips" role="group" aria-label="Filter by genre"></div>
-          </div>
-          <div class="filter-block">
-            <button class="reset-link" id="resetFilters" type="button">Reset filters</button>
           </div>
         </aside>
 
@@ -151,13 +176,15 @@
             <div class="sort-wrap">
               <label for="sortSelect">Sort</label>
               <select class="sort" id="sortSelect">
-                <option value="iq-desc">Acuity Score</option>
-                <option value="ent-desc">Craft &amp; execution</option>
-                <option value="edu-desc">Knowledge value</option>
-                <option value="cog-desc">Cognitive load</option>
+                <option value="iq-desc">Highest Acuity</option>
+                <option value="iq-asc">Lowest Acuity</option>
+                <option value="az">A–Z</option>
+                <option value="year-desc">Newest</option>
+                <option value="year-asc">Oldest</option>
+                <option value="cog-desc">Depth</option>
+                <option value="edu-desc">Insight</option>
+                <option value="ent-desc">Craft</option>
                 <option value="rating-desc">IMDb rating</option>
-                <option value="az">A–Z (title)</option>
-                <option value="year-desc">Year</option>
               </select>
             </div>
           </div>
