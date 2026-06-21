@@ -32,6 +32,47 @@ accessed the original** implements solely from that spec.
    derived from the original's scores.
 5. Original branding/name is NOT reused; the implementation ships under its own brand.
 
+## The clean-room separation, in practice (the legal core)
+The defensibility rests on one fact: **the agent that wrote the shippable expression (code, copy,
+design) never saw the original.** Two *separate* sub-agents, not one:
+
+1. **Analyst (sub-agent A)** — given access to a local mirror of the original and asked to produce
+   a *functional requirements specification* and nothing else. Output: `SPEC.md`. Explicitly
+   instructed NOT to transcribe verbatim copy, prose, taglines, assets, or the original's score
+   values / tier names / thresholds. It described *what the product does* (information
+   architecture, data-schema shape, UX flows, idea-level design parameters) — the unprotectable
+   layer (ideas, function, facts), not protected expression.
+
+2. **Implementer (sub-agent B)** — a *different* agent, run as a separate process, with the
+   original **explicitly off-limits** (the mirror directory and the live URL were named as
+   forbidden in its instructions; it performed no read/fetch/search of them). It authored ALL code,
+   copy, brand, tier names, colors, and design **solely from `SPEC.md` and our fact-derived
+   dataset**. `SPEC.md` was the *only* channel between the two rooms.
+
+Because A and B are distinct agent sessions, no memory of the original's expression could reach B
+except through the functional spec — which by construction contains none. The orchestrator (main
+session) coordinated and built the *data pipeline* (IMDb facts + our own `score.py`) but authored
+no product expression; it handed B only the spec and the fact data.
+
+## What is independent (not derived from the original)
+- **Scores** — computed by our own `build/score.py` from IMDb facts (genre / rating / votes),
+  mapped to our own distribution. No original score value was used.
+- **Catalog** — sourced from **IMDb public datasets** (facts), independently selected and scored.
+- **Brand, copy, tier names, colors, layout, code** — all original, authored by the clean-room
+  implementer(s).
+- **Posters** — hotlinked from TMDB (not copied/rehosted), with attribution; not the original's assets.
+
+## Evidence / paper trail
+- `SPEC.md` — the requirements artifact that crossed the wall (it contains function only).
+- This file's dated, per-agent **attestations** (below) — Analyst, Implementer, and every
+  subsequent pass, each affirming it did not access the original.
+- Preserved sub-agent **transcripts** (the harness retains each agent's session log).
+- The independent **data pipeline** (`build/score.py` + IMDb datasets) and distinct **brand** (Acuity).
+
+> Subsequent passes (feature work + the visual redesign, logged below as v2–v10) all iterated on
+> *our own* Acuity site under the same rule — the original stayed off-limits to every agent; the
+> only inputs were our existing `dist/` files, our dataset, and the user's own design files.
+
 ## Log
 - (orchestrator) Protocol established. Catalog sourced from IMDb datasets; scoring engine is our own.
 - Agent attestations appended below as each phase completes.
