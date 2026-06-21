@@ -300,7 +300,9 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; line-height: 1.08;
 }
 .tcard-bars { display: flex; gap: 5px; margin-top: 13px; }
 .tcard-bar { flex: 1; height: 3px; border-radius: 2px; background: rgba(190, 180, 235, 0.10); overflow: hidden; }
-.tcard-bar-fill { height: 100%; background: var(--acc); }
+.tcard-bar-fill { height: 100%; background: var(--acc); transition: width .85s cubic-bezier(.22,1,.36,1); }
+[data-inst-bar], [data-inst-depth-bar], [data-inst-insight-bar], [data-inst-craft-bar] { transition: width .85s cubic-bezier(.22,1,.36,1); }
+@media (prefers-reduced-motion: reduce) { .tcard-bar-fill, [data-inst-bar], [data-inst-depth-bar], [data-inst-insight-bar], [data-inst-craft-bar] { transition: none !important; } }
 
 .card {
   position: relative; isolation: isolate; display: flex; flex-direction: column; color: var(--text);
