@@ -416,8 +416,8 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; line-height: 1.08;
 .filters::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 8px; }
 .filters-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
 .filters-label { font-family: var(--sans); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--text); font-weight: 600; }
-.filter-block { border-bottom: 1px solid var(--line); padding: 16px 0; }
-.filter-block h3 { font-family: var(--sans); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--muted-2); margin: 0 0 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.filter-block { border-bottom: 1px solid var(--line); padding: 10px 0; }
+.filter-block h3 { font-family: var(--sans); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted-2); margin: 0 0 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 /* collapsible groups: the h3 acts as a toggle with a chevron */
 .filter-block.collapsible > .fb-toggle { cursor: pointer; user-select: none; justify-content: flex-start; }
 .filter-block.collapsible > .fb-toggle::after { content: "▾"; margin-left: auto; font-size: 0.7rem; color: var(--muted-2); transition: transform 0.16s ease; }
@@ -428,9 +428,9 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; line-height: 1.08;
 .fb-toggle .count-tag, .fb-toggle .reset-link { margin-left: 0; }
 .fb-toggle .reset-link { text-transform: none; letter-spacing: 0; }
 .filter-block h3 .count-tag { color: var(--accent); font-size: 0.7rem; letter-spacing: 0.04em; }
-.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip {
-  cursor: pointer; font-size: 0.8rem; font-weight: 500; padding: 6px 11px; border-radius: 999px;
+  cursor: pointer; font-size: 0.79rem; font-weight: 500; padding: 4px 10px; border-radius: 999px;
   background: var(--surface); border: 1px solid var(--line); color: var(--muted); transition: 0.12s; user-select: none;
 }
 .chip:hover { color: var(--text); border-color: var(--line-strong); }
@@ -438,11 +438,11 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; line-height: 1.08;
 .chip.tierchip[aria-pressed="true"] { color: color-mix(in srgb, var(--tc) 80%, white); border-color: color-mix(in srgb, var(--tc) 55%, transparent); background: color-mix(in srgb, var(--tc) 16%, transparent); }
 .chip.tierchip .swatch { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--tc); margin-right: 6px; vertical-align: middle; }
 
-.filter-hint { font-size: 0.8rem; margin: 0 0 10px; color: var(--muted); }
-.svc-list { max-height: 220px; overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 2px; }
+.filter-hint { font-size: 0.76rem; margin: 0 0 7px; color: var(--muted); }
+.svc-list { max-height: 178px; overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 1px; }
 .svc-list::-webkit-scrollbar { width: 8px; }
 .svc-list::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 8px; }
-.svc-opt { display: flex; align-items: center; gap: 9px; padding: 6px 4px; border-radius: 7px; cursor: pointer; font-size: 0.86rem; color: var(--muted); }
+.svc-opt { display: flex; align-items: center; gap: 9px; padding: 4px 4px; border-radius: 7px; cursor: pointer; font-size: 0.84rem; color: var(--muted); }
 .svc-opt:hover { background: var(--surface); color: var(--text); }
 .svc-opt input { accent-color: var(--accent); width: 15px; height: 15px; }
 .svc-opt .c { margin-left: auto; font-size: 0.72rem; color: var(--muted-2); }
@@ -480,7 +480,7 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; line-height: 1.08;
 .weight-row input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--dc); border: 2px solid #0c0d11; }
 
 /* --- per-dimension minimum + IMDb confidence sliders --- */
-.dimmin-row { margin-bottom: 14px; }
+.dimmin-row { margin-bottom: 10px; }
 .dimmin-row:last-child { margin-bottom: 0; }
 .dimmin-row .dm-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
 .dimmin-row .dm-name { font-size: 0.84rem; font-weight: 500; color: var(--text); }
@@ -493,6 +493,24 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; line-height: 1.08;
 .dimmin-row input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--dc, var(--accent)); border: 2px solid #0c0d11; }
 .votes-label { display: block; margin: 12px 0 6px; font-size: 0.82rem; color: var(--muted); }
 select.votes-select { width: 100%; }
+
+/* a lone toggle (Kids & family) — no heading, tight block */
+.kids-block { border-bottom: 1px solid var(--line); padding: 10px 0; }
+.kids-chip { width: 100%; justify-content: center; text-align: center; }
+
+/* Advanced-filters disclosure */
+.adv-toggle {
+  width: 100%; margin: 12px 0 0; padding: 9px 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: var(--sans); font-size: 0.74rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; transition: 0.14s;
+}
+.adv-toggle:hover { color: var(--text); border-color: var(--line-strong); background: var(--surface-2); }
+.adv-toggle::after { content: "▾"; font-size: 0.7rem; color: var(--muted-2); transition: transform 0.16s ease; }
+.adv-toggle.open { color: var(--text); border-color: var(--accent-line); }
+.adv-toggle.open::after { transform: rotate(180deg); }
+.adv-wrap { margin-top: 2px; }
+.adv-wrap .filter-block:first-child { border-top: 0; }
 
 /* personalized-score indicators */
 .personal-flag { display: inline-block; margin-left: 10px; font-size: 0.78rem; color: var(--accent-hi); font-weight: 600; }
@@ -623,8 +641,19 @@ a.tier-row:hover { background: var(--surface-2); border-color: var(--line-strong
 .chart-stats .s .l { color: var(--muted); font-size: 0.82rem; }
 .chart-foot { margin-top: 14px; font-size: 0.86rem; color: var(--muted); }
 .hist { width: 100%; height: auto; display: block; }
-.hist .bar { fill: var(--accent); opacity: 0.85; }
+.hist .bar { opacity: 0.9; transition: opacity 0.15s ease; }
 .hist .bar:hover { opacity: 1; }
+.hist.has-active .bar { opacity: 0.12; }
+.hist.has-active .bar.lit { opacity: 1; }
+
+/* tier legend / key beneath the distribution histogram */
+.hist-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.hist-key { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-family: var(--sans); font-size: 0.8rem; color: var(--muted); padding: 6px 13px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); transition: 0.14s; }
+.hist-key:hover { border-color: var(--line-strong); color: var(--text); }
+.hist-key.active { border-color: color-mix(in srgb, var(--tc) 60%, transparent); background: color-mix(in srgb, var(--tc) 16%, transparent); color: var(--text); }
+.hist-key .hk-swatch { width: 10px; height: 10px; border-radius: 50%; background: var(--tc); flex: none; }
+.hist-key .hk-name { font-weight: 600; color: color-mix(in srgb, var(--tc) 82%, white); }
+.hist-key .hk-range { font-family: var(--mono); font-size: 0.72rem; color: var(--muted-2); letter-spacing: 0.02em; }
 .hist .axis { stroke: var(--line); stroke-width: 1; }
 .hist .grid { stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 4; opacity: 0.5; }
 .hist .meanline { stroke: var(--accent-hi); stroke-width: 1.5; stroke-dasharray: 5 4; }

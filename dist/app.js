@@ -885,6 +885,7 @@ function initExplore() {
     syncControls();
     if (state.q) elSearch.value = state.q;
     elClear.hidden = !state.q;
+    if (advActive()) setAdvOpen(true);
     apply();
   }).catch(err => {
     elGrid.appendChild(el('div', { class: 'empty' }, [el('h3', { text: 'Catalog unavailable' }), el('p', { text: 'Please refresh to try again.' })]));
@@ -1248,6 +1249,26 @@ function initExplore() {
   const fpanel = document.querySelector('#filterPanel');
   if (ftog && fpanel) ftog.addEventListener('click', () => fpanel.classList.toggle('open'));
 
+  // Advanced-filters disclosure: reveals score-range / age / weights / dim-mins / IMDb
+  const advToggle = document.querySelector('#advToggle');
+  const advWrap = document.querySelector('#advWrap');
+  function setAdvOpen(open) {
+    if (!advToggle || !advWrap) return;
+    if (open) advWrap.removeAttribute('hidden'); else advWrap.setAttribute('hidden', '');
+    advToggle.setAttribute('aria-expanded', String(open));
+    advToggle.classList.toggle('open', open);
+  }
+  if (advToggle && advWrap) {
+    advToggle.addEventListener('click', () => setAdvOpen(advWrap.hasAttribute('hidden')));
+  }
+  // open Advanced automatically when an advanced filter is already in effect
+  function advActive() {
+    return state.min > 0 || state.max < IQ_MAX ||
+      state.minCog > 0 || state.minEdu > 0 || state.minEnt > 0 ||
+      state.minRating > 0 || state.minVotes > 0 || state.maxAge != null || weightsActive();
+  }
+  if (advActive()) setAdvOpen(true);
+
   initWeightControls();
 
   /* -------- personalized weights: three sliders + toggle + reset -------- */
@@ -1595,17 +1616,23 @@ function drawHistogram(root, stats) {
     lbl.textContent = Math.round(f * maxCount); svg.appendChild(lbl);
   });
 
+  // each bar is colored by the tier its Acuity Quotient falls into, so the
+  // five tier bands are visible across the distribution.
+  const barsByTier = { 0: [], 1: [], 2: [], 3: [], 4: [] };
   keys.forEach(k => {
+    const tier = scoreTier(k);
     const h = (hist[k] / maxCount) * plotH;
     const rect = document.createElementNS(NS, 'rect');
     rect.setAttribute('x', (xFor(k) - barW / 2).toFixed(2));
     rect.setAttribute('y', (padT + plotH - h).toFixed(2));
     rect.setAttribute('width', barW.toFixed(2));
     rect.setAttribute('height', h.toFixed(2));
-    rect.setAttribute('class', 'bar');
+    rect.setAttribute('class', 'bar t' + tier);
+    rect.style.fill = tierColorVar(tier);
     const tt = document.createElementNS(NS, 'title');
-    tt.textContent = SCORE_LABEL + ' ' + k + ': ' + hist[k] + ' titles';
+    tt.textContent = SCORE_LABEL + ' ' + k + ' · ' + tierOf(tier).name + ': ' + hist[k] + ' titles';
     rect.appendChild(tt);
+    barsByTier[tier].push(rect);
     svg.appendChild(rect);
   });
 
@@ -1627,6 +1654,37 @@ function drawHistogram(root, stats) {
   mlab.setAttribute('class', 'meanlbl'); mlab.textContent = 'mean ' + stats.mean; svg.appendChild(mlab);
 
   root.appendChild(svg);
+
+  // tier legend / key — swatch + name + AQ range; click a tier to isolate its bars
+  const legendHost = document.querySelector('[data-hist-legend]');
+  if (legendHost) {
+    legendHost.innerHTML = '';
+    let activeTier = null;
+    const btns = [];
+    function applyActive() {
+      svg.classList.toggle('has-active', activeTier != null);
+      for (const tk in barsByTier) {
+        const lit = (+tk === activeTier);
+        barsByTier[tk].forEach(b => b.classList.toggle('lit', lit));
+      }
+      btns.forEach(b => {
+        const on = b.tk === activeTier;
+        b.el.classList.toggle('active', on);
+        b.el.setAttribute('aria-pressed', String(on));
+      });
+    }
+    [0, 1, 2, 3, 4].forEach(tk => {
+      const t = tierOf(tk);
+      const btn = el('button', { class: 'hist-key t' + tk, type: 'button', 'aria-pressed': 'false' }, [
+        el('span', { class: 'hk-swatch', 'aria-hidden': 'true' }),
+        el('span', { class: 'hk-name', text: t.name }),
+        el('span', { class: 'hk-range', text: SCORE_ABBR + ' ' + t.range }),
+      ]);
+      btn.addEventListener('click', () => { activeTier = (activeTier === tk) ? null : tk; applyActive(); });
+      btns.push({ el: btn, tk: tk });
+      legendHost.appendChild(btn);
+    });
+  }
 }
 
 /* ----------------------------------------------------- boot ------------- */
