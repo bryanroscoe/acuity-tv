@@ -406,8 +406,10 @@ function titleCard(rec, opts) {
   // three thin dimension mini-bars: Depth (cog) · Insight (edu) · Craft (ent)
   const bars = el('div', { class: 'tcard-bars' });
   ['cog', 'edu', 'ent'].forEach(k => {
-    bars.appendChild(el('div', { class: 'tcard-bar' },
-      [el('div', { class: 'tcard-bar-fill', style: 'width:' + rec[k] + '%;' })]));
+    const target = rec[k] + '%';
+    const fill = el('div', { class: 'tcard-bar-fill', style: 'width:' + (REDUCE_MOTION ? target : '0%') + ';' });
+    if (!REDUCE_MOTION) requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.width = target; }));
+    bars.appendChild(el('div', { class: 'tcard-bar' }, [fill]));
   });
   card.appendChild(bars);
   return card;
@@ -833,16 +835,20 @@ function initHome() {
       titleEl.textContent = rec.n;
       titleEl.setAttribute('href', titleHref(rec.slug));
       metaEl.textContent = rec.year + ' · ' + kindOf(rec);
-      aqEl.textContent = String(rec.iq);
+      countUp(aqEl, rec.iq, 700);
       aqEl.style.color = tc;
       tierEl.textContent = t.name;
       tierEl.style.color = tc;
-      barEl.style.width = (rec.iq / IQ_MAX * 100).toFixed(1) + '%';
       barEl.style.background = tc;
+      const aqW = (rec.iq / IQ_MAX * 100).toFixed(1) + '%';
+      if (REDUCE_MOTION) { barEl.style.width = aqW; }
+      else { barEl.style.width = '0%'; requestAnimationFrame(() => requestAnimationFrame(() => { barEl.style.width = aqW; })); }
       ['cog', 'edu', 'ent'].forEach(k => {
         const [vEl, bEl] = dims[k];
         vEl.textContent = String(rec[k]);
-        bEl.style.width = rec[k] + '%';
+        const w = rec[k] + '%';
+        if (REDUCE_MOTION) { bEl.style.width = w; }
+        else { bEl.style.width = '0%'; requestAnimationFrame(() => requestAnimationFrame(() => { bEl.style.width = w; })); }
       });
     };
   }
