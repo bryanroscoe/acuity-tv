@@ -5,6 +5,14 @@
    =========================================================================== */
 'use strict';
 
+/* ----------------------------------------------------- motion ----------- */
+/* Honor the user's reduced-motion preference everywhere (entrances, count-up). */
+const REDUCE_MOTION = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+/* Flag the document so the entrance styles apply only when scripting is live —
+   with no JS every block stays fully visible. Set the instant the script runs,
+   before first paint, to avoid a flash of the natural (un-animated) layout.    */
+document.documentElement.classList.add('acu-motion');
+
 /* ----------------------------------------------------- constants -------- */
 const IQ_MAX = 200; // display scale: the Acuity Quotient is shown as score / 200
 const SCORE_LABEL = 'Acuity Quotient';
@@ -219,6 +227,81 @@ function injectGrain() {
 const fmtVotes = v => v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : v >= 1e3 ? Math.round(v / 1e3) + 'k' : String(v);
 function titleHref(slug) { return './title.html?t=' + encodeURIComponent(slug); }
 
+/* ---------------------------------------------------- entrance motion ----
+   A single IntersectionObserver drives every entrance animation. Mark an
+   element `.acu-anim` (optionally with a `--d` stagger delay) and it fades and
+   lifts into place the first time it scrolls into view; above-the-fold marks
+   fire immediately. Honors prefers-reduced-motion (jumps to the final state).  */
+let _animIO = null;
+function animObserver() {
+  if (_animIO) return _animIO;
+  if (REDUCE_MOTION || !('IntersectionObserver' in window)) {
+    _animIO = { observe(node) { revealNow(node); }, unobserve() {}, disconnect() {} };
+    return _animIO;
+  }
+  _animIO = new IntersectionObserver((entries, obs) => {
+    entries.forEach(e => { if (e.isIntersecting) { revealNow(e.target); obs.unobserve(e.target); } });
+  }, { root: null, rootMargin: '0px 0px -6% 0px', threshold: 0.05 });
+  return _animIO;
+}
+/* add .is-in; once the transition finishes, drop the helper classes so the
+   element's own hover transitions (e.g. the card lift) are left untouched.     */
+function revealNow(node) {
+  node.classList.add('is-in');
+  if (REDUCE_MOTION) return;
+  const done = e => {
+    if (e && e.target !== node) return; // ignore bubbling child transitions
+    node.classList.remove('acu-anim', 'is-in');
+    node.style.removeProperty('--d');
+    node.style.willChange = '';
+    node.removeEventListener('transitionend', done);
+  };
+  node.addEventListener('transitionend', done);
+}
+/* mark one element to animate in (optionally after `delay` ms) */
+function animate(node, delay) {
+  if (!node) return node;
+  node.classList.add('acu-anim');
+  if (delay) node.style.setProperty('--d', Math.round(delay) + 'ms');
+  animObserver().observe(node);
+  return node;
+}
+/* stagger a list/NodeList of elements; cap the index so large grids don't trail */
+function animateStagger(nodes, opts) {
+  opts = opts || {};
+  const step = opts.step != null ? opts.step : 70;
+  const base = opts.base || 0;
+  const cap = opts.cap != null ? opts.cap : 10;
+  Array.prototype.forEach.call(nodes, (node, i) => animate(node, base + Math.min(i, cap) * step));
+}
+/* observe any pre-marked `.acu-anim` already present in the static HTML, reading
+   an optional `data-d` stagger delay from the markup.                          */
+function initMotion() {
+  document.querySelectorAll('.acu-anim').forEach(node => {
+    const d = parseInt(node.getAttribute('data-d') || '0', 10);
+    if (d) node.style.setProperty('--d', d + 'ms');
+    animObserver().observe(node);
+  });
+  // failsafe: never leave a marked block hidden if a callback is somehow missed
+  setTimeout(() => {
+    document.querySelectorAll('.acu-motion .acu-anim:not(.is-in)').forEach(revealNow);
+  }, 1600);
+}
+/* count a number up from 0 → `to` over `dur` ms (ease-out cubic), once */
+function countUp(node, to, dur) {
+  if (!node) return;
+  to = Math.round(to);
+  if (REDUCE_MOTION || !to) { node.textContent = String(to); return; }
+  const start = performance.now();
+  (function tick(now) {
+    const p = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    node.textContent = String(Math.round(to * eased));
+    if (p < 1) requestAnimationFrame(tick);
+    else node.textContent = String(to);
+  })(performance.now());
+}
+
 /* ---------------------------------------------------- percentile -------- */
 /* `pct` = "better than this % of the catalog" (0–100). Render concise,
    on-brand labels (mono). Near the top we flip to a "Top N%" framing.       */
@@ -327,6 +410,51 @@ function titleCard(rec, opts) {
       [el('div', { class: 'tcard-bar-fill', style: 'width:' + rec[k] + '%;' })]));
   });
   card.appendChild(bars);
+  return card;
+}
+
+/* ------------------------------------------------- poster-overlay card ----
+   The catalog / "in the same vein" card per the redesign: a 2:3 poster with
+   the tier badge top-right, the AQ + /200 bottom-left over a bottom gradient,
+   and the ★IMDb rating bottom-right (gold). Title + `year · genres` sit below
+   the poster. The whole card links to the title page; metadata stays legible.  */
+function posterCard(rec, opts) {
+  opts = opts || {};
+  const t = tierOf(rec.tier);
+  const score = displayIq(rec);
+  const pz = weightsActive();
+  const card = el('a', {
+    class: 'pcard t' + rec.tier + (pz ? ' is-personal' : ''),
+    href: titleHref(rec.slug),
+    'aria-label': rec.n + ', ' + (pz ? 'personalized ' : '') + SCORE_LABEL + ' ' + score + ' of ' + IQ_MAX + ', tier ' + t.name + ', IMDb ' + rec.rating.toFixed(1),
+  });
+
+  const poster = el('div', { class: 'pcard-poster' + (rec.p ? ' has-poster' : ' hatch') });
+  if (rec.p) {
+    poster.appendChild(el('img', {
+      class: 'pcard-img', loading: 'lazy', decoding: 'async', alt: '',
+      src: posterUrl(rec.p, 'w342'), width: 342, height: 513,
+    }));
+  } else {
+    poster.appendChild(el('span', { class: 'pcard-placard', text: rec.n }));
+  }
+  poster.appendChild(el('span', { class: 'pcard-badge', text: t.name }));
+  poster.appendChild(el('div', { class: 'pcard-grad', 'aria-hidden': 'true' }));
+  poster.appendChild(el('span', { class: 'pcard-aq', title: pz ? 'Personalized ' + SCORE_LABEL : SCORE_LABEL }, [
+    el('b', { text: String(score) }),
+    el('span', { class: 'pcard-of', text: '/' + IQ_MAX }),
+  ]));
+  poster.appendChild(el('span', { class: 'pcard-imdb', title: 'IMDb rating' }, [
+    el('span', { class: 'star', 'aria-hidden': 'true', text: '★' }),
+    document.createTextNode(rec.rating.toFixed(1)),
+  ]));
+  card.appendChild(poster);
+
+  const genres = (rec.g || []).slice(0, 2).join(', ');
+  card.appendChild(el('div', { class: 'pcard-info' }, [
+    el('div', { class: 'pcard-title', text: rec.n }),
+    el('div', { class: 'pcard-meta', text: rec.year + (genres ? ' · ' + genres : '') }),
+  ]));
   return card;
 }
 
@@ -723,8 +851,10 @@ function initHome() {
     const grid = document.querySelector('[data-feat]');
     if (!grid) return;
     const frag = document.createDocumentFragment();
-    cat.slice(0, 6).forEach((rec, i) => frag.appendChild(titleCard(rec, { rank: i + 1 })));
+    const cards = cat.slice(0, 6).map((rec, i) => titleCard(rec, { rank: i + 1 }));
+    cards.forEach(c => frag.appendChild(c));
     grid.appendChild(frag);
+    animateStagger(cards, { step: 75, cap: 6 }); // stagger the top-of-curve cards in
   }
 
   /* -------- genre chips that focus the instrument -------- */
@@ -863,7 +993,9 @@ function initKids() {
     const count = document.querySelector('[data-kids-count]');
     if (count) count.textContent = kids.length.toLocaleString();
     grid.removeAttribute('aria-busy');
-    kids.slice(0, 12).forEach(r => grid.appendChild(titleCard(r)));
+    const cards = kids.slice(0, 12).map(r => titleCard(r));
+    cards.forEach(c => grid.appendChild(c));
+    animateStagger(cards, { step: 60, cap: 12 });
   }).catch(err => {
     grid.appendChild(el('p', { class: 'muted', text: 'Could not load the catalog right now.' }));
     console.error(err);
@@ -908,16 +1040,10 @@ function initExplore() {
     edu: document.querySelector('#minEdu'),
     ent: document.querySelector('#minEnt'),
   };
-  const dimMinOut = {
-    cog: document.querySelector('#minCogVal'),
-    edu: document.querySelector('#minEduVal'),
-    ent: document.querySelector('#minEntVal'),
-  };
   const elMaxAge = document.querySelector('#maxAge');
-  const elMaxAgeVal = document.querySelector('#maxAgeVal');
   const elMinRating = document.querySelector('#minRating');
-  const elMinRatingVal = document.querySelector('#minRatingVal');
-  const elMinVotes = document.querySelector('#minVotes');
+  const elVotesChips = document.querySelector('#votesChips');
+  const elGenreSearch = document.querySelector('#genreSearch');
   const elSvc = document.querySelector('#svcList');
   const elSvcCount = document.querySelector('#svcCount');
   const elSvcSearch = document.querySelector('#svcSearch');
@@ -929,6 +1055,17 @@ function initExplore() {
   const elActive = document.querySelector('#activeFilters');
   const elReset = document.querySelector('#resetFilters');
   const elMoreWrap = document.querySelector('#loadMoreWrap');
+  // mobile filter drawer chrome
+  const elFilterPanel = document.querySelector('#filterPanel');
+  const elFilterToggle = document.querySelector('#filterToggle');
+  const elFilterClose = document.querySelector('#filterClose');
+  const elFilterScrim = document.querySelector('#filterScrim');
+  const elFilterApply = document.querySelector('#filterApply');
+  const elFilterBadge = document.querySelector('#filterBadge');
+
+  // minimum-IMDb-vote bands rendered as chip toggles
+  const VOTE_BANDS = [[1000, '1k+'], [10000, '10k+'], [50000, '50k+'], [100000, '100k+'], [500000, '500k+']];
+  let allGenres = []; // every genre (for the genre search box)
 
   // attach the ranked autocomplete first so it owns Escape while open
   if (elSearch) attachAutocomplete(elSearch);
@@ -951,7 +1088,6 @@ function initExplore() {
     syncControls();
     if (state.q) elSearch.value = state.q;
     elClear.hidden = !state.q;
-    if (advActive()) setAdvOpen(true);
     apply();
   }).catch(err => {
     elGrid.appendChild(el('div', { class: 'empty' }, [el('h3', { text: 'Catalog unavailable' }), el('p', { text: 'Please refresh to try again.' })]));
@@ -986,10 +1122,20 @@ function initExplore() {
     });
     const gc = {};
     cat.forEach(r => r.g.forEach(g => gc[g] = (gc[g] || 0) + 1));
-    Object.keys(gc).sort((a, b) => gc[b] - gc[a]).forEach(g => {
+    allGenres = Object.keys(gc).sort((a, b) => gc[b] - gc[a]);
+    allGenres.forEach(g => {
       const chip = el('button', { class: 'chip', type: 'button', 'aria-pressed': 'false', 'data-genre': g, text: g });
       chip.addEventListener('click', () => { toggle(state.genres, g, chip); resetPage(); apply(); });
       elGenreChips.appendChild(chip);
+    });
+    // genre search box — hides chips that do not match (picked ones always stay)
+    if (elGenreSearch) elGenreSearch.addEventListener('input', () => {
+      const q = elGenreSearch.value.trim().toLowerCase();
+      elGenreChips.querySelectorAll('.chip').forEach(c => {
+        const g = c.getAttribute('data-genre');
+        const show = !q || g.toLowerCase().includes(q) || state.genres.has(g);
+        c.hidden = !show;
+      });
     });
     [['film', 'Films'], ['series', 'Series']].forEach(([val, lbl]) => {
       const chip = el('button', { class: 'chip', type: 'button', 'aria-pressed': 'false', 'data-type': val, text: lbl });
@@ -1001,6 +1147,18 @@ function initExplore() {
         state.kids = !state.kids;
         elKidsToggle.setAttribute('aria-pressed', String(state.kids));
         resetPage(); apply();
+      });
+    }
+    // IMDb minimum-vote bands as exclusive chip toggles
+    if (elVotesChips) {
+      VOTE_BANDS.forEach(([val, lbl]) => {
+        const chip = el('button', { class: 'chip votechip', type: 'button', 'aria-pressed': 'false', 'data-votes': val, text: lbl });
+        chip.addEventListener('click', () => {
+          state.minVotes = (state.minVotes === val) ? 0 : val;
+          syncVoteChips();
+          resetPage(); apply();
+        });
+        elVotesChips.appendChild(chip);
       });
     }
     // services — canonical brands (ad/channel/tier variants merged), counted by
@@ -1088,17 +1246,22 @@ function initExplore() {
     DIMS.forEach(d => {
       const key = d.key, v = state['min' + key.charAt(0).toUpperCase() + key.slice(1)];
       if (dimMin[key]) dimMin[key].value = String(v);
-      if (dimMinOut[key]) dimMinOut[key].textContent = v > 0 ? '≥ ' + v : 'any';
     });
-    if (elMinRating) elMinRating.value = String(state.minRating);
-    if (elMinRatingVal) elMinRatingVal.textContent = state.minRating > 0 ? '≥ ' + state.minRating.toFixed(1) : 'any';
-    if (elMinVotes) elMinVotes.value = String(state.minVotes);
-    if (elMaxAge) elMaxAge.value = String(state.maxAge == null ? 19 : state.maxAge);
-    if (elMaxAgeVal) elMaxAgeVal.textContent = state.maxAge == null ? 'any' : '≤ ' + state.maxAge;
+    if (elMinRating) elMinRating.value = String(state.minRating || 0);
+    if (elMaxAge) elMaxAge.value = state.maxAge == null ? '' : String(state.maxAge);
+    syncVoteChips();
     if (elSort) elSort.value = state.sort;
     elSvc.querySelectorAll('input[data-svc]').forEach(cb => { cb.checked = state.services.has(cb.getAttribute('data-svc')); });
     if (state.services.size) Store.setServices([...state.services]);
     updateSvcCount();
+  }
+
+  function syncVoteChips() {
+    if (!elVotesChips) return;
+    elVotesChips.querySelectorAll('.votechip').forEach(c => {
+      const v = parseInt(c.getAttribute('data-votes'), 10);
+      c.setAttribute('aria-pressed', state.minVotes === v ? 'true' : 'false');
+    });
   }
 
   function updateSvcCount() {
@@ -1160,12 +1323,13 @@ function initExplore() {
     });
   }
 
-  function render() {
+  function render(mode) {
     elGrid.innerHTML = '';
     elCount.innerHTML = '';
     elCount.appendChild(el('b', { text: filtered.length.toLocaleString() }));
     elCount.appendChild(document.createTextNode(' ' + (filtered.length === 1 ? 'title' : 'titles')));
-    if (weightsActive()) elCount.appendChild(el('span', { class: 'personal-flag', text: '★ ranked by your priorities' }));
+    if (weightsActive()) elCount.appendChild(el('span', { class: 'personal-flag', text: '★ re-ranked to your priorities' }));
+    updateDrawerMeta();
 
     if (!filtered.length) {
       elGrid.appendChild(el('div', { class: 'empty' }, [
@@ -1179,15 +1343,20 @@ function initExplore() {
     }
     const slice = filtered.slice(0, state.shown);
     const frag = document.createDocumentFragment();
-    slice.forEach(r => frag.appendChild(titleCard(r)));
+    const cards = slice.map(r => posterCard(r));
+    cards.forEach(c => frag.appendChild(c));
     elGrid.appendChild(frag);
+    // entrance: on a fresh result set animate the first screen of cards in;
+    // on "show more" only the newly appended batch animates (the rest stay put)
+    const from = mode === 'more' ? Math.max(0, state.shown - PAGE) : 0;
+    animateStagger(cards.slice(from), { step: 40, cap: 10 });
 
     elMoreWrap.innerHTML = '';
     if (filtered.length > state.shown) {
       const remaining = filtered.length - state.shown;
       const btn = el('button', { class: 'btn btn-ghost', type: 'button',
         text: 'Show more (' + Math.min(PAGE, remaining) + ' of ' + remaining.toLocaleString() + ')' });
-      btn.addEventListener('click', () => { state.shown += PAGE; render(); });
+      btn.addEventListener('click', () => { state.shown += PAGE; render('more'); });
       elMoreWrap.appendChild(btn);
     }
   }
@@ -1206,12 +1375,12 @@ function initExplore() {
     DIMS.forEach(d => {
       const key = d.key, prop = 'min' + key.charAt(0).toUpperCase() + key.slice(1);
       if (state[prop] > 0) pills.push([d.label + ' ≥ ' + state[prop], () => {
-        state[prop] = 0; if (dimMin[key]) dimMin[key].value = '0'; if (dimMinOut[key]) dimMinOut[key].textContent = 'any';
+        state[prop] = 0; if (dimMin[key]) dimMin[key].value = '0';
       }]);
     });
-    if (state.minRating > 0) pills.push(['IMDb ≥ ' + state.minRating.toFixed(1), () => { state.minRating = 0; if (elMinRating) elMinRating.value = '0'; if (elMinRatingVal) elMinRatingVal.textContent = 'any'; }]);
-    if (state.minVotes > 0) pills.push(['≥ ' + fmtVotes(state.minVotes) + ' votes', () => { state.minVotes = 0; if (elMinVotes) elMinVotes.value = '0'; }]);
-    if (state.maxAge != null) pills.push(['Age ≤ ' + state.maxAge, () => { state.maxAge = null; if (elMaxAge) elMaxAge.value = '19'; if (elMaxAgeVal) elMaxAgeVal.textContent = 'any'; }]);
+    if (state.minRating > 0) pills.push(['IMDb ≥ ' + state.minRating.toFixed(1), () => { state.minRating = 0; if (elMinRating) elMinRating.value = '0'; }]);
+    if (state.minVotes > 0) pills.push(['≥ ' + fmtVotes(state.minVotes) + ' votes', () => { state.minVotes = 0; syncVoteChips(); }]);
+    if (state.maxAge != null) pills.push(['Age ≤ ' + state.maxAge, () => { state.maxAge = null; if (elMaxAge) elMaxAge.value = ''; }]);
 
     pills.forEach(([label, undo]) => {
       const x = el('button', { type: 'button', 'aria-label': 'Remove ' + label, text: '×' });
@@ -1219,6 +1388,17 @@ function initExplore() {
       x.addEventListener('click', () => { undo(); resetPage(); apply(); });
       elActive.appendChild(pill);
     });
+
+    // active-count badge on the mobile "Filters" trigger
+    if (elFilterBadge) {
+      elFilterBadge.textContent = String(pills.length);
+      elFilterBadge.hidden = pills.length === 0;
+    }
+  }
+
+  // keep the drawer's sticky "Show N titles" button in sync with the result count
+  function updateDrawerMeta() {
+    if (elFilterApply) elFilterApply.textContent = 'Show ' + filtered.length.toLocaleString() + ' title' + (filtered.length === 1 ? '' : 's');
   }
   function syncChip(container, attr, val) {
     const c = container.querySelector('[data-' + attr + '="' + val + '"]');
@@ -1233,10 +1413,11 @@ function initExplore() {
     state.minCog = 0; state.minEdu = 0; state.minEnt = 0;
     state.minRating = 0; state.minVotes = 0;
     state.maxAge = null;
-    if (elMaxAge) elMaxAge.value = '19'; if (elMaxAgeVal) elMaxAgeVal.textContent = 'any';
-    DIMS.forEach(d => { if (dimMin[d.key]) dimMin[d.key].value = '0'; if (dimMinOut[d.key]) dimMinOut[d.key].textContent = 'any'; });
-    if (elMinRating) { elMinRating.value = '0'; if (elMinRatingVal) elMinRatingVal.textContent = 'any'; }
-    if (elMinVotes) elMinVotes.value = '0';
+    if (elMaxAge) elMaxAge.value = '';
+    DIMS.forEach(d => { if (dimMin[d.key]) dimMin[d.key].value = '0'; });
+    if (elMinRating) elMinRating.value = '0';
+    syncVoteChips();
+    if (elGenreSearch) { elGenreSearch.value = ''; elGenreChips.querySelectorAll('.chip').forEach(c => { c.hidden = false; }); }
     if (elKidsToggle) elKidsToggle.setAttribute('aria-pressed', 'false');
     // keep service subscriptions (that is a user profile, not a transient filter)
     document.querySelectorAll('#tierChips .chip, #genreChips .chip, #typeChips .chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
@@ -1259,34 +1440,25 @@ function initExplore() {
   elMin.addEventListener('input', onRange);
   elMax.addEventListener('input', onRange);
 
-  // per-dimension minimum sliders (Cognitive load / Knowledge value / Craft)
+  // per-dimension minimums — selects (any / 40+ / 60+ / 80+)
   DIMS.forEach(d => {
-    const slider = dimMin[d.key];
-    if (!slider) return;
+    const sel = dimMin[d.key];
+    if (!sel) return;
     const prop = 'min' + d.key.charAt(0).toUpperCase() + d.key.slice(1);
-    slider.addEventListener('input', () => {
-      const v = Math.max(0, Math.min(100, parseInt(slider.value, 10) || 0));
-      state[prop] = v;
-      if (dimMinOut[d.key]) dimMinOut[d.key].textContent = v > 0 ? '≥ ' + v : 'any';
+    sel.addEventListener('change', () => {
+      state[prop] = Math.max(0, Math.min(100, parseInt(sel.value, 10) || 0));
       resetPage(); apply();
     });
   });
-  // IMDb rating minimum (0–10)
-  if (elMinRating) elMinRating.addEventListener('input', () => {
+  // IMDb rating minimum — select
+  if (elMinRating) elMinRating.addEventListener('change', () => {
     state.minRating = Math.max(0, Math.min(10, parseFloat(elMinRating.value) || 0));
-    if (elMinRatingVal) elMinRatingVal.textContent = state.minRating > 0 ? '≥ ' + state.minRating.toFixed(1) : 'any';
     resetPage(); apply();
   });
-  // IMDb minimum-votes threshold (select)
-  if (elMinVotes) elMinVotes.addEventListener('change', () => {
-    state.minVotes = Math.max(0, parseInt(elMinVotes.value, 10) || 0);
-    resetPage(); apply();
-  });
-  // audience-age cap — slider 0–18 sets "suitable for age ≤ N"; 19 = any (off)
-  if (elMaxAge) elMaxAge.addEventListener('input', () => {
+  // audience-age cap — select; "" = any, otherwise "suitable for age ≤ N"
+  if (elMaxAge) elMaxAge.addEventListener('change', () => {
     const v = parseInt(elMaxAge.value, 10);
-    state.maxAge = (isNaN(v) || v >= 19) ? null : Math.max(0, v);
-    if (elMaxAgeVal) elMaxAgeVal.textContent = state.maxAge == null ? 'any' : '≤ ' + state.maxAge;
+    state.maxAge = isNaN(v) ? null : Math.max(0, v);
     resetPage(); apply();
   });
 
@@ -1311,29 +1483,28 @@ function initExplore() {
   elSort.addEventListener('change', () => { state.sort = elSort.value; resetPage(); apply(); });
   elReset.addEventListener('click', resetAll);
 
-  const ftog = document.querySelector('#filterToggle');
-  const fpanel = document.querySelector('#filterPanel');
-  if (ftog && fpanel) ftog.addEventListener('click', () => fpanel.classList.toggle('open'));
-
-  // Advanced-filters disclosure: reveals score-range / age / weights / dim-mins / IMDb
-  const advToggle = document.querySelector('#advToggle');
-  const advWrap = document.querySelector('#advWrap');
-  function setAdvOpen(open) {
-    if (!advToggle || !advWrap) return;
-    if (open) advWrap.removeAttribute('hidden'); else advWrap.setAttribute('hidden', '');
-    advToggle.setAttribute('aria-expanded', String(open));
-    advToggle.classList.toggle('open', open);
+  // ---- mobile filter drawer: open / close + scrim ----
+  function openDrawer() {
+    if (!elFilterPanel) return;
+    elFilterPanel.classList.add('open');
+    if (elFilterScrim) elFilterScrim.hidden = false;
+    document.body.classList.add('drawer-open');
+    if (elFilterToggle) elFilterToggle.setAttribute('aria-expanded', 'true');
   }
-  if (advToggle && advWrap) {
-    advToggle.addEventListener('click', () => setAdvOpen(advWrap.hasAttribute('hidden')));
+  function closeDrawer() {
+    if (!elFilterPanel) return;
+    elFilterPanel.classList.remove('open');
+    if (elFilterScrim) elFilterScrim.hidden = true;
+    document.body.classList.remove('drawer-open');
+    if (elFilterToggle) elFilterToggle.setAttribute('aria-expanded', 'false');
   }
-  // open Advanced automatically when an advanced filter is already in effect
-  function advActive() {
-    return state.min > 0 || state.max < IQ_MAX ||
-      state.minCog > 0 || state.minEdu > 0 || state.minEnt > 0 ||
-      state.minRating > 0 || state.minVotes > 0 || state.maxAge != null || weightsActive();
-  }
-  if (advActive()) setAdvOpen(true);
+  if (elFilterToggle) elFilterToggle.addEventListener('click', () => {
+    if (elFilterPanel.classList.contains('open')) closeDrawer(); else openDrawer();
+  });
+  if (elFilterClose) elFilterClose.addEventListener('click', closeDrawer);
+  if (elFilterScrim) elFilterScrim.addEventListener('click', closeDrawer);
+  if (elFilterApply) elFilterApply.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && elFilterPanel && elFilterPanel.classList.contains('open')) closeDrawer(); });
 
   initWeightControls();
 
@@ -1457,105 +1628,80 @@ function initTitle() {
     root.className = 'detail t' + rec.tier;
     root.removeAttribute('aria-busy');
 
-    root.appendChild(el('nav', { class: 'breadcrumb' }, [
-      el('a', { href: './explore.html', text: 'Catalog' }),
-      document.createTextNode('  /  ' + rec.n),
-    ]));
-
-    const grid = el('div', { class: 'detail-grid' });
-
-    // left: real poster when available, score-tile fallback otherwise
     const score = displayIq(rec);
     const pz = weightsActive();
-    const ofLabel = (pz ? 'Your ' : '') + SCORE_LABEL + ' / ' + IQ_MAX;
-    const left = el('div', { class: 'detail-media' });
+
+    // back to catalog
+    root.appendChild(el('a', { class: 'back-link', href: './explore.html' }, [
+      el('span', { class: 'bl-arrow', 'aria-hidden': 'true', text: '←' }),
+      document.createTextNode(' Catalog'),
+    ]));
+
+    /* ---------------- HERO: poster + headline + AQ card + where-to-watch ---- */
+    const hero = el('div', { class: 'title-hero' });
+
+    // left: poster (~286px, 2:3) — real cover or hatched placard
+    const media = el('div', { class: 'th-poster' + (rec.p ? ' has-poster' : ' hatch') });
     if (rec.p) {
-      left.appendChild(el('img', {
-        class: 'detail-poster', loading: 'lazy', decoding: 'async',
-        src: posterUrl(rec.p, 'w500'), alt: 'Poster for ' + rec.n, width: 500, height: 750,
-      }));
-      left.appendChild(el('div', { class: 'detail-score t' + rec.tier + (pz ? ' personal' : '') }, [
-        el('span', { class: 'ds-num', text: String(score) }),
-        el('span', { class: 'ds-of', text: ofLabel }),
-        pz ? el('a', { class: 'ds-personal', href: './explore.html', text: '★ personalized — see priorities' }) : null,
-        tierChipLink(rec.tier),
-      ]));
+      media.appendChild(el('img', { class: 'th-poster-img', loading: 'eager', decoding: 'async',
+        src: posterUrl(rec.p, 'w500'), alt: 'Poster for ' + rec.n, width: 500, height: 750 }));
     } else {
-      left.appendChild(el('div', { class: 'hero-tile t' + rec.tier + (pz ? ' personal' : '') }, [
-        el('div', { class: 'big-iq', text: String(score) }),
-        el('div', { class: 'of', text: ofLabel }),
-        pz ? el('a', { class: 'ds-personal', href: './explore.html', text: '★ personalized' }) : null,
+      media.appendChild(el('span', { class: 'th-placard', text: rec.n }));
+    }
+    hero.appendChild(media);
+
+    const main = el('div', { class: 'th-main' });
+
+    // chips row: kind · year · cert · ★IMDb·votes (gold)
+    const chips = el('div', { class: 'th-chips' });
+    chips.appendChild(metaLink(kindOf(rec), { type: rec.type }, 'th-chip'));
+    chips.appendChild(metaLink(String(rec.year), { year: rec.year }, 'th-chip'));
+    if (rec.cert) chips.appendChild(el('span', { class: 'th-chip rated', title: 'Content rating', text: rec.cert }));
+    chips.appendChild(el('span', { class: 'th-chip imdb' }, [
+      el('span', { class: 'star', 'aria-hidden': 'true', text: '★' }),
+      el('b', { text: rec.rating.toFixed(1) }),
+      el('span', { class: 'th-votes', text: ' · ' + fmtVotes(rec.votes) + ' votes' }),
+    ]));
+    main.appendChild(chips);
+
+    // title (54px serif)
+    main.appendChild(el('h1', { class: 'th-title', text: rec.n }));
+
+    // genres → filtered Explore
+    const genreRow = el('div', { class: 'th-genres' });
+    (rec.g || []).forEach(g => genreRow.appendChild(metaLink(g, { genre: g }, 'th-genre')));
+    main.appendChild(genreRow);
+
+    // the big AQ card
+    const pp = pctPhrase(rec.pct);
+    const aqCard = el('div', { class: 'aq-card t' + rec.tier + (pz ? ' personal' : '') });
+    const aqcBig = el('span', { class: 'aqc-big', title: pz ? 'Personalized ' + SCORE_LABEL : SCORE_LABEL, text: REDUCE_MOTION ? String(score) : '0' });
+    aqCard.appendChild(el('div', { class: 'aqc-top' }, [
+      el('div', { class: 'aqc-num' }, [
+        aqcBig,
+        el('span', { class: 'aqc-of', text: '/' + IQ_MAX + ' ' + SCORE_ABBR }),
+      ]),
+      el('div', { class: 'aqc-side' }, [
         tierChipLink(rec.tier),
-      ]));
-    }
-    grid.appendChild(left);
-
-    // right column
-    const right = el('div', {});
-    const meta = el('div', { class: 'meta' });
-    meta.appendChild(metaLink(rec.type === 'series' ? 'Series' : 'Film', { type: rec.type }));
-    meta.appendChild(sep());
-    meta.appendChild(metaLink(String(rec.year), { year: rec.year }));
-    meta.appendChild(sep());
-    (rec.g || []).forEach((g, i) => {
-      if (i) meta.appendChild(document.createTextNode(', '));
-      meta.appendChild(metaLink(g, { genre: g }));
-    });
-    if (rec.cert) {
-      meta.appendChild(sep());
-      meta.appendChild(el('span', { class: 'age-badge', title: 'Content rating', text: rec.cert }));
-    }
-    meta.appendChild(sep());
-    meta.appendChild(el('span', { class: 'imdb', text: 'IMDb ' + rec.rating.toFixed(1) + ' (' + fmtVotes(rec.votes) + ')' }));
-    right.appendChild(el('div', { class: 'detail-head' }, [el('h1', { text: rec.n }), meta]));
-
-    right.appendChild(el('p', { class: 'tier-desc' }, [
-      el('a', { class: 'tier-name-link t' + rec.tier, href: exploreHref({ tier: rec.tier }), text: t.name }),
+        pp ? el('span', { class: 'aqc-pct', text: pp }) : null,
+        pz ? el('a', { class: 'ds-personal', href: './explore.html', text: '★ personalized — see priorities' }) : null,
+      ]),
+    ]));
+    const aqBar = el('div', { class: 'aqc-bar' }, [el('div', { class: 'aqc-bar-fill' })]);
+    aqCard.appendChild(aqBar);
+    aqCard.appendChild(el('p', { class: 'aqc-blurb' }, [
+      el('a', { class: 'aqc-tier tier-name-link t' + rec.tier, href: exploreHref({ tier: rec.tier }), text: t.name }),
       document.createTextNode(' — ' + t.desc),
     ]));
-
-    // AQ readout strip: percentile + a tier-colored bar on the 0–200 scale
-    const pp = pctPhrase(rec.pct);
-    const strip = el('div', { class: 'aq-strip' }, [
-      el('div', { class: 'aq-strip-top' }, [
-        el('span', { class: 'aq-pct', text: pp || (SCORE_LABEL + ' on a fixed 0–' + IQ_MAX + ' scale') }),
-        el('span', { class: 'aq-scale' }, [
-          el('b', { text: String(score) }), document.createTextNode(' / ' + IQ_MAX + ' ' + SCORE_ABBR),
-        ]),
-      ]),
-      el('div', { class: 'aq-bar' }, [el('div', { class: 'aq-bar-fill' })]),
-    ]);
-    right.appendChild(strip);
+    main.appendChild(aqCard);
+    // reveal once: fill the AQ bar (CSS width transition) and count the number up
     requestAnimationFrame(() => {
-      const f = strip.querySelector('.aq-bar-fill');
+      const f = aqBar.querySelector('.aqc-bar-fill');
       if (f) f.style.width = (score / IQ_MAX * 100).toFixed(1) + '%';
+      countUp(aqcBig, score, 720);
     });
 
-    // dimension bars
-    const dims = el('div', { class: 'dims' });
-    DIMS.forEach(d => {
-      const v = rec[d.key];
-      const row = el('div', { class: 'dim ' + d.key }, [
-        el('div', { class: 'dim-top' }, [
-          el('span', { class: 'name', html: d.label + ' <small>' + d.hint + '</small>' }),
-          el('span', { class: 'val', text: v + ' / 100' }),
-        ]),
-        el('div', { class: 'dim-track' }, [el('div', { class: 'dim-fill' })]),
-      ]);
-      dims.appendChild(row);
-      requestAnimationFrame(() => row.querySelector('.dim-fill').style.setProperty('--w', v + '%'));
-    });
-    right.appendChild(dims);
-
-    // reception — audience (always) + critic (when available); the AQ folds these in
-    right.appendChild(receptionBlock(rec));
-
-    right.appendChild(el('div', { class: 'rationale' }, [
-      el('h3', { text: 'Why this score' }),
-      el('p', { text: makeRationale(rec) }),
-    ]));
-
-    // actions
+    // mark watched / add to watchlist (kept from prior build, placed in the hero)
     const watchedBtn = el('button', { class: 'btn btn-ghost', type: 'button' });
     const listBtn = el('button', { class: 'btn btn-ghost', type: 'button' });
     function syncBtns() {
@@ -1570,28 +1716,81 @@ function initTitle() {
     syncBtns();
     const actions = el('div', { class: 'detail-actions' }, [watchedBtn, listBtn]);
     if (!Store.available) actions.appendChild(el('span', { class: 'muted', text: ' (browser storage is off — picks won’t persist)' }));
-    right.appendChild(actions);
+    main.appendChild(actions);
 
-    // where to watch — each provider chip (official logo) links into the streaming filter
-    right.appendChild(el('h2', { class: 'subhead', text: 'Where to watch (US)' }));
+    // where to watch — provider chips with official logos
+    main.appendChild(el('h2', { class: 'subhead', text: 'Where to watch (US)' }));
     watchHost = el('div', { class: 'watch-host' });
-    right.appendChild(watchHost);
+    main.appendChild(watchHost);
     renderWatch(rec);
 
-    grid.appendChild(right);
-    root.appendChild(grid);
+    hero.appendChild(main);
+    root.appendChild(hero);
+    // entrance: poster then the hero column lift in (above the fold → on load)
+    animate(media, 0);
+    animate(main, 110);
 
-    // similar titles: same primary genre, nearest score
+    /* ---------------- RECEPTION (audience + critic; AQ folds these in) ------ */
+    const reception = receptionBlock(rec);
+    root.appendChild(reception);
+    animate(reception);
+
+    /* ---------------- THE BREAKDOWN — three lenses, scored ----------------- */
+    const bd = el('section', { class: 'breakdown' });
+    bd.appendChild(el('div', { class: 'sec-head' }, [
+      el('h2', { text: 'The breakdown' }),
+      el('span', { class: 'sec-sub', text: 'Three lenses, scored' }),
+    ]));
+    const dims = el('div', { class: 'dims' });
+    DIMS.forEach(d => {
+      const v = rec[d.key];
+      const row = el('div', { class: 'dim ' + d.key }, [
+        el('div', { class: 'dim-top' }, [
+          el('span', { class: 'name', html: d.label + ' <small>' + d.hint + '</small>' }),
+          el('span', { class: 'val', text: v + ' / 100' }),
+        ]),
+        el('div', { class: 'dim-track' }, [el('div', { class: 'dim-fill' })]),
+      ]);
+      dims.appendChild(row);
+      requestAnimationFrame(() => row.querySelector('.dim-fill').style.setProperty('--w', v + '%'));
+    });
+    bd.appendChild(dims);
+    root.appendChild(bd);
+    animate(bd);
+
+    /* ---------------- THE RATIONALE + "how this was scored" sidecard ------- */
+    const rg = el('div', { class: 'rationale-grid' });
+    rg.appendChild(el('div', { class: 'rationale' }, [
+      el('h3', { text: 'The rationale — Why this score' }),
+      el('p', { text: makeRationale(rec) }),
+    ]));
+    rg.appendChild(el('aside', { class: 'score-sidecard' }, [
+      el('h4', { text: 'How this was scored' }),
+      el('p', { text: 'Every title runs through the same three lenses — Depth, Insight and Craft — blended into one Acuity Quotient on a fixed 0–' + IQ_MAX + ' scale. Audience and critic reception are folded in, never published as the verdict.' }),
+      el('a', { class: 'sidecard-link', href: './methodology.html', text: 'Read the methodology →' }),
+    ]));
+    root.appendChild(rg);
+    animate(rg);
+
+    /* ---------------- IN THE SAME VEIN — same genre, near this score -------- */
     const primary = rec.g[0];
     const similar = cat
       .filter(r => r.slug !== rec.slug && r.g.includes(primary))
       .sort((a, b) => Math.abs(a.iq - rec.iq) - Math.abs(b.iq - rec.iq))
-      .slice(0, 4);
+      .slice(0, 5);
     if (similar.length) {
-      root.appendChild(el('h2', { class: 'subhead', text: 'Close in spirit — ' + primary }));
-      const sg = el('div', { class: 'grid' });
-      similar.forEach(r => sg.appendChild(titleCard(r)));
-      root.appendChild(sg);
+      const rel = el('section', { class: 'related' });
+      rel.appendChild(el('div', { class: 'sec-head' }, [
+        el('h2', { text: 'In the same vein' }),
+        el('span', { class: 'sec-sub', text: primary + ' · near this score' }),
+      ]));
+      const sg = el('div', { class: 'grid grid-poster' });
+      const relCards = similar.map(r => posterCard(r));
+      relCards.forEach(c => sg.appendChild(c));
+      rel.appendChild(sg);
+      root.appendChild(rel);
+      animate(rel.querySelector('.sec-head'));
+      animateStagger(relCards, { step: 70, cap: 6 });
     }
   }
 }
@@ -1767,4 +1966,5 @@ document.addEventListener('DOMContentLoaded', () => {
   else if (page === 'title') initTitle();
   else if (page === 'methodology') initMethodology();
   else if (page === 'kids') initKids();
+  initMotion(); // observe any static `.acu-anim` blocks marked in the HTML
 });
