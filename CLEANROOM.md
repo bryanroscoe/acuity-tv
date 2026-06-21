@@ -483,3 +483,37 @@ Self-verification (served on :8919, then stopped):
 - Data note: this catalog.json build carries no `svc` / `maxage` fields, so the streaming and
   audience-age filters have no data to act on (they render and apply correctly but match nothing);
   this is a pre-existing dataset state, not a regression from this pass.
+
+### Implementer attestation (v10 — TMDB/IMDb attribution)
+**Date:** 2026-06-21
+
+I confirm that this pass was performed entirely clean-room: I did not read the
+`tvintelligentsia` reference repo, did not fetch `tvintelligentsia.com`, and ran no web
+search for any reference product. Work was done solely from `dist/` and the design language
+already present in the codebase.
+
+**Why:** the site hotlinks movie/series posters from `image.tmdb.org` and is built on facts
+from IMDb's public datasets; both require attribution. Images remain hotlinks (not downloaded
+or rehosted).
+
+**Changes:**
+- `dist/app.js` — added `injectAttribution()`, a single-source-of-truth helper that appends a
+  consistent data-credit block into whichever `<footer>` each page already has, wired into the
+  `DOMContentLoaded` boot right after `initNav()`. Text-only (no external logo, since the page
+  CSP `img-src 'self' data:` disallows one). The two credit lines:
+  - "This product uses the TMDB API but is not endorsed or certified by TMDB." (verbatim TMDB
+    wording; "TMDB" links to https://www.themoviedb.org/).
+  - "Title data from IMDb. For non-commercial use." ("IMDb" links to
+    https://www.imdb.com/interfaces/).
+- `dist/styles.css` — added `.attrib-credit` / `.attrib-inner` / `.attrib-line` / `.attrib-link`
+  rules in the muted IBM Plex Mono footer idiom, aligned to `--maxw`.
+- `dist/methodology.html` — added a "Sources & credits" prose block near the bottom (original
+  prose) restating the IMDb public-dataset metadata source, that posters are served by TMDB and
+  not downloaded, and the verbatim TMDB-not-endorsed line.
+
+**Self-verification:** `node --check dist/app.js` passes; no inline `<script>` bodies and no
+inline `on*=` handlers; served on :8920 — index, explore, title.html?t=schindlers-list-1993,
+methodology, and kids all return 200; every page carries a single `<footer>` target plus
+`app.js`, so the injected TMDB+IMDb credit lines render on all five; methodology contains the
+Sources & credits block and the verbatim TMDB line. Posters remain `image.tmdb.org` hotlinks.
+Server stopped after checks.

@@ -523,6 +523,27 @@ function attachAutocomplete(input, cfg) {
   return { isOpen: isOpen, close: close, refresh: run };
 }
 
+/* ----------------------------------------------- attribution footer ----- */
+/* Legally-required data credits, rendered once from here (single source of
+   truth) and appended into whatever footer the page already has, so the
+   wording stays consistent and DRY across every page. Text-only: the page
+   CSP (img-src 'self' data:) does not allow an external logo, and posters are
+   hotlinked from image.tmdb.org — we credit them rather than vendor anything. */
+function injectAttribution() {
+  const footer = document.querySelector('footer');
+  if (!footer || footer.querySelector('.attrib-credit')) return;
+  const tmdbLink = el('a', { class: 'attrib-link', href: 'https://www.themoviedb.org/', target: '_blank', rel: 'noopener noreferrer', text: 'TMDB' });
+  const imdbLink = el('a', { class: 'attrib-link', href: 'https://www.imdb.com/interfaces/', target: '_blank', rel: 'noopener noreferrer', text: 'IMDb' });
+  const block = el('div', { class: 'attrib-credit' }, [
+    el('div', { class: 'attrib-inner' }, [
+      // verbatim TMDB attribution wording (TMDB term-of-use requirement)
+      el('p', { class: 'attrib-line' }, ['This product uses the ', tmdbLink, ' API but is not endorsed or certified by TMDB.']),
+      el('p', { class: 'attrib-line' }, ['Title data from ', imdbLink, '. For non-commercial use.']),
+    ]),
+  ]);
+  footer.appendChild(block);
+}
+
 /* ----------------------------------------------------- nav -------------- */
 function initNav() {
   injectGrain();
@@ -1690,6 +1711,7 @@ function drawHistogram(root, stats) {
 /* ----------------------------------------------------- boot ------------- */
 document.addEventListener('DOMContentLoaded', () => {
   initNav();
+  injectAttribution();
   loadWeightPrefs();
   const page = document.body.getAttribute('data-page');
   if (page === 'home') initHome();
