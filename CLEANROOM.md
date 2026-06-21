@@ -427,3 +427,59 @@ Self-verification (served on :8918, then stopped):
   `<img>` thumbnail (`exploreDropdownImgs == rows`, `heroDropdownImgs == rows`).
 - `node --check app.js` passes; grep shows no `compare.html` references and no inline `on*=` handlers;
   no "LIVE" text remains; the only `<script>` tags are `src="./app.js"`.
+
+### Implementer attestation (v9 — filters basic/advanced + tier histogram)
+
+Date: 2026-06-21. I confirm no reference-product access during this work: I did not read
+`/Users/bryanroscoe/Developer/tvintelligentsia`, did not fetch `tvintelligentsia.com`, and ran no
+web search for any reference product. All work was done solely from the existing `dist/` files,
+the `design/` mockups, and the local dataset (`./data/catalog.json`, `./data/stats.json`).
+
+Changes:
+- **TASK 1 — Explore sidebar split into Basic / Advanced (much tighter).** `explore.html` sidebar
+  reordered into a lean Basic set shown by default — **Tier · Type · Genre** (moved high) · **My
+  streaming services** · a single **"Kids & family only"** toggle — and everything else moved
+  behind an **"Advanced filters"** disclosure (collapsed by default, one click reveals): **Acuity
+  score range · Audience age · Weight your priorities · Dimension minimums · IMDb**. The streaming
+  helper paragraph was cut to the one-liner "Pick yours; we hide the rest."; the verbose age /
+  dimension-minimums / weights helper paragraphs were removed. The Kids toggle is now a bare,
+  full-width chip (no heading). Each section remains a compact collapsible group with a chevron;
+  the sidebar stays sticky + independently scrollable.
+- **`app.js`:** added the Advanced disclosure wiring (`#advToggle`/`#advWrap`, toggles `hidden` +
+  `aria-expanded`, all via `addEventListener`); the panel auto-opens when an advanced filter is
+  already active (URL params like `?age=` / `?mincog=` or persisted weights) via a new `advActive()`
+  check. No filter behavior changed — every filter, URL param, live count, clear-all, persistence,
+  and the streaming logos / merged variants / "+ N more" expander still work.
+- **`styles.css`:** tightened vertical rhythm throughout the filters (`.filter-block` padding
+  16→10px, h3 margin 12→8px, `.chips` gap 7→6px, `.chip` padding 6/11→4/10px, `.filter-hint`
+  smaller/tighter, `.svc-list` max-height 220→178px, `.svc-opt` padding 6→4px, `.dimmin-row`
+  margin 14→10px); added `.kids-block`/`.kids-chip` and the `.adv-toggle`/`.adv-wrap` styles.
+- **TASK 2 — Methodology histogram colored by tier + tier legend.** `drawHistogram` now colors
+  every bar by the tier its Acuity Quotient falls into (`class="bar t<tier>"` + inline
+  `fill: var(--t<tier>)`, the five tier colors `#c66a86 #6a6580 #6f63c4 #8a78ff #b9acff`), so the
+  five bands are visible across the 4–200 range. Added an interactive **tier legend/key**
+  (`[data-hist-legend]` in `methodology.html`): five pills with color swatch + name + AQ range;
+  clicking a tier isolates its bars (`.hist.has-active` dims the rest, `.lit` keeps the active
+  band) and click-again clears. The hover tooltip (now AQ + tier name + count) and the mean line
+  are retained; numbers still come from `stats.json`.
+
+Engineering: no inline `<script>` / no inline `on*=` handlers (matches in grep are
+`content=`/`controls=` substrings, not events); relative paths; single `./data/catalog.json`
+source; `acuity_v1` localStorage namespace with graceful degradation unchanged.
+
+Self-verification (served on :8919, then stopped):
+- `node --check app.js` passes; `explore.html`, `methodology.html`, `app.js`, `data/catalog.json`
+  all return 200.
+- Headless Chrome (`--dump-dom`) on Explore: Basic sidebar renders **Tier · Type · Genre · My
+  streaming services** headings (+ the bare Kids chip) only; the `adv-wrap` is `hidden` and the
+  `adv-toggle` is `aria-expanded="false"` by default; streaming helper text reads "Pick yours; we
+  hide the rest."; `?genre=Drama&tier=4` → **2,249** titles and `?tier=4` → **2,740** (filters
+  change the count); `?age=8` reveals the Advanced panel (`adv-wrap` no longer `hidden`).
+- Headless Chrome on Methodology: histogram bars carry per-tier classes and inline tier fills
+  spread across all five bands (66/15/30/15/71 bars for tiers 0–4); legend renders all five tiers
+  (Idle/Ambient/Engaging/Absorbing/Profound) with AQ ranges; mean line present; tooltips read
+  "Acuity Quotient N · <Tier>: M titles". Screenshots confirm the rose→slate→violet→champagne
+  tier banding and the legend.
+- Data note: this catalog.json build carries no `svc` / `maxage` fields, so the streaming and
+  audience-age filters have no data to act on (they render and apply correctly but match nothing);
+  this is a pre-existing dataset state, not a regression from this pass.

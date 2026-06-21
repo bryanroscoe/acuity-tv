@@ -48,6 +48,7 @@
             <button class="reset-link" id="resetFilters" type="button">Clear all</button>
           </div>
 
+          <!-- ===== BASIC (default) ===== -->
           <div class="filter-block collapsible">
             <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Tier</h3>
             <div class="chips" id="tierChips" role="group" aria-label="Filter by tier"></div>
@@ -57,16 +58,13 @@
             <div class="chips" id="typeChips" role="group" aria-label="Filter by type"></div>
           </div>
           <div class="filter-block collapsible">
-            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Audience</h3>
-            <div class="chips" id="audienceChips" role="group" aria-label="Filter by audience">
-              <button class="chip" id="kidsToggle" type="button" aria-pressed="false">Kids &amp; family only</button>
-            </div>
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Genre</h3>
+            <div class="chips" id="genreChips" role="group" aria-label="Filter by genre"></div>
           </div>
-
           <div class="filter-block collapsible">
             <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">My streaming services <span class="count-tag" id="svcCount"></span></h3>
             <div class="fb-body">
-              <p class="filter-hint">Pick what you subscribe to — we remember it and hide the rest. Ad-supported and channel variants are merged into one brand.</p>
+              <p class="filter-hint">Pick yours; we hide the rest.</p>
               <div class="svc-search" id="svcSearchWrap" hidden>
                 <input type="search" id="svcSearch" placeholder="Search services…" aria-label="Search streaming services" autocomplete="off">
               </div>
@@ -74,93 +72,94 @@
               <button class="reset-link svc-show-all" id="svcShowAll" type="button" hidden>Show all services</button>
             </div>
           </div>
-
-          <div class="filter-block collapsible">
-            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Audience age</h3>
-            <div class="fb-body">
-              <p class="filter-hint">Show only titles suitable for a viewer of this age (from the content rating). Higher-rated or unrated titles are hidden.</p>
-              <div class="dimmin-row age-row">
-                <div class="dm-top"><span class="dm-name">Suitable for age</span><span class="dm-val" id="maxAgeVal">any</span></div>
-                <input type="range" min="0" max="19" step="1" value="19" id="maxAge" aria-label="Maximum audience age">
-              </div>
-            </div>
+          <div class="filter-block kids-block">
+            <button class="chip kids-chip" id="kidsToggle" type="button" aria-pressed="false">Kids &amp; family only</button>
           </div>
 
-          <div class="filter-block collapsible weight-block" id="weightBlock">
-            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Weight your priorities <button class="reset-link" id="weightReset" type="button" hidden>Reset</button></h3>
-            <div class="fb-body">
-              <p class="filter-hint">Score what <em>you</em> care about. We recompute every Acuity Quotient and re-rank the catalog live.</p>
-              <label class="svc-opt weight-on" for="weightOn">
-                <input type="checkbox" id="weightOn">
-                <span>Use my priorities</span>
-              </label>
-              <div class="weights" id="weightControls">
-                <div class="weight-row dim cog">
-                  <div class="wr-top"><span class="wr-name">Depth</span><span class="wr-pct" data-pct="cog">40%</span></div>
-                  <input type="range" min="0" max="100" step="5" value="40" id="wCog" aria-label="Depth weight">
-                </div>
-                <div class="weight-row dim edu">
-                  <div class="wr-top"><span class="wr-name">Insight</span><span class="wr-pct" data-pct="edu">25%</span></div>
-                  <input type="range" min="0" max="100" step="5" value="25" id="wEdu" aria-label="Insight weight">
-                </div>
-                <div class="weight-row dim ent">
-                  <div class="wr-top"><span class="wr-name">Craft</span><span class="wr-pct" data-pct="ent">35%</span></div>
-                  <input type="range" min="0" max="100" step="5" value="35" id="wEnt" aria-label="Craft and execution weight">
+          <!-- ===== ADVANCED (collapsed behind a disclosure) ===== -->
+          <button class="adv-toggle" id="advToggle" type="button" aria-expanded="false" aria-controls="advWrap">Advanced filters</button>
+          <div class="adv-wrap" id="advWrap" hidden>
+
+            <div class="filter-block collapsible">
+              <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Acuity score range</h3>
+              <div class="range-row fb-body">
+                <input type="number" id="iqMin" min="0" max="200" placeholder="0" aria-label="Minimum Acuity Quotient" inputmode="numeric">
+                <span>to</span>
+                <input type="number" id="iqMax" min="0" max="200" placeholder="200" aria-label="Maximum Acuity Quotient" inputmode="numeric">
+              </div>
+            </div>
+
+            <div class="filter-block collapsible">
+              <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Audience age</h3>
+              <div class="fb-body">
+                <div class="dimmin-row age-row">
+                  <div class="dm-top"><span class="dm-name">Suitable for age</span><span class="dm-val" id="maxAgeVal">any</span></div>
+                  <input type="range" min="0" max="19" step="1" value="19" id="maxAge" aria-label="Maximum audience age">
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="filter-block collapsible">
-            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Dimension minimums</h3>
-            <div class="fb-body">
-              <p class="filter-hint">Require a floor on any of the three score dimensions (0–100).</p>
-              <div class="dimmin-row dim cog">
-                <div class="dm-top"><span class="dm-name">Depth</span><span class="dm-val" id="minCogVal">any</span></div>
-                <input type="range" min="0" max="100" step="5" value="0" id="minCog" aria-label="Minimum depth">
-              </div>
-              <div class="dimmin-row dim edu">
-                <div class="dm-top"><span class="dm-name">Insight</span><span class="dm-val" id="minEduVal">any</span></div>
-                <input type="range" min="0" max="100" step="5" value="0" id="minEdu" aria-label="Minimum insight">
-              </div>
-              <div class="dimmin-row dim ent">
-                <div class="dm-top"><span class="dm-name">Craft</span><span class="dm-val" id="minEntVal">any</span></div>
-                <input type="range" min="0" max="100" step="5" value="0" id="minEnt" aria-label="Minimum craft">
+            <div class="filter-block collapsible weight-block" id="weightBlock">
+              <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Weight your priorities <button class="reset-link" id="weightReset" type="button" hidden>Reset</button></h3>
+              <div class="fb-body">
+                <label class="svc-opt weight-on" for="weightOn">
+                  <input type="checkbox" id="weightOn">
+                  <span>Use my priorities</span>
+                </label>
+                <div class="weights" id="weightControls">
+                  <div class="weight-row dim cog">
+                    <div class="wr-top"><span class="wr-name">Depth</span><span class="wr-pct" data-pct="cog">40%</span></div>
+                    <input type="range" min="0" max="100" step="5" value="40" id="wCog" aria-label="Depth weight">
+                  </div>
+                  <div class="weight-row dim edu">
+                    <div class="wr-top"><span class="wr-name">Insight</span><span class="wr-pct" data-pct="edu">25%</span></div>
+                    <input type="range" min="0" max="100" step="5" value="25" id="wEdu" aria-label="Insight weight">
+                  </div>
+                  <div class="weight-row dim ent">
+                    <div class="wr-top"><span class="wr-name">Craft</span><span class="wr-pct" data-pct="ent">35%</span></div>
+                    <input type="range" min="0" max="100" step="5" value="35" id="wEnt" aria-label="Craft and execution weight">
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="filter-block collapsible">
-            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Acuity score range</h3>
-            <div class="range-row fb-body">
-              <input type="number" id="iqMin" min="0" max="200" placeholder="0" aria-label="Minimum Acuity Quotient" inputmode="numeric">
-              <span>to</span>
-              <input type="number" id="iqMax" min="0" max="200" placeholder="200" aria-label="Maximum Acuity Quotient" inputmode="numeric">
-            </div>
-          </div>
-
-          <div class="filter-block collapsible">
-            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">IMDb</h3>
-            <div class="fb-body">
-              <div class="dimmin-row">
-                <div class="dm-top"><span class="dm-name">Rating</span><span class="dm-val" id="minRatingVal">any</span></div>
-                <input type="range" min="0" max="10" step="0.5" value="0" id="minRating" aria-label="Minimum IMDb rating">
+            <div class="filter-block collapsible">
+              <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Dimension minimums</h3>
+              <div class="fb-body">
+                <div class="dimmin-row dim cog">
+                  <div class="dm-top"><span class="dm-name">Depth</span><span class="dm-val" id="minCogVal">any</span></div>
+                  <input type="range" min="0" max="100" step="5" value="0" id="minCog" aria-label="Minimum depth">
+                </div>
+                <div class="dimmin-row dim edu">
+                  <div class="dm-top"><span class="dm-name">Insight</span><span class="dm-val" id="minEduVal">any</span></div>
+                  <input type="range" min="0" max="100" step="5" value="0" id="minEdu" aria-label="Minimum insight">
+                </div>
+                <div class="dimmin-row dim ent">
+                  <div class="dm-top"><span class="dm-name">Craft</span><span class="dm-val" id="minEntVal">any</span></div>
+                  <input type="range" min="0" max="100" step="5" value="0" id="minEnt" aria-label="Minimum craft">
+                </div>
               </div>
-              <label class="votes-label" for="minVotes">Minimum votes</label>
-              <select class="sort votes-select" id="minVotes" aria-label="Minimum IMDb votes">
-                <option value="0">Any</option>
-                <option value="1000">1k+</option>
-                <option value="10000">10k+</option>
-                <option value="50000">50k+</option>
-                <option value="100000">100k+</option>
-                <option value="500000">500k+</option>
-              </select>
             </div>
-          </div>
 
-          <div class="filter-block collapsible">
-            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Genre</h3>
-            <div class="chips" id="genreChips" role="group" aria-label="Filter by genre"></div>
+            <div class="filter-block collapsible">
+              <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">IMDb</h3>
+              <div class="fb-body">
+                <div class="dimmin-row">
+                  <div class="dm-top"><span class="dm-name">Rating</span><span class="dm-val" id="minRatingVal">any</span></div>
+                  <input type="range" min="0" max="10" step="0.5" value="0" id="minRating" aria-label="Minimum IMDb rating">
+                </div>
+                <label class="votes-label" for="minVotes">Minimum votes</label>
+                <select class="sort votes-select" id="minVotes" aria-label="Minimum IMDb votes">
+                  <option value="0">Any</option>
+                  <option value="1000">1k+</option>
+                  <option value="10000">10k+</option>
+                  <option value="50000">50k+</option>
+                  <option value="100000">100k+</option>
+                  <option value="500000">500k+</option>
+                </select>
+              </div>
+            </div>
+
           </div>
         </aside>
 
