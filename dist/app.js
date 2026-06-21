@@ -6,31 +6,32 @@
 'use strict';
 
 /* ----------------------------------------------------- constants -------- */
-const IQ_MAX = 200; // display scale: the Acuity Score is shown as score / 200
-const SCORE_LABEL = 'Acuity Score';
+const IQ_MAX = 200; // display scale: the Acuity Quotient is shown as score / 200
+const SCORE_LABEL = 'Acuity Quotient';
+const SCORE_ABBR = 'AQ';
 
 const TIERS = [
   { key: 0, name: 'Idle',        color: 'var(--t0)', range: 'below 70',
     desc: 'Pure background — on while you do something else, and gone by the time it ends.' },
-  { key: 1, name: 'Passive',     color: 'var(--t1)', range: '70–84',
+  { key: 1, name: 'Ambient',     color: 'var(--t1)', range: '70–84',
     desc: 'Easy, low-effort company that asks little of you and leaves little behind.' },
   { key: 2, name: 'Engaging',    color: 'var(--t2)', range: '85–114',
     desc: 'Holds your attention and rewards it — solid, well-made, worth the hour.' },
-  { key: 3, name: 'Stimulating', color: 'var(--t3)', range: '115–129',
+  { key: 3, name: 'Absorbing',   color: 'var(--t3)', range: '115–129',
     desc: 'Genuinely makes you think — structure, ideas, or craft that stay with you.' },
   { key: 4, name: 'Profound',    color: 'var(--t4)', range: '130 and up',
     desc: 'The rare title that enlarges how you see the world. Worth choosing on purpose.' },
 ];
 
 const DIMS = [
-  { key: 'cog', label: 'Cognitive load',  hint: 'mental challenge & complexity' },
-  { key: 'edu', label: 'Knowledge value', hint: 'how much you learn' },
-  { key: 'ent', label: 'Craft & execution', hint: 'how well it is made' },
+  { key: 'cog', label: 'Depth',   hint: 'ideas, ambiguity & the thinking it demands' },
+  { key: 'edu', label: 'Insight', hint: 'knowledge & perspective you carry out' },
+  { key: 'ent', label: 'Craft',   hint: 'how well it is made' },
 ];
 
 /* ----------------------------------------------- personalized weights ---- */
 /* Default blend: Cognitive 40% · Knowledge 25% · Craft 35%. Users can set
-   their own weights; we recompute a personalized Acuity Score and re-rank.   */
+   their own weights; we recompute a personalized Acuity Quotient and re-rank.   */
 const DEFAULT_WEIGHTS = { cog: 40, edu: 25, ent: 35 };
 const IQ_MIN_DISPLAY = 10; // personalized scores land on the same ~10–200 scale
 
@@ -206,8 +207,31 @@ function el(tag, attrs, children) {
   return node;
 }
 const tierOf = t => TIERS[t] || TIERS[2];
+/* fixed cut-points on the 0–200 scale → tier index (Idle…Profound) */
+function scoreTier(s) { return s < 70 ? 0 : s < 85 ? 1 : s < 115 ? 2 : s < 130 ? 3 : 4; }
+/* CSS custom-property reference for a tier's color (consistent everywhere) */
+function tierColorVar(t) { return 'var(--t' + t + ')'; }
+/* inject the animated film-grain overlay on every page */
+function injectGrain() {
+  if (document.querySelector('.acu-grain')) return;
+  document.body.appendChild(el('div', { class: 'acu-grain', 'aria-hidden': 'true' }));
+}
 const fmtVotes = v => v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : v >= 1e3 ? Math.round(v / 1e3) + 'k' : String(v);
 function titleHref(slug) { return './title.html?t=' + encodeURIComponent(slug); }
+
+/* ---------------------------------------------------- percentile -------- */
+/* `pct` = "better than this % of the catalog" (0–100). Render concise,
+   on-brand labels (mono). Near the top we flip to a "Top N%" framing.       */
+function ordinal(n) { const v = n % 100; const s = ['th', 'st', 'nd', 'rd']; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+function pctTag(pct) {
+  if (pct == null) return null;
+  return pct >= 90 ? 'Top ' + Math.max(1, 100 - pct) + '%' : ordinal(pct) + ' pct';
+}
+function pctPhrase(pct) {
+  if (pct == null) return null;
+  return pct >= 90 ? 'In the top ' + Math.max(1, 100 - pct) + '% of the catalog'
+                   : 'Scores better than ' + pct + '% of the catalog';
+}
 
 /* build an explore.html URL that pre-applies filters via query params */
 function exploreHref(params) {
@@ -247,58 +271,62 @@ function tierChipLink(tier, cls) {
     [el('span', { class: 'swatch' }), document.createTextNode(t.name)]);
 }
 
-/* the title card (poster when available, score-tile fallback otherwise) */
-function titleCard(rec) {
+/* ----------------------------------------------------------- title card ----
+   THE single canonical card, used on every grid: the home "top of the curve",
+   the Explore/catalog grid, the Kids grid, and the "similar titles" row.
+   Layout: a 2:3 poster with the tier badge on it (top-right) and an optional
+   rank pill (top-left, home only); below the poster a row with the title, the
+   YEAR · TYPE meta and a percentile tag on the left, and the big tier-colored
+   AQ number on the right; then three thin dimension mini-bars. The whole card
+   links to the title page. Pass { rank: n } to show the rank pill.            */
+function titleCard(rec, opts) {
+  opts = opts || {};
   const t = tierOf(rec.tier);
   const score = displayIq(rec);
   const pz = weightsActive();
-  const card = el('div', { class: 'card t' + rec.tier + (pz ? ' is-personal' : '') });
-
-  const tile = el('div', { class: 'tile' + (rec.p ? ' has-poster' : '') });
-  if (rec.p) {
-    tile.appendChild(el('img', {
-      class: 'poster', loading: 'lazy', decoding: 'async',
-      src: posterUrl(rec.p, 'w342'), alt: '', width: 342, height: 513,
-    }));
-    tile.appendChild(el('div', { class: 'tile-grad' }));
-  } else {
-    tile.appendChild(el('div', { class: 'tile-iq', text: String(score) }));
-    tile.appendChild(el('div', { class: 'tile-of', text: (pz ? 'Your ' : '') + SCORE_LABEL + ' / ' + IQ_MAX }));
-  }
-  // single Acuity Score — a corner overlay on poster cards, the centerpiece on
-  // placard cards (never duplicated in the body below)
-  if (rec.p) {
-    tile.appendChild(el('span', { class: 'tile-score-badge' + (pz ? ' personal' : ''), title: pz ? 'Personalized Acuity Score' : SCORE_LABEL }, [
-      el('span', { class: 'b-num', text: String(score) }),
-      el('span', { class: 'b-of', text: '/' + IQ_MAX }),
-      pz ? el('span', { class: 'pz-dot', 'aria-label': 'personalized', text: '★' }) : null,
-    ]));
-  }
-  // clickable overlays (links sit above the stretched cover)
-  tile.appendChild(tierChipLink(rec.tier));
-  tile.appendChild(el('a', { class: 'type-tag', href: exploreHref({ type: rec.type }),
-    text: rec.type === 'series' ? 'Series' : 'Film' }));
-  // stretched cover link → the title detail page (whole card clickable)
-  tile.appendChild(el('a', { class: 'card-cover', href: titleHref(rec.slug),
-    'aria-label': rec.n + ', ' + (pz ? 'personalized ' : '') + SCORE_LABEL + ' ' + score + ' of ' + IQ_MAX + ', tier ' + t.name }));
-  card.appendChild(tile);
-
-  const flags = el('div', { class: 'tracker-flags' });
-  if (Store.has('watched', rec.slug)) flags.appendChild(el('span', { class: 'flag on-watched', text: 'Watched' }));
-  if (Store.has('watchlist', rec.slug)) flags.appendChild(el('span', { class: 'flag on-list', text: 'List' }));
-
-  const meta = el('div', { class: 'card-meta' });
-  meta.appendChild(metaLink(String(rec.year), { year: rec.year }));
-  (rec.g || []).slice(0, 2).forEach(g => {
-    meta.appendChild(el('span', { class: 'dotsep', text: '·' }));
-    meta.appendChild(metaLink(g, { genre: g }));
+  const card = el('a', {
+    class: 'tcard t' + rec.tier + (pz ? ' is-personal' : ''),
+    href: titleHref(rec.slug),
+    'aria-label': rec.n + ', ' + (pz ? 'personalized ' : '') + SCORE_LABEL + ' ' + score + ' of ' + IQ_MAX + ', tier ' + t.name,
   });
 
-  card.appendChild(el('div', { class: 'card-body' }, [
-    el('a', { class: 'card-title', href: titleHref(rec.slug), text: rec.n }),
-    meta,
-    el('div', { class: 'card-foot' }, [flags]),
+  // poster block (real cover, or a hatched violet placard with faint mono title)
+  const poster = el('div', { class: 'tcard-poster' + (rec.p ? ' has-poster' : ' hatch') });
+  if (rec.p) {
+    poster.appendChild(el('img', {
+      class: 'tcard-img', loading: 'lazy', decoding: 'async', alt: '',
+      src: posterUrl(rec.p, 'w342'), width: 342, height: 513,
+    }));
+  } else {
+    poster.appendChild(el('span', { class: 'tcard-placard', text: rec.n }));
+  }
+  // rank pill, top-left — only where rank is meaningful (home top-of-curve)
+  if (opts.rank != null) {
+    poster.appendChild(el('span', { class: 'tcard-rank', text: '#' + String(opts.rank).padStart(2, '0') }));
+  }
+  // tier badge, top-right, ON the poster — fully inside (max-width + ellipsis guard)
+  poster.appendChild(el('span', { class: 'tcard-badge', text: t.name }));
+  card.appendChild(poster);
+
+  // below the poster: title + meta + percentile (left), big AQ number (right)
+  const info = el('div', { class: 'tcard-info' }, [
+    el('div', { class: 'tcard-title', text: rec.n }),
+    el('div', { class: 'tcard-meta', text: rec.year + ' · ' + kindOf(rec) }),
+  ]);
+  const ptag = pctTag(rec.pct);
+  if (ptag) info.appendChild(el('span', { class: 'tcard-pct', title: pctPhrase(rec.pct), text: ptag }));
+  card.appendChild(el('div', { class: 'tcard-row' }, [
+    info,
+    el('div', { class: 'tcard-aq', title: pz ? 'Personalized ' + SCORE_LABEL : SCORE_LABEL, text: String(score) }),
   ]));
+
+  // three thin dimension mini-bars: Depth (cog) · Insight (edu) · Craft (ent)
+  const bars = el('div', { class: 'tcard-bars' });
+  ['cog', 'edu', 'ent'].forEach(k => {
+    bars.appendChild(el('div', { class: 'tcard-bar' },
+      [el('div', { class: 'tcard-bar-fill', style: 'width:' + rec[k] + '%;' })]));
+  });
+  card.appendChild(bars);
   return card;
 }
 
@@ -497,6 +525,7 @@ function attachAutocomplete(input, cfg) {
 
 /* ----------------------------------------------------- nav -------------- */
 function initNav() {
+  injectGrain();
   const burger = document.querySelector('.hamburger');
   const menu = document.querySelector('.mobile-menu');
   if (burger && menu) {
@@ -522,45 +551,239 @@ function initNav() {
   });
 }
 
-/* ----------------------------------------------------- HERO SEARCH ------ */
-function initHeroSearch() {
-  const form = document.querySelector('[data-hero-search]');
-  if (!form) return;
-  const input = form.querySelector('input');
-  if (input) attachAutocomplete(input);
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const q = input.value.trim();
-    location.href = './explore.html' + (q ? '?q=' + encodeURIComponent(q) : '');
-  });
+/* ====================================================================== */
+/* HOME — the Acuity design, wired to real data                            */
+/* ====================================================================== */
+const kindOf = r => (r.type === 'series' ? 'Series' : 'Film');
+
+/* a poster tile (real cover when available, hatched placard otherwise) */
+function posterTile(rec, w, sizeName) {
+  const tile = el('div', { class: 'acu-tile' + (rec.p ? '' : ' hatch') });
+  if (w) tile.style.width = w + 'px';
+  if (rec.p) {
+    tile.appendChild(el('img', { loading: 'lazy', decoding: 'async', alt: '',
+      src: posterUrl(rec.p, sizeName || 'w154') }));
+  } else {
+    tile.appendChild(el('span', { class: 'acu-tile-t', text: rec.n }));
+  }
+  return tile;
 }
 
-/* ====================================================================== */
-/* HOME                                                                    */
-/* ====================================================================== */
 function initHome() {
+  const root = document.querySelector('.acu-home');
+  if (!root) return;
+
   Promise.all([loadCatalog(), loadStats()]).then(([cat, stats]) => {
-    const band = document.querySelector('[data-statband]');
-    if (band) {
-      const films = stats.n_films, series = stats.n_series;
-      const profound = stats.tier_counts['4'];
-      const stat = (num, unit, lbl) => el('div', { class: 'stat' }, [
-        el('div', { class: 'num', html: num + (unit ? ' <span class="unit">' + unit + '</span>' : '') }),
-        el('div', { class: 'lbl', text: lbl }),
-      ]);
-      band.appendChild(stat(stats.n.toLocaleString(), '', 'titles scored on one fixed scale'));
-      band.appendChild(stat(films.toLocaleString() + '·' + series.toLocaleString(), '', 'films and series, side by side'));
-      band.appendChild(stat(String(Math.round(stats.mean)), '/' + IQ_MAX, 'median score — a true bell curve, sd ' + Math.round(stats.sd)));
-      band.appendChild(stat(profound.toLocaleString(), '', 'titles in the top “Profound” tier'));
-    }
-    const grid = document.querySelector('[data-featured]');
-    if (grid) { grid.removeAttribute('aria-busy'); cat.slice(0, 8).forEach(r => grid.appendChild(titleCard(r))); }
+    const tagline = document.querySelector('[data-hero-tagline]');
+    if (tagline) tagline.textContent = stats.n.toLocaleString() + ' titles scored · Method v2.0 · No studio money';
+    const stTitles = document.querySelector('[data-stat-titles]');
+    if (stTitles) stTitles.textContent = stats.n.toLocaleString();
+
+    buildMarquee(cat);
+    const focus = buildInstrument(cat);
+    buildFeatured(cat, focus);
+    buildGenreChips(cat, focus);
+    buildHeroSearch(cat, focus);
+    buildCurve(stats);
+
+    focus(cat[0]); // default the instrument to the top title
   }).catch(err => {
-    const grid = document.querySelector('[data-featured]');
-    if (grid) grid.appendChild(el('p', { class: 'muted', text: 'Could not load the catalog right now.' }));
     console.error(err);
+    const feat = document.querySelector('[data-feat]');
+    if (feat) feat.appendChild(el('p', { class: 'muted', text: 'Could not load the catalog right now.' }));
   });
-  initHeroSearch();
+
+  /* -------- hero poster marquee (6 scrolling columns) -------- */
+  function buildMarquee(cat) {
+    const cols = document.querySelectorAll('[data-marq-col]');
+    if (!cols.length) return;
+    const withP = cat.filter(r => r.p);
+    const pool = (withP.length >= 60 ? withP : cat).slice(0, 120);
+    const per = 10;
+    cols.forEach((col, ci) => {
+      const items = [];
+      for (let n = 0; n < per; n++) items.push(pool[(ci * 7 + n) % pool.length]);
+      const fill = list => list.forEach(r => col.appendChild(posterTile(r, 150, 'w154')));
+      fill(items); fill(items); // duplicate for a seamless loop
+    });
+  }
+
+  /* -------- the Acuity Instrument focus card -------- */
+  function buildInstrument() {
+    const posterBox = document.querySelector('[data-inst-poster]');
+    const titleEl = document.querySelector('[data-inst-title]');
+    const metaEl = document.querySelector('[data-inst-meta]');
+    const aqEl = document.querySelector('[data-inst-aq]');
+    const tierEl = document.querySelector('[data-inst-tier]');
+    const barEl = document.querySelector('[data-inst-bar]');
+    const dims = {
+      cog: [document.querySelector('[data-inst-depth-v]'), document.querySelector('[data-inst-depth-bar]')],
+      edu: [document.querySelector('[data-inst-insight-v]'), document.querySelector('[data-inst-insight-bar]')],
+      ent: [document.querySelector('[data-inst-craft-v]'), document.querySelector('[data-inst-craft-bar]')],
+    };
+    return function focus(rec) {
+      if (!rec) return;
+      const tc = tierColorVar(rec.tier), t = tierOf(rec.tier);
+      posterBox.innerHTML = '';
+      posterBox.classList.toggle('hatch', !rec.p);
+      if (rec.p) {
+        posterBox.appendChild(el('img', { loading: 'lazy', decoding: 'async', alt: 'Poster for ' + rec.n,
+          src: posterUrl(rec.p, 'w185'),
+          style: 'width:100%;height:100%;object-fit:cover;' }));
+      } else {
+        posterBox.style.display = 'flex'; posterBox.style.alignItems = 'center'; posterBox.style.justifyContent = 'center';
+        posterBox.appendChild(el('span', { class: 'acu-tile-t', text: rec.n,
+          style: 'text-align:center;padding:0 6px;width:100%;' }));
+      }
+      titleEl.textContent = rec.n;
+      titleEl.setAttribute('href', titleHref(rec.slug));
+      metaEl.textContent = rec.year + ' · ' + kindOf(rec);
+      aqEl.textContent = String(rec.iq);
+      aqEl.style.color = tc;
+      tierEl.textContent = t.name;
+      tierEl.style.color = tc;
+      barEl.style.width = (rec.iq / IQ_MAX * 100).toFixed(1) + '%';
+      barEl.style.background = tc;
+      ['cog', 'edu', 'ent'].forEach(k => {
+        const [vEl, bEl] = dims[k];
+        vEl.textContent = String(rec[k]);
+        bEl.style.width = rec[k] + '%';
+      });
+    };
+  }
+
+  /* -------- top-of-the-curve featured grid (the canonical title card) -------- */
+  function buildFeatured(cat, focus) {
+    const grid = document.querySelector('[data-feat]');
+    if (!grid) return;
+    const frag = document.createDocumentFragment();
+    cat.slice(0, 6).forEach((rec, i) => frag.appendChild(titleCard(rec, { rank: i + 1 })));
+    grid.appendChild(frag);
+  }
+
+  /* -------- genre chips that focus the instrument -------- */
+  function buildGenreChips(cat, focus) {
+    const host = document.querySelector('[data-inst-chips]');
+    if (!host) return;
+    const counts = {};
+    cat.forEach(r => (r.g || []).forEach(g => { counts[g] = (counts[g] || 0) + 1; }));
+    const genres = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).slice(0, 6);
+    const chips = [];
+    genres.forEach(g => {
+      const top = cat.find(r => (r.g || []).includes(g)); // catalog is sorted by AQ desc
+      const btn = el('button', { class: 'acu-chip', type: 'button', text: g });
+      btn.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        if (top) focus(top);
+      });
+      chips.push(btn);
+      host.appendChild(btn);
+    });
+  }
+
+  /* -------- hero search with live autocomplete dropdown -------- */
+  function buildHeroSearch(cat, focus) {
+    const input = document.querySelector('[data-hero-input]');
+    const list = document.querySelector('[data-hero-results]');
+    if (!input || !list) return;
+    let timer = null;
+
+    function close() { list.setAttribute('hidden', ''); list.innerHTML = ''; }
+    function run() {
+      const q = input.value.trim();
+      if (!q) { close(); return; }
+      const items = searchTitles(cat, q, 6);
+      if (items.length) focus(items[0]); // searching focuses the instrument on the best match
+      list.innerHTML = '';
+      if (!items.length) { close(); return; }
+      items.forEach(rec => {
+        const tc = tierColorVar(rec.tier);
+        // mini poster thumbnail (2:3, rounded) — real cover, hatched fallback
+        const thumb = el('span', { class: 'acu-res-thumb' + (rec.p ? '' : ' noimg') });
+        if (rec.p) thumb.appendChild(el('img', { loading: 'lazy', decoding: 'async', alt: '', src: posterUrl(rec.p, 'w92'), width: 30, height: 45 }));
+        const a = el('a', { class: 'acu-res', role: 'option', href: titleHref(rec.slug) }, [
+          thumb,
+          el('span', { text: String(rec.iq), style: 'font-family:var(--mono); font-size:17px; font-weight:600; color:' + tc + '; min-width:34px;' }),
+          el('span', { style: 'flex:1; min-width:0;' }, [
+            el('span', { text: rec.n, style: 'display:block; font-size:14px; color:var(--text); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;' }),
+            el('span', { text: rec.year + ' · ' + kindOf(rec) + ' · ' + tierOf(rec.tier).name, style: 'display:block; font-family:var(--mono); font-size:10.5px; color:#8f8a9e; letter-spacing:0.5px;' }),
+          ]),
+          el('span', { text: 'Inspect →', style: 'font-size:12px; color:var(--muted-2);' }),
+        ]);
+        list.appendChild(a);
+      });
+      list.removeAttribute('hidden');
+    }
+    input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(run, 110); });
+    input.addEventListener('focus', () => { if (input.value.trim()) run(); });
+    input.addEventListener('keydown', e => { if (e.key === 'Escape') { close(); input.blur(); } });
+    document.addEventListener('click', e => { if (!list.contains(e.target) && e.target !== input) close(); });
+  }
+
+  /* -------- flat-curve histogram from stats.json -------- */
+  function buildCurve(stats) {
+    const host = document.querySelector('[data-curve]');
+    const tip = document.querySelector('[data-curve-tip]');
+    const legendHost = document.querySelector('[data-legend]');
+    if (!host) return;
+
+    const plottedEl = document.querySelector('[data-plotted]');
+    const tailEl = document.querySelector('[data-tailpct]');
+    if (plottedEl) plottedEl.textContent = stats.n.toLocaleString();
+    const tc = stats.tier_counts || {};
+    const tail = (tc['0'] || 0) + (tc['4'] || 0);
+    if (tailEl) tailEl.textContent = Math.round(tail / stats.n * 100) + '%';
+
+    const hist = stats.histogram || {};
+    const keys = Object.keys(hist).map(Number).sort((a, b) => a - b);
+    const maxCount = Math.max.apply(null, keys.map(k => hist[k]));
+    let activeTier = null;
+    const bars = [];
+
+    keys.forEach((k, i) => {
+      const tier = scoreTier(k);
+      const bar = el('div', { class: 'acu-bar' });
+      bar.style.height = (3 + (hist[k] / maxCount) * 97).toFixed(1) + '%';
+      bar.style.background = tierColorVar(tier);
+      bar._tier = tier;
+      bar.addEventListener('mouseenter', () => {
+        if (!tip) return;
+        tip.style.left = (((i + 0.5) / keys.length) * 100).toFixed(1) + '%';
+        tip.style.borderColor = tierColorVar(tier);
+        tip.innerHTML = '';
+        tip.appendChild(el('div', { text: 'AQ ' + k + ' · ' + tierOf(tier).name, style: 'font-family:var(--mono); font-size:11px; color:' + tierColorVar(tier) + '; font-weight:600;' }));
+        tip.appendChild(el('div', { text: hist[k] + ' titles', style: 'font-family:var(--mono); font-size:10px; color:#8f8a9e; margin-top:2px;' }));
+        tip.removeAttribute('hidden');
+      });
+      bars.push(bar);
+      host.appendChild(bar);
+    });
+    host.addEventListener('mouseleave', () => { if (tip) tip.setAttribute('hidden', ''); });
+
+    function applyActive() {
+      bars.forEach(b => { b.style.opacity = (activeTier != null && b._tier !== activeTier) ? '0.16' : '1'; });
+    }
+    if (legendHost) {
+      const legBtns = [];
+      [4, 3, 2, 1, 0].forEach(tk => {
+        const t = tierOf(tk), col = tierColorVar(tk);
+        const btn = el('button', { class: 'acu-legend', type: 'button' }, [
+          el('span', { style: 'width:8px; height:8px; border-radius:50%; background:' + col + '; flex:none;' }),
+          document.createTextNode(t.name),
+          el('span', { text: t.range, style: 'font-family:var(--mono); font-size:10px; color:#8f8a9e; margin-left:2px;' }),
+        ]);
+        btn.addEventListener('click', () => {
+          activeTier = (activeTier === tk) ? null : tk;
+          legBtns.forEach(b => b.el.classList.toggle('active', b.tk === activeTier));
+          applyActive();
+        });
+        legBtns.push({ el: btn, tk });
+        legendHost.appendChild(btn);
+      });
+    }
+  }
+
 }
 
 /* ====================================================================== */
@@ -598,6 +821,7 @@ function initExplore() {
     min: 0, max: IQ_MAX,
     minCog: 0, minEdu: 0, minEnt: 0,
     minRating: 0, minVotes: 0,
+    maxAge: null,
     year: null,
     kids: false,
     services: new Set(Store.getServices()),
@@ -623,6 +847,8 @@ function initExplore() {
     edu: document.querySelector('#minEduVal'),
     ent: document.querySelector('#minEntVal'),
   };
+  const elMaxAge = document.querySelector('#maxAge');
+  const elMaxAgeVal = document.querySelector('#maxAgeVal');
   const elMinRating = document.querySelector('#minRating');
   const elMinRatingVal = document.querySelector('#minRatingVal');
   const elMinVotes = document.querySelector('#minVotes');
@@ -679,6 +905,7 @@ function initExplore() {
     if (params.has('minent')) state.minEnt = clamp100(params.get('minent'));
     if (params.has('minrating')) state.minRating = Math.max(0, Math.min(10, parseFloat(params.get('minrating')) || 0));
     if (params.has('minvotes')) state.minVotes = Math.max(0, parseInt(params.get('minvotes'), 10) || 0);
+    if (params.has('age')) { const a = parseInt(params.get('age'), 10); if (a >= 0 && a <= 18) state.maxAge = a; }
     if (params.has('sort')) state.sort = params.get('sort');
   }
 
@@ -799,6 +1026,8 @@ function initExplore() {
     if (elMinRating) elMinRating.value = String(state.minRating);
     if (elMinRatingVal) elMinRatingVal.textContent = state.minRating > 0 ? '≥ ' + state.minRating.toFixed(1) : 'any';
     if (elMinVotes) elMinVotes.value = String(state.minVotes);
+    if (elMaxAge) elMaxAge.value = String(state.maxAge == null ? 19 : state.maxAge);
+    if (elMaxAgeVal) elMaxAgeVal.textContent = state.maxAge == null ? 'any' : '≤ ' + state.maxAge;
     if (elSort) elSort.value = state.sort;
     elSvc.querySelectorAll('input[data-svc]').forEach(cb => { cb.checked = state.services.has(cb.getAttribute('data-svc')); });
     if (state.services.size) Store.setServices([...state.services]);
@@ -828,6 +1057,9 @@ function initExplore() {
       if (r.cog < state.minCog || r.edu < state.minEdu || r.ent < state.minEnt) return false;
       if (state.minRating > 0 && r.rating < state.minRating) return false;
       if (state.minVotes > 0 && r.votes < state.minVotes) return false;
+      // audience age: keep only titles rated suitable for a viewer ≤ maxAge;
+      // titles whose maturity is higher or unknown are hidden when the cap is set
+      if (state.maxAge != null && (r.maxage == null || r.maxage > state.maxAge)) return false;
       const s = displayIq(r);
       if (s < lo || s > hi) return false;
       if (state.genres.size) { if (!r.g.some(g => state.genres.has(g))) return false; }
@@ -856,6 +1088,7 @@ function initExplore() {
       if (s === 'az') return a.n.localeCompare(b.n);
       if (s === 'za') return b.n.localeCompare(a.n);
       if (s === 'year-desc') return b.year - a.year || a.n.localeCompare(b.n);
+      if (s === 'year-asc') return a.year - b.year || a.n.localeCompare(b.n);
       return 0;
     });
   }
@@ -869,7 +1102,7 @@ function initExplore() {
 
     if (!filtered.length) {
       elGrid.appendChild(el('div', { class: 'empty' }, [
-        el('h3', { text: 'Nothing matches — yet' }),
+        el('h3', { text: 'Nothing matches.' }),
         el('p', { text: 'Loosen a filter, widen the score range, or clear your search to see more of the catalog.' }),
         el('button', { class: 'btn btn-ghost', type: 'button', text: 'Clear all filters' }),
       ]));
@@ -911,6 +1144,7 @@ function initExplore() {
     });
     if (state.minRating > 0) pills.push(['IMDb ≥ ' + state.minRating.toFixed(1), () => { state.minRating = 0; if (elMinRating) elMinRating.value = '0'; if (elMinRatingVal) elMinRatingVal.textContent = 'any'; }]);
     if (state.minVotes > 0) pills.push(['≥ ' + fmtVotes(state.minVotes) + ' votes', () => { state.minVotes = 0; if (elMinVotes) elMinVotes.value = '0'; }]);
+    if (state.maxAge != null) pills.push(['Age ≤ ' + state.maxAge, () => { state.maxAge = null; if (elMaxAge) elMaxAge.value = '19'; if (elMaxAgeVal) elMaxAgeVal.textContent = 'any'; }]);
 
     pills.forEach(([label, undo]) => {
       const x = el('button', { type: 'button', 'aria-label': 'Remove ' + label, text: '×' });
@@ -931,6 +1165,8 @@ function initExplore() {
     state.min = 0; state.max = IQ_MAX; elMin.value = ''; elMax.value = '';
     state.minCog = 0; state.minEdu = 0; state.minEnt = 0;
     state.minRating = 0; state.minVotes = 0;
+    state.maxAge = null;
+    if (elMaxAge) elMaxAge.value = '19'; if (elMaxAgeVal) elMaxAgeVal.textContent = 'any';
     DIMS.forEach(d => { if (dimMin[d.key]) dimMin[d.key].value = '0'; if (dimMinOut[d.key]) dimMinOut[d.key].textContent = 'any'; });
     if (elMinRating) { elMinRating.value = '0'; if (elMinRatingVal) elMinRatingVal.textContent = 'any'; }
     if (elMinVotes) elMinVotes.value = '0';
@@ -978,6 +1214,31 @@ function initExplore() {
   if (elMinVotes) elMinVotes.addEventListener('change', () => {
     state.minVotes = Math.max(0, parseInt(elMinVotes.value, 10) || 0);
     resetPage(); apply();
+  });
+  // audience-age cap — slider 0–18 sets "suitable for age ≤ N"; 19 = any (off)
+  if (elMaxAge) elMaxAge.addEventListener('input', () => {
+    const v = parseInt(elMaxAge.value, 10);
+    state.maxAge = (isNaN(v) || v >= 19) ? null : Math.max(0, v);
+    if (elMaxAgeVal) elMaxAgeVal.textContent = state.maxAge == null ? 'any' : '≤ ' + state.maxAge;
+    resetPage(); apply();
+  });
+
+  // collapsible filter groups — click/keyboard toggles each block open/closed
+  document.querySelectorAll('.filter-block.collapsible > .fb-toggle').forEach(h => {
+    function toggle() {
+      const block = h.parentNode;
+      const open = !block.classList.contains('collapsed');
+      block.classList.toggle('collapsed', open);
+      h.setAttribute('aria-expanded', String(!open));
+    }
+    h.addEventListener('click', e => {
+      // let inner controls (e.g. the weight Reset button) act without toggling
+      if (e.target.closest('button') && e.target.closest('button') !== h) return;
+      toggle();
+    });
+    h.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
   });
 
   elSort.addEventListener('change', () => { state.sort = elSort.value; resetPage(); apply(); });
@@ -1042,7 +1303,7 @@ function initExplore() {
     if (onBox) onBox.addEventListener('change', () => { on = onBox.checked; commit(); });
     if (resetBtn) resetBtn.addEventListener('click', () => {
       weights = Object.assign({}, DEFAULT_WEIGHTS);
-      on = false;                       // return to the default Acuity Score
+      on = false;                       // return to the default Acuity Quotient
       syncSliders();
       commit();
     });
@@ -1153,6 +1414,10 @@ function initTitle() {
       if (i) meta.appendChild(document.createTextNode(', '));
       meta.appendChild(metaLink(g, { genre: g }));
     });
+    if (rec.cert) {
+      meta.appendChild(sep());
+      meta.appendChild(el('span', { class: 'age-badge', title: 'Content rating', text: rec.cert }));
+    }
     meta.appendChild(sep());
     meta.appendChild(el('span', { class: 'imdb', text: 'IMDb ' + rec.rating.toFixed(1) + ' (' + fmtVotes(rec.votes) + ')' }));
     right.appendChild(el('div', { class: 'detail-head' }, [el('h1', { text: rec.n }), meta]));
@@ -1161,6 +1426,23 @@ function initTitle() {
       el('a', { class: 'tier-name-link t' + rec.tier, href: exploreHref({ tier: rec.tier }), text: t.name }),
       document.createTextNode(' — ' + t.desc),
     ]));
+
+    // AQ readout strip: percentile + a tier-colored bar on the 0–200 scale
+    const pp = pctPhrase(rec.pct);
+    const strip = el('div', { class: 'aq-strip' }, [
+      el('div', { class: 'aq-strip-top' }, [
+        el('span', { class: 'aq-pct', text: pp || (SCORE_LABEL + ' on a fixed 0–' + IQ_MAX + ' scale') }),
+        el('span', { class: 'aq-scale' }, [
+          el('b', { text: String(score) }), document.createTextNode(' / ' + IQ_MAX + ' ' + SCORE_ABBR),
+        ]),
+      ]),
+      el('div', { class: 'aq-bar' }, [el('div', { class: 'aq-bar-fill' })]),
+    ]);
+    right.appendChild(strip);
+    requestAnimationFrame(() => {
+      const f = strip.querySelector('.aq-bar-fill');
+      if (f) f.style.width = (score / IQ_MAX * 100).toFixed(1) + '%';
+    });
 
     // dimension bars
     const dims = el('div', { class: 'dims' });
@@ -1196,8 +1478,7 @@ function initTitle() {
     watchedBtn.addEventListener('click', () => { const on = Store.toggleSet('watched', rec.slug); syncBtns(); toast(on ? 'Marked as watched.' : 'Removed from watched.'); });
     listBtn.addEventListener('click', () => { const on = Store.toggleSet('watchlist', rec.slug); syncBtns(); toast(on ? 'Added to your watchlist.' : 'Removed from watchlist.'); });
     syncBtns();
-    const actions = el('div', { class: 'detail-actions' }, [watchedBtn, listBtn,
-      el('a', { class: 'btn btn-ghost', href: './compare.html?a=' + encodeURIComponent(rec.slug), text: 'Compare ↔' })]);
+    const actions = el('div', { class: 'detail-actions' }, [watchedBtn, listBtn]);
     if (!Store.available) actions.appendChild(el('span', { class: 'muted', text: ' (browser storage is off — picks won’t persist)' }));
     right.appendChild(actions);
 
@@ -1296,7 +1577,7 @@ function drawHistogram(root, stats) {
   svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
   svg.setAttribute('class', 'hist');
   svg.setAttribute('role', 'img');
-  svg.setAttribute('aria-label', 'Histogram of cognitive-value scores across the catalog, forming a symmetric bell curve centred on ' + stats.mean + '.');
+  svg.setAttribute('aria-label', 'Histogram of cognitive-value scores across the catalog, forming a single, deliberately flattened hump centred on ' + stats.mean + ' with weighted tails.');
 
   const xFor = v => padL + ((v - minX) / (maxX - minX)) * plotW;
   const span = maxX - minX;
@@ -1348,139 +1629,6 @@ function drawHistogram(root, stats) {
   root.appendChild(svg);
 }
 
-/* ====================================================================== */
-/* COMPARE                                                                 */
-/* ====================================================================== */
-function initCompare() {
-  const root = document.querySelector('[data-compare]');
-  if (!root) return;
-  let CAT = [];
-  const params = new URLSearchParams(location.search);
-  const sel = { a: null, b: null };
-
-  loadCatalog().then(cat => {
-    CAT = cat;
-    wirePicker('a'); wirePicker('b');
-    if (params.get('a')) preset('a', params.get('a'));
-    if (params.get('b')) preset('b', params.get('b'));
-    renderVersus();
-  }).catch(err => console.error(err));
-
-  function preset(side, slug) {
-    const rec = CAT.find(r => r.slug === slug);
-    if (rec) { sel[side] = rec; document.querySelector('#pick_' + side + ' input').value = rec.n; }
-  }
-
-  function wirePicker(side) {
-    const box = document.querySelector('#pick_' + side);
-    const input = box.querySelector('input');
-    const results = box.querySelector('.picker-results');
-    let active = -1, items = [];
-
-    function close() { results.setAttribute('hidden', ''); active = -1; }
-    function search() {
-      const q = input.value.trim();
-      results.innerHTML = '';
-      if (!q) { close(); return; }
-      items = searchTitles(CAT, q, 18);
-      if (!items.length) { close(); return; }
-      items.forEach((r, i) => {
-        const btn = el('button', { type: 'button', class: 't' + r.tier, 'data-i': i }, [
-          el('span', {}, [document.createTextNode(r.n + ' '), el('span', { class: 'pr-meta', text: '(' + r.year + ')' })]),
-          el('span', { class: 'pr-iq', text: String(r.iq) }),
-        ]);
-        btn.addEventListener('click', () => { choose(side, r); input.value = r.n; close(); });
-        results.appendChild(btn);
-      });
-      results.removeAttribute('hidden');
-    }
-    input.addEventListener('input', search);
-    input.addEventListener('focus', () => { if (input.value.trim()) search(); });
-    input.addEventListener('keydown', e => {
-      if (results.hasAttribute('hidden')) return;
-      const btns = [...results.querySelectorAll('button')];
-      if (e.key === 'ArrowDown') { e.preventDefault(); active = Math.min(active + 1, btns.length - 1); }
-      else if (e.key === 'ArrowUp') { e.preventDefault(); active = Math.max(active - 1, 0); }
-      else if (e.key === 'Enter') { e.preventDefault(); if (active >= 0) btns[active].click(); return; }
-      else if (e.key === 'Escape') { close(); return; }
-      btns.forEach((b, i) => b.classList.toggle('active', i === active));
-      if (btns[active]) btns[active].scrollIntoView({ block: 'nearest' });
-    });
-    document.addEventListener('click', e => { if (!box.contains(e.target)) close(); });
-  }
-
-  function choose(side, rec) { sel[side] = rec; syncUrl(); renderVersus(); }
-  function syncUrl() {
-    const p = new URLSearchParams();
-    if (sel.a) p.set('a', sel.a.slug);
-    if (sel.b) p.set('b', sel.b.slug);
-    history.replaceState(null, '', './compare.html' + (p.toString() ? '?' + p : ''));
-  }
-
-  function sideCard(rec, isWinner) {
-    if (!rec) return el('div', { class: 'vs-empty', text: 'Search and pick a title to compare.' });
-    const t = tierOf(rec.tier);
-    const card = el('div', { class: 'vs-card t' + rec.tier + (isWinner ? ' winner' : '') });
-    if (isWinner) card.appendChild(el('span', { class: 'winner-tag', text: '★ Higher ' + SCORE_LABEL }));
-    card.appendChild(el('h3', {}, [el('a', { href: titleHref(rec.slug), text: rec.n })]));
-    card.appendChild(el('div', { class: 'vs-meta', text: (rec.type === 'series' ? 'Series' : 'Film') + ' · ' + rec.year + ' · ' + ((rec.g || []).slice(0, 3).join(' · ') || '—') }));
-    card.appendChild(el('div', { class: 'vs-iq' }, [
-      el('span', { class: 'n', text: String(rec.iq) }), el('span', { class: 'm', text: '/ ' + IQ_MAX }),
-    ]));
-    card.appendChild(tierChip(rec.tier));
-    card.appendChild(el('p', { class: 'muted', html: '<br>' + t.name + ' tier — ' + t.desc }));
-    return card;
-  }
-
-  function renderVersus() {
-    const wrap = document.querySelector('#versus');
-    const gap = document.querySelector('#gapSummary');
-    const dimWrap = document.querySelector('#cmpDims');
-    wrap.innerHTML = ''; gap.innerHTML = ''; dimWrap.innerHTML = '';
-
-    const a = sel.a, b = sel.b;
-    const aWin = a && b && a.iq > b.iq, bWin = a && b && b.iq > a.iq;
-    wrap.appendChild(sideCard(a, aWin));
-    wrap.appendChild(el('div', { class: 'vs-mid' }, [el('span', { text: 'vs' })]));
-    wrap.appendChild(sideCard(b, bWin));
-
-    if (a && b) {
-      const diff = Math.abs(a.iq - b.iq);
-      const hi = a.iq >= b.iq ? a : b, lo = a.iq >= b.iq ? b : a;
-      gap.innerHTML = diff === 0
-        ? '<b>' + escapeHtml(a.n) + '</b> and <b>' + escapeHtml(b.n) + '</b> are dead even at ' + a.iq + ' on the ' + SCORE_LABEL + '.'
-        : '<b>' + escapeHtml(hi.n) + '</b> leads <b>' + escapeHtml(lo.n) + '</b> by <b>' + diff + ' points</b> — ' + gapWord(diff) + '.';
-
-      DIMS.forEach(d => {
-        const av = a[d.key], bv = b[d.key];
-        const block = el('div', { class: 'cmp-dim ' + d.key });
-        block.appendChild(el('div', { class: 'cd-label' }, [
-          el('span', { text: d.label }),
-          el('span', { text: av + '  ·  ' + bv }),
-        ]));
-        const bars = el('div', { class: 'cmp-bars' });
-        const leftTrack = el('div', { class: 'cmp-bar-track right' }, [el('div', { class: 'cmp-bar-fill', style: '--dc:var(--' + d.key + ')' })]);
-        const rightTrack = el('div', { class: 'cmp-bar-track' }, [el('div', { class: 'cmp-bar-fill', style: '--dc:var(--' + d.key + ')' })]);
-        bars.appendChild(leftTrack); bars.appendChild(rightTrack);
-        block.appendChild(bars);
-        dimWrap.appendChild(block);
-        requestAnimationFrame(() => {
-          leftTrack.querySelector('.cmp-bar-fill').style.setProperty('--w', av + '%');
-          rightTrack.querySelector('.cmp-bar-fill').style.setProperty('--w', bv + '%');
-        });
-      });
-    }
-  }
-  function gapWord(d) {
-    if (d <= 5) return 'a near dead heat';
-    if (d <= 15) return 'a clear but modest edge';
-    if (d <= 30) return 'a decisive gap';
-    return 'a different league entirely';
-  }
-}
-
-function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
-
 /* ----------------------------------------------------- boot ------------- */
 document.addEventListener('DOMContentLoaded', () => {
   initNav();
@@ -1490,6 +1638,5 @@ document.addEventListener('DOMContentLoaded', () => {
   else if (page === 'explore') initExplore();
   else if (page === 'title') initTitle();
   else if (page === 'methodology') initMethodology();
-  else if (page === 'compare') initCompare();
   else if (page === 'kids') initKids();
 });

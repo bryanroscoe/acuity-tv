@@ -128,27 +128,49 @@ def quantile_to_0_100(values):               # for dimension bars: percentile*10
         out[i] = round(100*(rank+0.5)/n)
     return out
 
-# Wider spread: median 100, fatter tails so the top reaches ~200 and the extremes are populated.
-# (Tunable — raise IQ_SD for an even flatter/wider curve. Scale recalibrates as the catalog grows.)
-IQ_SD, IQ_LO, IQ_HI = 26, 10, 200
-iq   = quantile_to_normal([r["_composite"] for r in cat], sd=IQ_SD, lo=IQ_LO, hi=IQ_HI)
+# Flattened bell: median 100, but FLATTER than a Gaussian with more weight pushed toward the
+# ends — a blend of a normal and a uniform, both centered on 100. Still single-humped (a bell),
+# just not a normal distribution. FLATTEN: 0 = pure bell, 1 = flat. Tunable; recalibrates as the
+# catalog grows.
+IQ_SD, IQ_LO, IQ_HI, FLATTEN = 27, 4, 200, 0.60
+
+def quantile_flattened(values, sd=IQ_SD, lo=IQ_LO, hi=IQ_HI, w=FLATTEN):
+    nd = NormalDist(100, sd)
+    order = sorted(range(len(values)), key=lambda i: values[i])
+    out = [0]*len(values); n = len(values)
+    for rank, i in enumerate(order):
+        p = (rank + 0.5) / n
+        blended = (1 - w)*nd.inv_cdf(p) + w*(p*200.0)   # uniform part spans [0,200], median 100
+        out[i] = round(min(hi, max(lo, blended)))
+    return out
+
+def percentile_rank(values):                 # 0..100: "better than this % of the catalog"
+    order = sorted(range(len(values)), key=lambda i: values[i])
+    out = [0]*len(values); n = len(values)
+    for rank, i in enumerate(order):
+        out[i] = round(100*rank/(n-1))
+    return out
+
+iq   = quantile_flattened([r["_composite"] for r in cat])
+pct  = percentile_rank([r["_composite"] for r in cat])
 cog  = quantile_to_0_100([r["_cog"] for r in cat])
 edu  = quantile_to_0_100([r["_edu"] for r in cat])
 ent  = quantile_to_0_100([r["_ent"] for r in cat])
 
-# tiers by standard-deviation bands of the Normal(100,15) IQ (0..4 low->high)
+# tier bands on the flattened scale (0..4 low->high). Profound stays selective (~top tenth) so
+# the 130-200 region is split between Absorbing and Profound rather than one giant bucket.
 def tier_index(x):
-    if x >= 130: return 4
-    if x >= 115: return 3
-    if x >=  85: return 2
-    if x >=  70: return 1
+    if x >= 150: return 4
+    if x >= 122: return 3
+    if x >=  82: return 2
+    if x >=  54: return 1
     return 0
 
 records = []
 for k, r in enumerate(cat):
     records.append({
         "id": r["id"], "n": r["n"], "year": r["year"], "type": r["type"], "g": r["g"],
-        "iq": iq[k], "cog": cog[k], "edu": edu[k], "ent": ent[k],
+        "iq": iq[k], "pct": pct[k], "cog": cog[k], "edu": edu[k], "ent": ent[k],
         "tier": tier_index(iq[k]), "kids": r["kids"],
         "rating": r["rating"], "votes": r["votes"],
         "slug": slugify(r["n"], r["year"]),
