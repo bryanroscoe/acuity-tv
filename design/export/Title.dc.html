@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#0d0c12}
+  ::selection{background:rgba(138,120,255,0.34);color:#fff}
+</style>
+</helmet>
+<main ref="{{ rootRef }}" data-screen-label="Acuity — Title" style="--acc:#8a78ff; position:relative; background:#0d0c12; color:#ece9f4; font-family:'Hanken Grotesk',sans-serif; min-height:100vh; -webkit-font-smoothing:antialiased;">
+
+  <!-- NAV -->
+  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; gap:24px; padding:16px 32px; border-bottom:1px solid rgba(190,180,235,0.09); background:rgba(13,12,18,0.82); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);">
+    <a href="Acuity.dc.html" style="display:flex; align-items:center; gap:11px; text-decoration:none; color:#ece9f4;">
+      <svg width="26" height="26" viewBox="0 0 28 28" style="display:block;">
+        <line x1="14" y1="14" x2="14" y2="5" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.55"></line>
+        <line x1="14" y1="14" x2="5.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.55"></line>
+        <line x1="14" y1="14" x2="22.5" y2="22" stroke="var(--acc,#8a78ff)" stroke-width="1.3" opacity="0.55"></line>
+        <circle cx="14" cy="5" r="2.4" fill="var(--acc,#8a78ff)"></circle>
+        <circle cx="5.5" cy="22" r="2.4" fill="var(--acc,#8a78ff)"></circle>
+        <circle cx="22.5" cy="22" r="2.4" fill="var(--acc,#8a78ff)"></circle>
+        <circle cx="14" cy="14" r="3" fill="#b9acff"></circle>
+      </svg>
+      <span style="font-family:'Instrument Serif',serif; font-size:27px; letter-spacing:0.3px; line-height:1;">Acuity</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8a9e; border:1px solid rgba(190,180,235,0.16); padding:2px 5px; border-radius:3px; margin-top:2px;">AQ</span>
+    </a>
+    <div style="display:flex; align-items:center; gap:30px;">
+      <a href="Catalog.dc.html" style="font-size:13.5px; color:#b3aec0; text-decoration:none; letter-spacing:0.2px;">Catalog</a>
+      <a href="Acuity.dc.html#compare" style="font-size:13.5px; color:#b3aec0; text-decoration:none; letter-spacing:0.2px;">Compare</a>
+      <a href="Acuity.dc.html#method" style="font-size:13.5px; color:#b3aec0; text-decoration:none; letter-spacing:0.2px;">Methodology</a>
+      <a href="Catalog.dc.html" style="font-size:13px; font-weight:600; color:#0d0c12; background:var(--acc,#8a78ff); padding:9px 16px; border-radius:6px; text-decoration:none; letter-spacing:0.2px;">Browse the index</a>
+    </div>
+  </nav>
+
+  <div style="max-width:1100px; margin:0 auto; padding:30px 32px 80px;">
+    <a href="Catalog.dc.html" style="display:inline-flex; align-items:center; gap:7px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:1px; color:#8f8a9e; text-decoration:none; margin-bottom:30px;" style-hover="color:var(--acc,#8a78ff);"><span style="font-size:14px;">←</span> Back to catalog</a>
+
+    <!-- HERO -->
+    <div style="display:flex; gap:40px; flex-wrap:wrap; margin-bottom:54px;">
+      <div style="flex:none; width:286px; max-width:100%;">
+        <div style="position:relative; aspect-ratio:2/3; border-radius:14px; overflow:hidden; border:1px solid rgba(190,180,235,0.12); background:#100e18; box-shadow:0 30px 70px rgba(0,0,0,0.5);">
+          <div role="img" aria-label="{{ title }}" style="position:absolute; inset:0; background-image:{{ posterCss }}; background-size:cover; background-position:center;"></div>
+          <sc-if value="{{ noPoster }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute; inset:0; background-image:repeating-linear-gradient(135deg, rgba(138,120,255,0.08) 0 11px, transparent 11px 22px); display:flex; align-items:center; justify-content:center;"><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1.6px; color:#6f6a80; text-align:center; padding:0 14px; line-height:1.8;">{{ posterLabel }}</span></div>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="flex:1; min-width:300px;">
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:1.5px; color:#a59fb2; text-transform:uppercase; border:1px solid rgba(190,180,235,0.16); padding:4px 9px; border-radius:5px;">{{ kind }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:1.5px; color:#a59fb2; border:1px solid rgba(190,180,235,0.16); padding:4px 9px; border-radius:5px;">{{ year }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:1.5px; color:#a59fb2; border:1px solid rgba(190,180,235,0.16); padding:4px 9px; border-radius:5px;">{{ cert }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:1px; color:#e8c662; border:1px solid rgba(232,198,98,0.3); padding:4px 9px; border-radius:5px;">★ {{ rating }} · {{ votesFmt }} votes</span>
+        </div>
+        <h1 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:54px; line-height:1.0; letter-spacing:-0.5px; margin:0 0 12px; color:#f4f1fb;">{{ title }}</h1>
+        <div style="font-size:14px; color:#948fa3; margin-bottom:28px;">{{ genresLabel }}</div>
+
+        <div style="display:flex; align-items:flex-end; gap:22px; flex-wrap:wrap; padding:22px; background:linear-gradient(180deg,#17141f,#131019); border:1px solid rgba(190,180,235,0.12); border-radius:14px; margin-bottom:24px;">
+          <div style="display:flex; flex-direction:column;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; color:#8f8a9e; text-transform:uppercase; margin-bottom:4px;">Acuity Quotient</span>
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:76px; font-weight:600; line-height:0.82; color:{{ tierColor }};">{{ iq }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:15px; color:#645f73;">/200</span>
+            </div>
+          </div>
+          <div style="flex:1; min-width:160px;">
+            <span style="display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:{{ tierColor }}; border:1px solid currentColor; padding:4px 10px; border-radius:5px; margin-bottom:12px;">{{ tier }} tier</span>
+            <div style="height:8px; border-radius:4px; background:rgba(190,180,235,0.12); overflow:hidden;"><div style="height:100%; width:{{ iqPct }}; background:{{ tierColor }}; border-radius:4px;"></div></div>
+            <p style="font-size:12.5px; color:#8f8a9e; line-height:1.5; margin:10px 0 0;">{{ tierBlurb }}</p>
+          </div>
+        </div>
+
+        <div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1.8px; color:#645f73; text-transform:uppercase;">Where to watch</span>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:11px;">
+            <sc-for list="{{ services }}" as="s" hint-placeholder-count="2">
+              <span style="display:flex; align-items:center; gap:8px; font-size:13px; color:#c8c3d4; background:rgba(190,180,235,0.06); border:1px solid rgba(190,180,235,0.14); padding:7px 13px 7px 8px; border-radius:8px;"><span style="width:22px; height:22px; border-radius:5px; flex:none; background:{{ s.logoBg }}; display:flex; align-items:center; justify-content:center; color:#fff; font-size:10px; font-weight:700; border:1px solid rgba(255,255,255,0.1);">{{ s.logo }}</span>{{ s.name }}</span>
+            </sc-for>
+            <sc-if value="{{ noServices }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:13px; color:#8f8a9e; padding:8px 0;">Not currently on a tracked service.</span>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIMENSIONS -->
+    <div style="margin-bottom:54px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:2.4px; color:var(--acc,#8a78ff); text-transform:uppercase;">The breakdown</span>
+      <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:34px; line-height:1.05; margin:10px 0 26px; color:#f4f1fb;">Three lenses, scored.</h2>
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <sc-for list="{{ dims }}" as="d" hint-placeholder-count="3">
+          <div style="display:flex; gap:22px; align-items:center; flex-wrap:wrap;">
+            <div style="width:200px; flex:none;">
+              <div style="font-family:'Instrument Serif',serif; font-size:23px; color:#f4f1fb; line-height:1;">{{ d.name }}</div>
+              <div style="font-size:12.5px; color:#8f8a9e; margin-top:4px;">{{ d.desc }}</div>
+            </div>
+            <div style="flex:1; min-width:200px; display:flex; align-items:center; gap:16px;">
+              <div style="flex:1; height:10px; border-radius:5px; background:rgba(190,180,235,0.10); overflow:hidden;"><div style="height:100%; width:{{ d.pct }}; background:var(--acc,#8a78ff); border-radius:5px;"></div></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:600; color:#f4f1fb; width:64px; text-align:right;">{{ d.val }}<span style="font-size:12px; color:#645f73;">/100</span></span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- RATIONALE -->
+    <div style="display:flex; gap:44px; flex-wrap:wrap; margin-bottom:54px;">
+      <div style="flex:1.6; min-width:320px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:2.4px; color:var(--acc,#8a78ff); text-transform:uppercase;">The rationale</span>
+        <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:34px; line-height:1.05; margin:10px 0 20px; color:#f4f1fb;">Why this score.</h2>
+        <sc-for list="{{ rationale }}" as="p" hint-placeholder-count="3">
+          <p style="font-size:16px; line-height:1.7; color:#bcb5c8; margin:0 0 18px; max-width:600px;">{{ p }}</p>
+        </sc-for>
+      </div>
+      <div style="flex:1; min-width:240px;">
+        <div style="background:#15131d; border:1px solid rgba(190,180,235,0.10); border-radius:14px; padding:22px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1.8px; color:#8f8a9e; text-transform:uppercase;">How this was scored</span>
+          <p style="font-size:13.5px; line-height:1.6; color:#948fa3; margin:12px 0 16px;">Read on the same three lenses — Depth, Insight, Craft — then combined and calibrated onto one number on a fixed 0–200 scale. The weighting is tuned in-house, not published as a one-line formula.</p>
+          <a href="Acuity.dc.html#method" style="display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--acc,#8a78ff); text-decoration:none;">Read the methodology →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- RELATED -->
+    <div>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:2.4px; color:var(--acc,#8a78ff); text-transform:uppercase;">In the same vein</span>
+      <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:34px; line-height:1.05; margin:10px 0 24px; color:#f4f1fb;">{{ relHeading }}</h2>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:18px;">
+        <sc-for list="{{ related }}" as="r" hint-placeholder-count="5">
+          <a href="Title.dc.html?t={{ r.slug }}" style="display:block; text-decoration:none; color:inherit; transition:transform .22s ease;" style-hover="transform:translateY(-5px);">
+            <div style="position:relative; aspect-ratio:2/3; border-radius:11px; overflow:hidden; border:1px solid rgba(190,180,235,0.10); background:#100e18;">
+              <div role="img" aria-label="{{ r.n }}" style="position:absolute; inset:0; background-image:{{ r.posterCss }}; background-size:cover; background-position:center;"></div>
+              <sc-if value="{{ r.noPoster }}" hint-placeholder-val="{{ true }}">
+                <div style="position:absolute; inset:0; background-image:repeating-linear-gradient(135deg, rgba(138,120,255,0.07) 0 10px, transparent 10px 20px); display:flex; align-items:center; justify-content:center;"><span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:1.2px; color:#6f6a80; text-align:center; padding:0 8px; line-height:1.6;">{{ r.posterLabel }}</span></div>
+              </sc-if>
+              <span style="position:absolute; top:9px; right:9px; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase; color:#0d0c12; background:{{ r.tierColor }}; padding:3px 7px; border-radius:5px; font-weight:600;">{{ r.iq }}</span>
+              <div style="position:absolute; left:0; right:0; bottom:0; height:54px; background:linear-gradient(0deg, rgba(13,12,18,0.92), transparent);"></div>
+            </div>
+            <div style="font-size:14px; font-weight:600; color:#f4f1fb; line-height:1.2; margin-top:10px;">{{ r.n }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8f8a9e; margin-top:3px;">{{ r.year }} · {{ r.tier }}</div>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="margin-top:64px; border-top:1px solid rgba(190,180,235,0.08); padding-top:22px;">
+      <p style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; line-height:1.7; color:#645f73; margin:0;">© 2026 Acuity. Every score is computed from one calibrated method. Title facts from IMDb public datasets · availability illustrative · poster art via TMDB.</p>
+    </div>
+  </div>
+
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1100,&quot;height&quot;:1400},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#8a78ff&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  state = { slug:null, cat:[], loaded:false, poster:undefined, relPosters:{} };
+  defaultSlug = 'schindlers-list-1993';
+
+  async componentDidMount(){
+    const r=this.rootRef.current; if(r) r.style.setProperty('--acc', this.props.accent || '#8a78ff');
+    let slug=null;
+    try { slug = new URLSearchParams(location.search).get('t'); } catch(e){}
+    slug = slug || this.defaultSlug;
+    this.mod = await import('./acuity-catalog.js');
+    const cat = await this.mod.loadCatalog();
+    this.setState({ slug, cat, loaded:true }, ()=>this.loadPosters());
+  }
+
+  current(){ const sl=this.state.slug || this.defaultSlug; return this.state.cat.find(x=>x.slug===sl) || this.state.cat.find(x=>x.slug===this.defaultSlug) || this.state.cat[0]; }
+  relatedList(cur){ if(!cur) return []; return this.state.cat.filter(x=>x!==cur && x.g.some(g=>cur.g.includes(g))).sort((a,b)=>b.iq-a.iq).slice(0,5); }
+
+  async loadPosters(){
+    const cur=this.current(); if(!cur) return;
+    const u=await this.mod.resolvePoster(cur); this.setState({ poster:u||null });
+    for(const x of this.relatedList(cur)){
+      const ru=await this.mod.resolvePoster(x);
+      this._rp=this._rp||{}; this._rp[x.slug]=ru||null; this.setState({ relPosters:{...this._rp} });
+    }
+  }
+
+  fmtVotes(v){ if(v==null) return '—'; if(v>=1e6) return (v/1e6).toFixed(1)+'M'; if(v>=1e3) return Math.round(v/1e3)+'K'; return ''+v; }
+  svcLogo(name){ const map={ 'Netflix':'N','Prime Video':'P','Max':'M','Hulu':'h','Disney+':'D','Apple TV+':'','Peacock':'P','Paramount+':'P+','Tubi':'T','Criterion':'C','MUBI':'M','Starz':'S','AMC+':'A','BritBox':'B' }; return map[name]!==undefined?map[name]:name[0]; }
+  svcColor(name){ const map={ 'Netflix':'#e50914','Prime Video':'#00a8e1','Max':'#0046ff','Hulu':'#1ce783','Disney+':'#0a2a6b','Apple TV+':'#111','Peacock':'#000','Paramount+':'#0064ff','Tubi':'#fa382f','Criterion':'#1c1c1c','MUBI':'#000','Starz':'#000','AMC+':'#cf2030','BritBox':'#1a1a6e' }; return map[name]||'#2a2733'; }
+
+  genericRationale(x){
+    const dims=[['Depth',x.cog],['Insight',x.edu],['Craft',x.ent]].sort((a,b)=>b[1]-a[1]);
+    const note={ Depth:'the attention and inference it demands', Insight:'the real-world understanding it leaves you with', Craft:'the control of writing, performance, and image' };
+    const tier=this.mod.tierName(x.tier);
+    return [
+      `${x.n} lands in the ${tier} tier at an Acuity Quotient of ${x.iq}. Its strongest lens is ${dims[0][0]} — ${note[dims[0][0]]} — which does the most to lift the overall number.`,
+      `${dims[2][0]} is where it gives back least, and that gap is what the score is built to surface: not whether it is liked, but how much it actually returns to your mind.`,
+      `Against the rest of the catalog that places it ${x.iq>=130?'well above':x.iq>=115?'above':x.iq>=85?'around':'below'} the midpoint of everything we have scored.`
+    ];
+  }
+
+  renderVals(){
+    const M=this.mod;
+    if(!this.state.loaded || !M){
+      return { title:'Loading…', kind:'', year:'', cert:'', rating:'', votesFmt:'', genresLabel:'', iq:'', iqPct:'0%', tier:'', tierColor:'#8a78ff', tierBlurb:'', noPoster:true, posterCss:'none', posterLabel:'', services:[], noServices:false, dims:[], rationale:[], related:[], relHeading:'', titleText:'' };
+    }
+    const x=this.current();
+    if(!x){ return { title:'Title not found', kind:'', year:'', cert:'', rating:'', votesFmt:'', genresLabel:'', iq:'', iqPct:'0%', tier:'', tierColor:'#8a78ff', tierBlurb:'', noPoster:true, posterCss:'none', posterLabel:'POSTER', services:[], noServices:true, dims:[], rationale:[], related:[], relHeading:'' }; }
+    const tier=M.tierName(x.tier), tc=M.tierColor(x.tier);
+    const pu=this.state.poster;
+    const rel=this.relatedList(x).map(o=>{ const ru=this.state.relPosters[o.slug];
+      return { n:o.n, year:o.year, slug:o.slug, iq:o.iq, tier:M.tierName(o.tier), tierColor:M.tierColor(o.tier), posterCss: ru?('url("'+ru+'")'):'none', noPoster:!ru, posterLabel:'POSTER · '+o.n.toUpperCase() }; });
+    return {
+      title:x.n, kind:(x.type==='film'?'Film':'Series'), year:x.year, cert:x.cert||'NR', rating:(x.rating!=null?x.rating.toFixed(1):'—'), votesFmt:this.fmtVotes(x.votes),
+      genresLabel:x.g.join(' · '),
+      iq:x.iq, iqPct:(x.iq/200*100).toFixed(1)+'%', tier, tierColor:tc, tierBlurb:M.TIER_BLURB[x.tier],
+      posterCss: pu?('url("'+pu+'")'):'none', noPoster: pu===undefined||pu===null, posterLabel:'POSTER · '+x.n.toUpperCase(),
+      services:(x.svc||[]).map(n=>({ name:n, logo:this.svcLogo(n), logoBg:this.svcColor(n) })), noServices:(x.svc||[]).length===0,
+      dims:[
+        { name:'Depth', desc:'What it asks of your attention', val:x.cog, pct:x.cog+'%' },
+        { name:'Insight', desc:'What you carry out of it', val:x.edu, pct:x.edu+'%' },
+        { name:'Craft', desc:'How well it is made', val:x.ent, pct:x.ent+'%' }
+      ],
+      rationale: x.rationale ? [x.rationale] : this.genericRationale(x),
+      related: rel, relHeading: 'More '+(x.g[0]||'titles')+' worth your time.'
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -776,9 +776,10 @@ function initHome() {
     buildMarquee(cat);
     const focus = buildInstrument(cat);
     buildFeatured(cat, focus);
-    buildGenreChips(cat, focus);
+    buildTitleChips(cat, focus);
     buildHeroSearch(cat, focus);
     buildCurve(stats);
+    buildCompare(cat);
 
     focus(cat[0]); // default the instrument to the top title
   }).catch(err => {
@@ -857,25 +858,86 @@ function initHome() {
     animateStagger(cards, { step: 75, cap: 6 }); // stagger the top-of-curve cards in
   }
 
-  /* -------- genre chips that focus the instrument -------- */
-  function buildGenreChips(cat, focus) {
+  /* -------- title chips that focus the instrument (top of the curve) -------- */
+  function buildTitleChips(cat, focus) {
     const host = document.querySelector('[data-inst-chips]');
     if (!host) return;
-    const counts = {};
-    cat.forEach(r => (r.g || []).forEach(g => { counts[g] = (counts[g] || 0) + 1; }));
-    const genres = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).slice(0, 6);
     const chips = [];
-    genres.forEach(g => {
-      const top = cat.find(r => (r.g || []).includes(g)); // catalog is sorted by AQ desc
-      const btn = el('button', { class: 'acu-chip', type: 'button', text: g });
+    cat.slice(0, 6).forEach(rec => {
+      const btn = el('button', { class: 'acu-chip', type: 'button', text: rec.n });
       btn.addEventListener('click', () => {
         chips.forEach(c => c.classList.remove('active'));
         btn.classList.add('active');
-        if (top) focus(top);
+        focus(rec);
       });
       chips.push(btn);
       host.appendChild(btn);
     });
+  }
+
+  /* -------- head-to-head compare: two titles, delta, swap the right one -------- */
+  function buildCompare(cat) {
+    const cardHost = document.querySelector('[data-compare-cards]');
+    const swapHost = document.querySelector('[data-compare-swap]');
+    if (!cardHost || !swapHost) return;
+    const n = cat.length;
+    const left = cat[0]; // the highest-scoring title anchors the left
+    // a varied swap pool spread across the distribution (deduped, never the left title)
+    const picks = [];
+    const seen = new Set([left.slug]);
+    [Math.floor(n * 0.5), Math.floor(n * 0.18), Math.floor(n * 0.82), 4].forEach(i => {
+      const r = cat[Math.max(0, Math.min(n - 1, i))];
+      if (r && !seen.has(r.slug)) { seen.add(r.slug); picks.push(r); }
+    });
+    if (!picks.length) return;
+    let right = picks[0];
+
+    // one compare card (real data, design styles); `accent` highlights the left card
+    function compareCard(rec, accent) {
+      const tc = tierColorVar(rec.tier), t = tierOf(rec.tier);
+      const poster = el('div', { class: 'acu-cmp-poster' + (rec.p ? '' : ' hatch') });
+      if (rec.p) poster.appendChild(el('img', { loading: 'lazy', decoding: 'async', alt: '', src: posterUrl(rec.p, 'w185') }));
+      else poster.appendChild(el('span', { class: 'acu-tile-t', text: rec.n }));
+      const head = el('div', { class: 'acu-cmp-head' }, [
+        poster,
+        el('div', { class: 'acu-cmp-meta' }, [
+          el('a', { class: 'acu-cmp-title', href: titleHref(rec.slug), text: rec.n }),
+          el('div', { class: 'acu-cmp-sub', text: rec.year + ' · ' + kindOf(rec) }),
+          el('div', { class: 'acu-cmp-aq', style: 'color:' + tc + ';', text: String(rec.iq) }),
+          el('span', { class: 'acu-cmp-tier', style: 'color:' + tc + ';', text: t.name }),
+        ]),
+      ]);
+      const bars = el('div', { class: 'acu-cmp-bars' });
+      [['DEPTH', 'cog'], ['INSIGHT', 'edu'], ['CRAFT', 'ent']].forEach(([lbl, k]) => {
+        bars.appendChild(el('div', { class: 'acu-cmp-bar' }, [
+          el('div', { class: 'acu-cmp-bar-top' }, [el('span', { text: lbl }), el('span', { text: String(rec[k]) })]),
+          el('div', { class: 'acu-cmp-track' }, [el('div', { class: 'acu-cmp-fill', style: 'width:' + rec[k] + '%;' })]),
+        ]));
+      });
+      return el('div', { class: 'acu-cmp-card' + (accent ? ' is-accent' : '') }, [head, bars]);
+    }
+
+    function renderCmp() {
+      cardHost.innerHTML = '';
+      const dd = left.iq - right.iq;
+      const delta = el('div', { class: 'acu-cmp-delta' }, [
+        el('span', { class: 'acu-cmp-delta-l', text: 'DELTA' }),
+        el('span', { class: 'acu-cmp-delta-n', style: 'color:' + (dd >= 0 ? 'var(--acc)' : 'var(--t0)') + ';', text: (dd > 0 ? '+' : '') + dd }),
+        el('span', { class: 'acu-cmp-delta-l', text: 'AQ' }),
+      ]);
+      cardHost.appendChild(compareCard(left, true));
+      cardHost.appendChild(delta);
+      cardHost.appendChild(compareCard(right, false));
+      swapHost.querySelectorAll('.acu-cmp-swap').forEach(b => b.classList.toggle('active', b._slug === right.slug));
+    }
+
+    picks.forEach(rec => {
+      const btn = el('button', { class: 'acu-cmp-swap', type: 'button', text: rec.n });
+      btn._slug = rec.slug;
+      btn.addEventListener('click', () => { right = rec; renderCmp(); });
+      swapHost.appendChild(btn);
+    });
+    renderCmp();
   }
 
   /* -------- hero search with live autocomplete dropdown -------- */
@@ -1043,6 +1105,26 @@ function initExplore() {
   const elMaxAge = document.querySelector('#maxAge');
   const elMinRating = document.querySelector('#minRating');
   const elVotesChips = document.querySelector('#votesChips');
+  // live value read-outs for the slider-based filters (dimension mins / age / IMDb)
+  const elDmVal = {
+    cog: document.querySelector('[data-dm="cog"]'),
+    edu: document.querySelector('[data-dm="edu"]'),
+    ent: document.querySelector('[data-dm="ent"]'),
+  };
+  const elAgeVal = document.querySelector('[data-ageval]');
+  const elRatingVal = document.querySelector('[data-ratingval]');
+  // label text: age slider reads "any age" at the top, else "a N-year-old"
+  function ageLabelText(v) { return (v == null || v >= 18) ? 'any age' : ('a ' + v + '-year-old'); }
+  function ratingLabelText(v) { return v > 0 ? '★ ' + v.toFixed(1) : 'Any'; }
+  // push current slider state into the read-out labels
+  function syncSliderLabels() {
+    DIMS.forEach(d => {
+      const prop = 'min' + d.key.charAt(0).toUpperCase() + d.key.slice(1);
+      if (elDmVal[d.key]) elDmVal[d.key].textContent = String(state[prop] || 0);
+    });
+    if (elAgeVal) elAgeVal.textContent = ageLabelText(state.maxAge);
+    if (elRatingVal) elRatingVal.textContent = ratingLabelText(state.minRating);
+  }
   const elGenreSearch = document.querySelector('#genreSearch');
   const elSvc = document.querySelector('#svcList');
   const elSvcCount = document.querySelector('#svcCount');
@@ -1248,7 +1330,8 @@ function initExplore() {
       if (dimMin[key]) dimMin[key].value = String(v);
     });
     if (elMinRating) elMinRating.value = String(state.minRating || 0);
-    if (elMaxAge) elMaxAge.value = state.maxAge == null ? '' : String(state.maxAge);
+    if (elMaxAge) elMaxAge.value = state.maxAge == null ? '18' : String(state.maxAge);
+    syncSliderLabels();
     syncVoteChips();
     if (elSort) elSort.value = state.sort;
     elSvc.querySelectorAll('input[data-svc]').forEach(cb => { cb.checked = state.services.has(cb.getAttribute('data-svc')); });
@@ -1380,12 +1463,12 @@ function initExplore() {
     });
     if (state.minRating > 0) pills.push(['IMDb ≥ ' + state.minRating.toFixed(1), () => { state.minRating = 0; if (elMinRating) elMinRating.value = '0'; }]);
     if (state.minVotes > 0) pills.push(['≥ ' + fmtVotes(state.minVotes) + ' votes', () => { state.minVotes = 0; syncVoteChips(); }]);
-    if (state.maxAge != null) pills.push(['Age ≤ ' + state.maxAge, () => { state.maxAge = null; if (elMaxAge) elMaxAge.value = ''; }]);
+    if (state.maxAge != null) pills.push(['Age ≤ ' + state.maxAge, () => { state.maxAge = null; if (elMaxAge) elMaxAge.value = '18'; }]);
 
     pills.forEach(([label, undo]) => {
       const x = el('button', { type: 'button', 'aria-label': 'Remove ' + label, text: '×' });
       const pill = el('span', { class: 'active-pill' }, [document.createTextNode(label), x]);
-      x.addEventListener('click', () => { undo(); resetPage(); apply(); });
+      x.addEventListener('click', () => { undo(); syncSliderLabels(); resetPage(); apply(); });
       elActive.appendChild(pill);
     });
 
@@ -1413,9 +1496,10 @@ function initExplore() {
     state.minCog = 0; state.minEdu = 0; state.minEnt = 0;
     state.minRating = 0; state.minVotes = 0;
     state.maxAge = null;
-    if (elMaxAge) elMaxAge.value = '';
+    if (elMaxAge) elMaxAge.value = '18';
     DIMS.forEach(d => { if (dimMin[d.key]) dimMin[d.key].value = '0'; });
     if (elMinRating) elMinRating.value = '0';
+    syncSliderLabels();
     syncVoteChips();
     if (elGenreSearch) { elGenreSearch.value = ''; elGenreChips.querySelectorAll('.chip').forEach(c => { c.hidden = false; }); }
     if (elKidsToggle) elKidsToggle.setAttribute('aria-pressed', 'false');
@@ -1440,25 +1524,28 @@ function initExplore() {
   elMin.addEventListener('input', onRange);
   elMax.addEventListener('input', onRange);
 
-  // per-dimension minimums — selects (any / 40+ / 60+ / 80+)
+  // per-dimension minimums — sliders (0–100, step 5)
   DIMS.forEach(d => {
-    const sel = dimMin[d.key];
-    if (!sel) return;
+    const sl = dimMin[d.key];
+    if (!sl) return;
     const prop = 'min' + d.key.charAt(0).toUpperCase() + d.key.slice(1);
-    sel.addEventListener('change', () => {
-      state[prop] = Math.max(0, Math.min(100, parseInt(sel.value, 10) || 0));
+    sl.addEventListener('input', () => {
+      state[prop] = Math.max(0, Math.min(100, parseInt(sl.value, 10) || 0));
+      if (elDmVal[d.key]) elDmVal[d.key].textContent = String(state[prop]);
       resetPage(); apply();
     });
   });
-  // IMDb rating minimum — select
-  if (elMinRating) elMinRating.addEventListener('change', () => {
+  // IMDb rating minimum — slider (0–9.5, step 0.5; 0 = Any)
+  if (elMinRating) elMinRating.addEventListener('input', () => {
     state.minRating = Math.max(0, Math.min(10, parseFloat(elMinRating.value) || 0));
+    if (elRatingVal) elRatingVal.textContent = ratingLabelText(state.minRating);
     resetPage(); apply();
   });
-  // audience-age cap — select; "" = any, otherwise "suitable for age ≤ N"
-  if (elMaxAge) elMaxAge.addEventListener('change', () => {
+  // audience-age cap — slider (6–18; 18 = any age, otherwise "suitable for age ≤ N")
+  if (elMaxAge) elMaxAge.addEventListener('input', () => {
     const v = parseInt(elMaxAge.value, 10);
-    state.maxAge = isNaN(v) ? null : Math.max(0, v);
+    state.maxAge = (isNaN(v) || v >= 18) ? null : Math.max(0, v);
+    if (elAgeVal) elAgeVal.textContent = ageLabelText(state.maxAge);
     resetPage(); apply();
   });
 

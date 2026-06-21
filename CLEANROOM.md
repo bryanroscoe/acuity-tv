@@ -737,3 +737,55 @@ fill measured 0px → 302 → 488 → 573 → 616 → 657px across a sample burs
 filled; 5 related cards. With `prefers-reduced-motion: reduce` emulated: home hero `opacity:1`,
 `transform:none`, marquee `animation-name:none`; title AQ rendered "200" immediately. Server and
 Chrome stopped after checks.
+
+### Implementer attestation (v15 — latest 3-page design export port)
+
+Date: 2026-06-21. Source of truth: the user's own design export in
+`design/export/` (`Acuity.dc.html`, `Catalog.dc.html`, `Title.dc.html`,
+`acuity-catalog.js`, `HANDOFF-README.md`) — the user's own design, fine to use.
+No competitor product was read, fetched, or searched; the private
+`tvintelligentsia` mirror was NOT accessed. Clean-room rule observed.
+
+Changes made:
+- Home (`index.html` + `app.js`): re-added the design's **Compare** section
+  ("Head to head — Two titles. One scale.") wired to real `catalog.json` —
+  left card anchored on the top title, swappable right card (4-title pool spread
+  across the distribution), live DELTA (accent when ≥0, rose `--t0` when <0),
+  poster/title/AQ/tier + Depth/Insight/Craft bars. Added nav "Compare" link,
+  changed the hero's second CTA to "Compare two titles" (→ `#compare`), added the
+  instrument "LIVE" indicator, switched instrument focus chips from genres to the
+  top-6 titles ("Click a title…"), and updated the distribution copy to "We grade
+  on a flat curve." The internal **naming study** section was intentionally OMITTED.
+- Catalog (`explore.html` + `app.js`): converted the select-based filters to the
+  design's **slider** controls — dimension minimums (Depth/Insight/Craft, 0–100
+  step 5), audience age (6–18, 18 = "any age", reads "a N-year-old"), and IMDb
+  rating (0–9.5 step 0.5, gold "★ N.N") — each with a live value read-out; vote
+  bands, genre search, logo-streaming + "+N more", weights/priorities re-rank,
+  score range, sort, autocomplete, URL params, and the mobile drawer preserved.
+- Compare-card and slider styling added to `styles.css`. Added "Compare" to the
+  catalog/title nav (→ `./index.html#compare`).
+- Preserved (no regression): title Reception block (IMDb / Metacritic / Rotten
+  Tomatoes, "No critic score yet"), percentile, cert badge, real provider logos +
+  merged variants + "+N more", mark-watched / watchlist (localStorage `acuity_v1`),
+  TMDB/IMDb/OMDb attribution footer, favicon, and the `.acu-anim` motion system
+  (marquee, AQ count-up, prefers-reduced-motion).
+
+SECURITY — inline TMDB token stripped: the design's `acuity-catalog.js` carries an
+inline TMDB read token (`eyJhbG…`) plus a runtime TMDB-search fallback and a
+`localStorage` poster cache in `resolvePoster()`. None of that ships. `dist/` was
+NOT given `acuity-catalog.js` or `support.js`; posters render purely from the
+precomputed `rec.p` via `image.tmdb.org/t/p/w342|w500|…` with a hatched fallback
+when `p` is null — no token, no runtime lookup, no poster cache. Verified:
+`grep -rn eyJhbG dist/` → none; the only `themoviedb.org` strings are the
+attribution-footer website links; all `image.tmdb.org` references are poster /
+provider-logo image URLs (no API token, no `api.themoviedb.org/3`).
+
+Self-verification (served on :8925, headless Chrome + DevTools-protocol driver):
+all pages HTTP 200; catalog counts move with filters (baseline 15,883 →
+tier=4 2,740, type=series 5,163, genre=Drama 8,553, mincog=80 3,256, minrating=9
+112, age=6 770); dimension slider live 15,883 → 3,256 with label "80"; priorities
+re-rank flips the top card (Breaking Bad → Schindler's List) and shows the
+re-ranked flag; mobile drawer (600px) opens and closes; compare swap changes the
+right title and recomputes the delta; title page shows AQ + Reception + 3-lens
+breakdown + cert + percentile + watchlist; `node --check app.js` passes; no inline
+`on*=` handlers; no TMDB token anywhere in `dist/`. Server and Chrome stopped.
