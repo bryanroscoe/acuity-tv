@@ -101,14 +101,29 @@ print(f"  {len(films):,} films + {len(series):,} series + {len(kids):,} kids "
 # --- raw sub-dimension scores (0..1) -----------------------------------------
 maxlv = math.log10(max(r["votes"] for r in cat))
 minlv = math.log10(MIN_VOTES)
+try:
+    OMDB = json.load(open(f"{OUT}/omdb_cache.json"))   # imdb -> {mc, rt, imdb} reception scores
+except Exception:
+    OMDB = {}
+
 for r in cat:
-    rn = (r["rating"] - 1) / 9.0                              # 0..1 quality
+    rn = (r["rating"] - 1) / 9.0                              # 0..1 audience (IMDb users)
     pop = (math.log10(r["votes"]) - minlv) / (maxlv - minlv)  # 0..1 cultural reach
     pop = min(1.0, max(0.0, pop))
     r["_cog"] = 0.55*gmean(r["g"], COG) + 0.35*rn + 0.10*pop
     r["_edu"] = 0.75*gmean(r["g"], EDU) + 0.25*rn
     r["_ent"] = 0.60*rn + 0.25*gmean(r["g"], ENT) + 0.15*pop
-    r["_composite"] = 0.40*r["_cog"] + 0.25*r["_edu"] + 0.35*r["_ent"]
+    cog_comp = 0.40*r["_cog"] + 0.25*r["_edu"] + 0.35*r["_ent"]   # cognitive value 0..1
+    # Fold RECEPTION into the AQ: audience (IMDb) + critic (Metacritic / Rotten Tomatoes).
+    o = OMDB.get(r["id"]) or {}
+    mc, rt = o.get("mc"), o.get("rt")
+    r["_mc"], r["_rt"] = mc, rt
+    cvals = [v for v in (mc, rt) if v is not None]
+    crit = (sum(cvals)/len(cvals))/100.0 if cvals else None      # 0..1 critic
+    if crit is not None:
+        r["_composite"] = 0.45*cog_comp + 0.25*rn + 0.30*crit
+    else:
+        r["_composite"] = (0.45*cog_comp + 0.25*rn) / 0.70       # renormalize without critic
 
 # --- quantile-normalize composite -> Normal(100,15) (TRUE bell curve) ---------
 def quantile_to_normal(values, mean=100, sd=15, lo=40, hi=160):
@@ -173,6 +188,7 @@ for k, r in enumerate(cat):
         "iq": iq[k], "pct": pct[k], "cog": cog[k], "edu": edu[k], "ent": ent[k],
         "tier": tier_index(iq[k]), "kids": r["kids"],
         "rating": r["rating"], "votes": r["votes"],
+        "mc": r.get("_mc"), "rt": r.get("_rt"),
         "slug": slugify(r["n"], r["year"]),
     })
 # de-dup slugs

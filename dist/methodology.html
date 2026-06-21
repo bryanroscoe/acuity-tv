@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body data-page="methodology">
@@ -37,10 +38,10 @@
       <p class="eyebrow">Methodology</p>
       <div class="prose">
         <h1>What the number means.</h1>
-        <p class="lede">Acuity asks one question of every title: how much does watching this enrich the mind behind your eyes? Not how popular it is, not how long it keeps you on the couch — how much it gives back. Here is exactly how we turn that question into a score.</p>
+        <p class="lede">Acuity asks one question of every title: how much does watching this enrich the mind behind your eyes? That cognitive read is the spine of the score — and we temper it with how the title actually landed, both with the audiences who watched it and the critics who reviewed it. Here is exactly how we turn all of that into a single number.</p>
 
         <h2>One scale, three dimensions</h2>
-        <p>Every film and series is graded on three independent dimensions, each from 0 to 100:</p>
+        <p>The cognitive core of the score begins with three independent dimensions, each graded from 0 to 100:</p>
       </div>
 
       <div class="dimcard-grid">
@@ -59,7 +60,16 @@
       </div>
 
       <div class="prose">
-        <p>The three dimensions are blended into a single composite, then placed on a wide, IQ-style scale we call the <strong>Acuity Quotient</strong> — a deliberate nod to a familiar standardized measure. The median title sits at <strong data-stat="mean">100</strong> and the scale runs up to roughly <strong data-stat="max">200</strong>. The number is a measure of a title's cognitive value, not a ranking position — and because the scale is anchored to the whole catalog, it <em>recalibrates as the catalog grows</em>: add thousands more titles and every score is re-derived from the same method, so a 130 means the same thing tomorrow as it does today.</p>
+        <h2>Three inputs, one number</h2>
+        <p>Those dimensions don't stand alone. The Acuity Quotient is a blend of three signals, so the number reflects not just what we think a title demands of you, but how it actually landed:</p>
+        <ul>
+          <li><strong>Cognitive value</strong> — the Depth, Insight, and Craft scores above, combined into a single composite. This is our own read of what a title gives the mind.</li>
+          <li><strong>Audience reception</strong> — how the broad base of <strong>IMDb</strong> users rate the title. Every title in the catalog carries this signal.</li>
+          <li><strong>Critic reception</strong> — the professional verdict, read from <strong>Metacritic</strong> and <strong>Rotten Tomatoes</strong>. It is the sharpest counterweight to a popular but slight title, and the strongest endorsement of a difficult but accomplished one.</li>
+        </ul>
+        <p>Critic coverage is strongest for popular, widely-reviewed titles; the deeper into the long tail you go, the more a title leans on its cognitive read and its audience score alone. Where no critic has weighed in yet, the other two inputs carry the number — and the title's detail page says so plainly rather than inventing a verdict.</p>
+
+        <p>Those three inputs are blended into a single composite, then placed on a wide, IQ-style scale we call the <strong>Acuity Quotient</strong> — a deliberate nod to a familiar standardized measure. The median title sits at <strong data-stat="mean">100</strong> and the scale runs up to roughly <strong data-stat="max">200</strong>. The number is a measure of a title's overall value, not a ranking position — and because the scale is anchored to the whole catalog, it <em>recalibrates as the catalog grows</em>: add thousands more titles and every score is re-derived from the same method, so a 130 means the same thing tomorrow as it does today.</p>
 
         <h2 id="curve">A deliberately flattened curve</h2>
         <p>Most rating sites drift upward until almost everything is "great" and the scale stops meaning anything. We do the opposite — but we also refuse the other trap, the tall central spike that buries every title in the middle. The Acuity Quotient is calibrated into a single, bell-shaped hump centered on a median of <strong data-stat="mean">100</strong>, with a standard deviation of about <strong data-stat="sd">37</strong>. It is intentionally <em>flatter than a normal distribution</em>: we push real weight outward toward the ends, so the top and bottom of the scale are populated rather than empty. Most titles still cluster near the middle, but genuine brilliance and genuine noise both have room to live in tails that actually carry titles.</p>
@@ -81,7 +91,7 @@
 
       <div class="prose">
         <h2>Where the facts come from</h2>
-        <p>The factual scaffolding — titles, years, genres, audience ratings, and vote counts — is drawn from public IMDb datasets. Streaming availability reflects US services and is illustrative; when a title has no availability on record, we say so rather than guess. The scores themselves are ours: computed by a single, repeatable method from those public signals, never hand-tuned title by title.</p>
+        <p>The factual scaffolding — titles, years, genres, audience ratings, and vote counts — is drawn from public IMDb datasets, and the critic scores (Metacritic and Rotten Tomatoes) come through OMDb. Streaming availability reflects US services and is illustrative; when a title has no availability on record, we say so rather than guess. The scores themselves are ours: computed by a single, repeatable method from those public signals, never hand-tuned title by title.</p>
         <p>Because one canonical dataset drives every page, a title's number is identical wherever you meet it — the catalog, its detail page, a head-to-head comparison. Update the data, and the whole site updates with it. There is no second, editorial set of numbers hiding behind the first.</p>
 
         <h2>What it is not</h2>
@@ -91,7 +101,7 @@
 
       <div class="prose">
         <h2 id="sources">Sources &amp; credits</h2>
-        <p>The factual layer beneath every score comes from public datasets, and we credit it plainly. Title metadata — names, release years, genres, audience ratings, and vote counts — is drawn from <a href="https://www.imdb.com/interfaces/">IMDb's public datasets</a> and is used here for non-commercial purposes only. Poster artwork is served directly from TMDB's image servers and is never downloaded or rehosted: we simply hotlink each image so the credit and the bytes both stay with their source.</p>
+        <p>The factual layer beneath every score comes from public datasets, and we credit it plainly. Title metadata — names, release years, genres, audience ratings, and vote counts — is drawn from <a href="https://www.imdb.com/interfaces/">IMDb's public datasets</a> and is used here for non-commercial purposes only. Reception scores — audience ratings alongside the <a href="https://www.metacritic.com/">Metacritic</a> and <a href="https://www.rottentomatoes.com/">Rotten Tomatoes</a> critic verdicts — are retrieved via <a href="https://www.omdbapi.com/">OMDb</a>. Poster artwork is served directly from TMDB's image servers and is never downloaded or rehosted: we simply hotlink each image so the credit and the bytes both stay with their source.</p>
         <p>This product uses the <a href="https://www.themoviedb.org/">TMDB</a> API but is not endorsed or certified by TMDB. The Acuity Quotient, its three dimensions, and the tiers are our own computed work, layered on top of these public facts — the numbers are ours, the underlying data is theirs.</p>
       </div>
     </section>
