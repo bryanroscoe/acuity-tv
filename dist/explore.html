@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catalog — Acuity</title>
+  <meta name="description" content="Search and filter 7,500 films and series by cognitive-value score, tier, genre, type, and the streaming services you actually subscribe to.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body data-page="explore">
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="./index.html">Acuity<span class="dot">.</span><span class="glyph">IQ</span></a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="./explore.html">Catalog</a>
+        <a href="./compare.html">Compare</a>
+        <a href="./methodology.html">Methodology</a>
+      </nav>
+      <span class="nav-spacer"></span>
+      <a class="nav-cta desktop" href="./compare.html">Compare titles</a>
+      <button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
+    </div>
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile" hidden>
+      <a href="./explore.html">Catalog</a>
+      <a href="./compare.html">Compare</a>
+      <a href="./methodology.html">Methodology</a>
+    </nav>
+  </header>
+
+  <main id="main" data-explore>
+    <div class="wrap explore-head">
+      <p class="eyebrow">The index</p>
+      <h1>Every title, on one scale.</h1>
+    </div>
+
+    <div class="wrap">
+      <button class="btn btn-ghost filter-toggle" id="filterToggle" type="button">Filters ▾</button>
+      <div class="explore-layout">
+
+        <aside class="filters" id="filterPanel" aria-label="Filters">
+          <div class="filter-block">
+            <h3>Tier</h3>
+            <div class="chips" id="tierChips" role="group" aria-label="Filter by tier"></div>
+          </div>
+          <div class="filter-block">
+            <h3>Type</h3>
+            <div class="chips" id="typeChips" role="group" aria-label="Filter by type"></div>
+          </div>
+          <div class="filter-block">
+            <h3>IQ score range</h3>
+            <div class="range-row">
+              <input type="number" id="iqMin" min="0" max="200" placeholder="0" aria-label="Minimum score" inputmode="numeric">
+              <span>to</span>
+              <input type="number" id="iqMax" min="0" max="200" placeholder="200" aria-label="Maximum score" inputmode="numeric">
+            </div>
+          </div>
+          <div class="filter-block">
+            <h3>My streaming services <span class="count-tag" id="svcCount"></span></h3>
+            <p class="filter-hint">Pick what you subscribe to — we remember it and hide the rest.</p>
+            <div class="svc-list" id="svcList" role="group" aria-label="Filter by streaming service"></div>
+          </div>
+          <div class="filter-block">
+            <h3>Genre</h3>
+            <div class="chips" id="genreChips" role="group" aria-label="Filter by genre"></div>
+          </div>
+          <div class="filter-block">
+            <button class="reset-link" id="resetFilters" type="button">Reset filters</button>
+          </div>
+        </aside>
+
+        <section aria-label="Results">
+          <div class="search-bar" role="search">
+            <span class="icon" aria-hidden="true">⌕</span>
+            <input type="search" id="searchInput" placeholder="Search titles… (Esc to clear)" aria-label="Search titles" autocomplete="off">
+            <button class="clear-x" id="searchClear" type="button" aria-label="Clear search" hidden>×</button>
+          </div>
+
+          <div class="results-bar">
+            <div class="results-count" id="resultCount" aria-live="polite"></div>
+            <div class="sort-wrap">
+              <label for="sortSelect">Sort</label>
+              <select class="sort" id="sortSelect">
+                <option value="iq-desc">Highest IQ</option>
+                <option value="iq-asc">Lowest IQ</option>
+                <option value="az">A → Z</option>
+                <option value="za">Z → A</option>
+                <option value="year-desc">Newest first</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="active-filters" id="activeFilters" aria-label="Active filters"></div>
+          <div class="grid" id="resultGrid"></div>
+          <div class="load-more" id="loadMoreWrap"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-bottom">
+        <span>© 2026 Acuity. Scores are computed by our own method — see the <a href="./methodology.html">methodology</a>.</span>
+        <span>Title facts from public IMDb datasets.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

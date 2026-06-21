@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acuity — an IQ for everything you watch</title>
+  <meta name="description" content="Acuity rates film and television on cognitive value — how much a title actually enriches your mind — on one fixed scale, scored by a transparent method.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body data-page="home">
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="./index.html">Acuity<span class="dot">.</span><span class="glyph">IQ</span></a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="./explore.html">Catalog</a>
+        <a href="./compare.html">Compare</a>
+        <a href="./methodology.html">Methodology</a>
+      </nav>
+      <span class="nav-spacer"></span>
+      <a class="nav-cta desktop" href="./explore.html">Browse the index</a>
+      <button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
+    </div>
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile" hidden>
+      <a href="./explore.html">Catalog</a>
+      <a href="./compare.html">Compare</a>
+      <a href="./methodology.html">Methodology</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero wrap">
+      <p class="eyebrow">Cognitive-value ratings</p>
+      <h1>An <em>IQ</em> for everything you watch.</h1>
+      <p class="sub">Most apps measure how long they can keep you watching. Acuity measures something better: how much a film or series actually feeds your mind. One honest number, scored the same way for every title.</p>
+      <form class="hero-search" data-hero-search role="search" aria-label="Search the catalog">
+        <input type="search" placeholder="Search 7,500 titles — try “Chernobyl”…" aria-label="Search titles">
+        <button class="btn btn-primary" type="submit">Search</button>
+      </form>
+      <div class="hero-actions">
+        <a class="btn btn-ghost" href="./methodology.html">How scoring works</a>
+        <a class="btn btn-ghost" href="./compare.html">Compare two titles</a>
+      </div>
+    </section>
+
+    <section class="statband">
+      <div class="wrap">
+        <div class="statband-grid" data-statband aria-label="Catalog at a glance"></div>
+      </div>
+    </section>
+
+    <section class="section wrap">
+      <div class="section-head">
+        <div>
+          <h2>The top of the curve</h2>
+          <p>The highest cognitive-value titles in the index — where ideas, knowledge, and craft all run high at once.</p>
+        </div>
+        <a class="link" href="./explore.html">See the full catalog →</a>
+      </div>
+      <div class="grid" data-featured aria-busy="true"></div>
+    </section>
+
+    <section class="section wrap">
+      <div class="cta-band">
+        <p class="eyebrow">Watch on purpose</p>
+        <h2>Audit your watchlist, not your attention.</h2>
+        <p>One short letter a week: a few titles worth your evening, a number you can trust, and nothing engineered to keep you scrolling. No noise.</p>
+        <form class="cta-form" data-newsletter aria-label="Newsletter signup">
+          <input type="email" required placeholder="you@example.com" aria-label="Email address">
+          <button class="btn btn-primary" type="submit">Join the list</button>
+        </form>
+        <p class="cta-note">A demonstration build. Your address never leaves your browser.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="./index.html">Acuity<span class="dot">.</span></a>
+          <p class="footer-tag">Cognitive-value ratings for film and television. A deliberate alternative to the autoplay feed.</p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <div class="footer-links">
+            <a href="./explore.html">Full catalog</a>
+            <a href="./compare.html">Compare titles</a>
+            <a href="./methodology.html">Methodology</a>
+          </div>
+        </div>
+        <div>
+          <h4>The method</h4>
+          <div class="footer-links">
+            <a href="./methodology.html">How we score</a>
+            <a href="./methodology.html#tiers">The five tiers</a>
+            <a href="./methodology.html#curve">The score curve</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Acuity. An independent, clean-room demonstration. Scores are computed, not editorial gospel.</span>
+        <span>Title facts from public IMDb datasets · availability is illustrative.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

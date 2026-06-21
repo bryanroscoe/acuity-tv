@@ -1,0 +1,3 @@
+# huge regenerable IMDb source datasets (facts) — not committed
+data/*.tsv.gz
+.DS_Store

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Methodology — Acuity</title>
+  <meta name="description" content="How Acuity scores cognitive value: three dimensions, a fixed IQ scale calibrated to a true bell curve (mean 100, sd 15), and five named tiers.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body data-page="methodology">
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="./index.html">Acuity<span class="dot">.</span><span class="glyph">IQ</span></a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="./explore.html">Catalog</a>
+        <a href="./compare.html">Compare</a>
+        <a href="./methodology.html">Methodology</a>
+      </nav>
+      <span class="nav-spacer"></span>
+      <a class="nav-cta desktop" href="./explore.html">Browse the index</a>
+      <button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
+    </div>
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile" hidden>
+      <a href="./explore.html">Catalog</a>
+      <a href="./compare.html">Compare</a>
+      <a href="./methodology.html">Methodology</a>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap">
+    <section class="detail">
+      <p class="eyebrow">Methodology</p>
+      <div class="prose">
+        <h1>What the number means.</h1>
+        <p class="lede">Acuity asks one question of every title: how much does watching this enrich the mind behind your eyes? Not how popular it is, not how long it keeps you on the couch — how much it gives back. Here is exactly how we turn that question into a score.</p>
+
+        <h2>One scale, three dimensions</h2>
+        <p>Every film and series is graded on three independent dimensions, each from 0 to 100:</p>
+      </div>
+
+      <div class="dimcard-grid">
+        <div class="dimcard dim cog">
+          <h4>Cognitive load</h4>
+          <p>How much the title asks of you — structural complexity, ambiguity, layered plotting, and ideas that reward a second pass. High scores demand attention.</p>
+        </div>
+        <div class="dimcard dim edu">
+          <h4>Knowledge value</h4>
+          <p>What you carry out of it — history, science, character of a real place or person, a discipline made legible. How much you simply know that you didn't before.</p>
+        </div>
+        <div class="dimcard dim ent">
+          <h4>Craft &amp; execution</h4>
+          <p>Whether the thing is actually made well — writing, performance, direction, and the cohesion that separates a considered work from a competent one.</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>The three dimensions are blended into a single composite, then placed on a fixed scale we call the <strong>IQ</strong> — a deliberate nod to the idea of a standardized score. It runs to a maximum of 200, and like a real IQ it is <em>norm-referenced</em>: a title's number describes where it sits relative to the whole catalog, not against an absolute ideal of perfection.</p>
+
+        <h2 id="curve">A true bell curve, on purpose</h2>
+        <p>Most rating sites drift upward until almost everything is "great" and the scale stops meaning anything. We do the opposite. The IQ scale is calibrated so the catalog forms an honest normal distribution — centered at <strong>100</strong>, with a standard deviation of <strong>15</strong>. Most titles land near the middle; genuine brilliance and genuine noise are both rare, and live in the thin tails where they belong.</p>
+        <p>This is the credibility test for the whole project, so we show our work. Here is the distribution of every score in the catalog:</p>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-stats" data-chart-stats aria-label="Distribution statistics"></div>
+        <div data-histogram></div>
+        <p class="chart-foot">Each bar is the number of titles at a given IQ. A near-zero skew confirms the curve is symmetric — no thumb on the scale.</p>
+      </div>
+
+      <div class="prose">
+        <h2 id="tiers">The five tiers</h2>
+        <p>Numbers are precise but cold, so each title also falls into one of five named bands, drawn by standard-deviation cut-points and color-coded consistently everywhere on the site. The names follow a simple metaphor — how sharply a title comes into focus.</p>
+      </div>
+      <div class="tier-table" data-tier-table aria-label="Tier definitions"></div>
+
+      <div class="prose">
+        <h2>Where the facts come from</h2>
+        <p>The factual scaffolding — titles, years, genres, audience ratings, and vote counts — is drawn from public IMDb datasets. Streaming availability reflects US services and is illustrative; when a title has no availability on record, we say so rather than guess. The scores themselves are ours: computed by a single, repeatable method from those public signals, never hand-tuned title by title.</p>
+        <p>Because one canonical dataset drives every page, a title's number is identical wherever you meet it — the catalog, its detail page, a head-to-head comparison. Update the data, and the whole site updates with it. There is no second, editorial set of numbers hiding behind the first.</p>
+
+        <h2>What it is not</h2>
+        <p>A high IQ is not a command and a low one is not an insult. Comfort viewing earns a low cognitive load by design, and that is a perfectly good reason to watch something. Acuity is a measuring instrument, not a verdict on your taste — its only job is to tell you, plainly, what a given hour is likely to give back.</p>
+        <a class="btn btn-primary" href="./explore.html">See it applied — open the catalog</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-bottom">
+        <span>© 2026 Acuity. An independent, clean-room demonstration.</span>
+        <span>Title facts from public IMDb datasets.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>
