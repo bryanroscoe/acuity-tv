@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kids &amp; family — Acuity</title>
+  <meta name="description" content="Family and children's titles, scored on the same Acuity Score as everything else — so you can pick something that entertains and actually feeds a growing mind.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body data-page="kids">
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="./index.html">Acuity<span class="dot">.</span><span class="glyph">AS</span></a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="./explore.html">Catalog</a>
+        <a href="./kids.html">Kids</a>
+        <a href="./compare.html">Compare</a>
+        <a href="./methodology.html">Methodology</a>
+      </nav>
+      <span class="nav-spacer"></span>
+      <a class="nav-cta desktop" href="./explore.html?kids=1">Browse all kids titles</a>
+      <button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
+    </div>
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile" hidden>
+      <a href="./explore.html">Catalog</a>
+      <a href="./kids.html">Kids</a>
+      <a href="./compare.html">Compare</a>
+      <a href="./methodology.html">Methodology</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="kids-hero wrap">
+      <p class="eyebrow">For younger viewers</p>
+      <h1>Screen time that <em>gives something back</em>.</h1>
+      <p class="sub">Children's and family titles get the same honest Acuity Score as everything else on the site — no special grading curve. Sort the wonderful from the merely loud, and hand over the remote knowing a show earns its hour. <span data-kids-count>—</span> family titles are scored here.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="./explore.html?kids=1">Browse all kids &amp; family titles</a>
+        <a class="btn btn-ghost" href="./methodology.html">How scoring works</a>
+      </div>
+    </section>
+
+    <section class="section wrap">
+      <div class="section-head">
+        <div>
+          <h2>The sharpest family picks</h2>
+          <p>The highest-scoring children's and family titles — proof that "for kids" and "worth watching" are not opposites.</p>
+        </div>
+        <a class="link" href="./explore.html?kids=1">See all kids titles →</a>
+      </div>
+      <div class="grid" data-kids-grid aria-busy="true"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-bottom">
+        <span>© 2026 Acuity. Family titles use the same computed Acuity Score as the rest of the catalog — see the <a href="./methodology.html">methodology</a>.</span>
+        <span>Title facts from public IMDb datasets · availability is illustrative.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

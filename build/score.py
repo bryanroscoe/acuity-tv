@@ -14,8 +14,8 @@ from statistics import NormalDist
 
 DATA = "/Users/bryanroscoe/Developer/tvi-rebuild/data"
 OUT  = "/Users/bryanroscoe/Developer/tvi-rebuild/build"
-N_MOVIES, N_SERIES = 5000, 2500          # ~7500 titles total (>3x a 2,338 catalog)
-MIN_VOTES = 1000
+N_MOVIES, N_SERIES, N_KIDS = 9000, 4500, 3000   # much bigger catalog + dedicated kids bucket
+MIN_VOTES = 500
 
 # --- our genre weight maps (0..1) per dimension -------------------------------
 # cognitive stimulation: rewards complexity / sustained attention
@@ -88,8 +88,15 @@ print(f"  {len(rows):,} candidate titles")
 # --- select top-by-votes within each kind ------------------------------------
 films  = sorted([r for r in rows if r["type"]=="film"],   key=lambda r:-r["votes"])[:N_MOVIES]
 series = sorted([r for r in rows if r["type"]=="series"], key=lambda r:-r["votes"])[:N_SERIES]
-cat = films + series
-print(f"  selected {len(films):,} films + {len(series):,} series = {len(cat):,}")
+kids   = sorted([r for r in rows if "Family" in r["g"]],  key=lambda r:-r["votes"])[:N_KIDS]
+by_id = {}                                   # merge + de-dup by IMDb id
+for r in films + series + kids:
+    by_id.setdefault(r["id"], r)
+cat = list(by_id.values())
+for r in cat:
+    r["kids"] = "Family" in r["g"]
+print(f"  {len(films):,} films + {len(series):,} series + {len(kids):,} kids "
+      f"-> {len(cat):,} unique ({sum(1 for r in cat if r['kids']):,} kids-flagged)")
 
 # --- raw sub-dimension scores (0..1) -----------------------------------------
 maxlv = math.log10(max(r["votes"] for r in cat))
@@ -121,7 +128,10 @@ def quantile_to_0_100(values):               # for dimension bars: percentile*10
         out[i] = round(100*(rank+0.5)/n)
     return out
 
-iq   = quantile_to_normal([r["_composite"] for r in cat])
+# Wider spread: median 100, fatter tails so the top reaches ~200 and the extremes are populated.
+# (Tunable — raise IQ_SD for an even flatter/wider curve. Scale recalibrates as the catalog grows.)
+IQ_SD, IQ_LO, IQ_HI = 26, 10, 200
+iq   = quantile_to_normal([r["_composite"] for r in cat], sd=IQ_SD, lo=IQ_LO, hi=IQ_HI)
 cog  = quantile_to_0_100([r["_cog"] for r in cat])
 edu  = quantile_to_0_100([r["_edu"] for r in cat])
 ent  = quantile_to_0_100([r["_ent"] for r in cat])
@@ -137,9 +147,9 @@ def tier_index(x):
 records = []
 for k, r in enumerate(cat):
     records.append({
-        "n": r["n"], "year": r["year"], "type": r["type"], "g": r["g"],
+        "id": r["id"], "n": r["n"], "year": r["year"], "type": r["type"], "g": r["g"],
         "iq": iq[k], "cog": cog[k], "edu": edu[k], "ent": ent[k],
-        "tier": tier_index(iq[k]),
+        "tier": tier_index(iq[k]), "kids": r["kids"],
         "rating": r["rating"], "votes": r["votes"],
         "slug": slugify(r["n"], r["year"]),
     })
