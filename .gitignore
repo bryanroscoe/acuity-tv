@@ -1,3 +1,10 @@
 # huge regenerable IMDb source datasets (facts) — not committed
 data/*.tsv.gz
 .DS_Store
+
+# build-time secret (never committed)
+.tmdb_token
+poster_cache.json
+tmdb_id_cache.json
+providers_cache.json
+ratings_cache.json
