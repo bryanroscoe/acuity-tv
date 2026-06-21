@@ -19,6 +19,7 @@
       <a class="brand" href="./index.html">Acuity<span class="dot">.</span><span class="glyph">AQ</span></a>
       <nav class="nav-links" aria-label="Primary">
         <a href="./explore.html">Catalog</a>
+        <a href="./index.html#compare">Compare</a>
         <a href="./kids.html">Kids</a>
         <a href="./methodology.html">Methodology</a>
       </nav>
@@ -28,6 +29,7 @@
     </div>
     <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile" hidden>
       <a href="./explore.html">Catalog</a>
+      <a href="./index.html#compare">Compare</a>
       <a href="./kids.html">Kids</a>
       <a href="./methodology.html">Methodology</a>
     </nav>
@@ -98,19 +100,15 @@
             </div>
           </div>
 
-          <!-- ===== AUDIENCE AGE (select) ===== -->
+          <!-- ===== AUDIENCE AGE (slider) ===== -->
           <div class="filter-block collapsible">
             <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Audience age</h3>
             <div class="fb-body">
-              <label class="select-label" for="maxAge">Suitable for age</label>
-              <select class="sort" id="maxAge" aria-label="Suitable for audience age">
-                <option value="">Any age</option>
-                <option value="6">6 and under</option>
-                <option value="8">8 and under</option>
-                <option value="10">10 and under</option>
-                <option value="13">13 and under</option>
-                <option value="16">16 and under</option>
-              </select>
+              <div class="dimmin-row">
+                <div class="dm-top"><span class="dm-name">Suitable for</span><span class="dm-val" data-ageval>any age</span></div>
+                <input type="range" min="6" max="18" step="1" value="18" id="maxAge" aria-label="Suitable for audience age">
+                <div class="slider-ends"><span>6</span><span>any age</span></div>
+              </div>
             </div>
           </div>
 
@@ -127,22 +125,22 @@
             </div>
           </div>
 
-          <!-- ===== DIMENSION MINIMUMS (selects) ===== -->
+          <!-- ===== DIMENSION MINIMUMS (sliders) ===== -->
           <div class="filter-block collapsible">
             <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Dimension minimums</h3>
-            <div class="fb-body dimmin-selects">
-              <label class="select-row dim cog"><span class="select-label">Depth</span>
-                <select class="sort" id="minCog" aria-label="Minimum depth">
-                  <option value="0">Any</option><option value="40">40+</option><option value="60">60+</option><option value="80">80+</option>
-                </select></label>
-              <label class="select-row dim edu"><span class="select-label">Insight</span>
-                <select class="sort" id="minEdu" aria-label="Minimum insight">
-                  <option value="0">Any</option><option value="40">40+</option><option value="60">60+</option><option value="80">80+</option>
-                </select></label>
-              <label class="select-row dim ent"><span class="select-label">Craft</span>
-                <select class="sort" id="minEnt" aria-label="Minimum craft">
-                  <option value="0">Any</option><option value="40">40+</option><option value="60">60+</option><option value="80">80+</option>
-                </select></label>
+            <div class="fb-body dimmin-rows">
+              <div class="dimmin-row dim cog">
+                <div class="dm-top"><span class="dm-name">Depth &ge;</span><span class="dm-val" data-dm="cog">0</span></div>
+                <input type="range" min="0" max="100" step="5" value="0" id="minCog" aria-label="Minimum depth">
+              </div>
+              <div class="dimmin-row dim edu">
+                <div class="dm-top"><span class="dm-name">Insight &ge;</span><span class="dm-val" data-dm="edu">0</span></div>
+                <input type="range" min="0" max="100" step="5" value="0" id="minEdu" aria-label="Minimum insight">
+              </div>
+              <div class="dimmin-row dim ent">
+                <div class="dm-top"><span class="dm-name">Craft &ge;</span><span class="dm-val" data-dm="ent">0</span></div>
+                <input type="range" min="0" max="100" step="5" value="0" id="minEnt" aria-label="Minimum craft">
+              </div>
             </div>
           </div>
 
@@ -160,16 +158,10 @@
           <div class="filter-block collapsible">
             <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">IMDb</h3>
             <div class="fb-body">
-              <label class="select-label" for="minRating">Rating</label>
-              <select class="sort" id="minRating" aria-label="Minimum IMDb rating">
-                <option value="0">Any</option>
-                <option value="6">6.0+</option>
-                <option value="7">7.0+</option>
-                <option value="7.5">7.5+</option>
-                <option value="8">8.0+</option>
-                <option value="8.5">8.5+</option>
-                <option value="9">9.0+</option>
-              </select>
+              <div class="dimmin-row">
+                <div class="dm-top"><span class="dm-name">Rating &ge;</span><span class="dm-val gold" data-ratingval>Any</span></div>
+                <input type="range" min="0" max="9.5" step="0.5" value="0" id="minRating" aria-label="Minimum IMDb rating">
+              </div>
               <span class="select-label votes-head">Minimum votes</span>
               <div class="chips" id="votesChips" role="group" aria-label="Minimum IMDb votes"></div>
             </div>
