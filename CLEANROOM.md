@@ -627,3 +627,113 @@ IMDb · Critic 95 /100 Metacritic · Critic 98 % Rotten Tomatoes"; `title.html?t
 "Three inputs, one number" section (audience + critic) with the flattened-curve framing
 and histogram intact. Footer on title and methodology pages shows "Reception scores via
 OMDb (Metacritic, Rotten Tomatoes, IMDb)." Server stopped after checks.
+
+### Implementer attestation (v13 — Title + Catalog designs)
+
+Date: 2026-06-21. These two visual designs are the user's OWN mockups (`Title.dc.html`
+and `Catalog.dc.html`, in the user's private design project). No competitor or third-party
+property was accessed; the work re-skins our existing pages in our own established Acuity
+design language (violet `#8a78ff`, `#0d0c12`, Instrument Serif / Hanken Grotesk / IBM Plex
+Mono) and wires the designs to OUR real `dist/data/catalog.json` (15,883 titles) and
+`providers.json` — the mock catalog/scoring data embedded in the design files was ignored.
+
+TASK A — Title page (`dist/title.html` → `renderTitle()` in `dist/app.js`, CSS in
+`dist/styles.css`):
+- Replaced the old breadcrumb/two-column layout with the new design: a back-to-catalog
+  link; a hero (sticky ~286px 2:3 poster left; right = chips row [kind · year · cert ·
+  ★IMDb·votes in gold], 54px serif title, clickable genres → filtered Explore, the big
+  AQ card [76px AQ in tier color, /200, tier chip-link, AQ bar, tier blurb], plus the
+  preserved mark-watched / add-to-watchlist controls and Where-to-watch logo chips).
+- Preserved: AQ is displayed as-is (already blends cognitive + audience + critic — never
+  recomputed); Reception block (Audience IMDb + Critic Metacritic/RT, else "No critic
+  score yet"); percentile "In the top X%"; content-rating `cert` chip; streaming with real
+  provider logos; watched/watchlist (localStorage `acuity_v1`); attribution footer.
+- Added the design's "The breakdown — Three lenses, scored" (Depth/Insight/Craft rows),
+  "The rationale — Why this score" + a "How this was scored" sidecard (→ methodology), and
+  the "In the same vein" related grid (same primary genre, nearest AQ) using the new card.
+
+TASK B — Catalog page (`dist/explore.html` + `initExplore()` in `dist/app.js` + CSS):
+- Rebuilt the sidebar in the design order: Weight-your-priorities reweighting panel pinned
+  at TOP (toggle + Depth/Insight/Craft sliders, live re-rank on `cog/edu/ent`), then Tier,
+  Type, Audience (Kids & family), Audience age as a SELECT (any / 6 / 8 / 10 / 13 / 16 via
+  `maxage`), My streaming services (OUR merged logo list + "+N more" expander, kept), then
+  Dimension minimums as SELECTs (Depth/Insight/Craft, any/40+/60+/80+), Acuity score range,
+  IMDb (rating SELECT + minimum-vote chip bands), and Genre with a search box.
+- Added the mobile filter DRAWER (≤900px): the sidebar becomes an off-canvas drawer with a
+  dimming scrim, a sticky "Filters" header with a close ✕, a sticky bottom "Show N titles"
+  button, and a "Filters" trigger button (with an active-count badge) above the results;
+  body scroll locks while open; ✕ / scrim / Show-N / Esc all close it.
+- New card (`posterCard()`, replaces the prior "AQ-below-the-poster" card on Catalog and on
+  the Title "In the same vein" grid): 2:3 poster, tier badge top-right, AQ + /200 bottom-
+  left over a bottom gradient, ★IMDb (gold) bottom-right, title + `year · genres` below.
+  Home and Kids keep the existing `titleCard` so the home design is not regressed.
+- Kept: ranked/typo-tolerant autocomplete, clickable metadata, URL-param filters,
+  localStorage service/weight persistence, "re-ranked to your priorities" tag, all sorts
+  (Highest/Lowest Acuity, A–Z, Newest, Oldest, Depth, Insight, Craft, IMDb), performance
+  over 15,883 rows. Compare was NOT re-added (the mocks still reference it; intentionally
+  omitted). No inline `<script>` bodies, no inline `on*=` handlers, relative paths only.
+
+Self-verification: `node --check dist/app.js` passes; no real inline `on*=` handlers and no
+inline `<script>` bodies in the HTML; no Compare links. Served `dist/` on :8923 and rendered
+with headless Chrome 149. `title.html?t=schindlers-list-1993` → new hero with chips row,
+54px title, AQ card showing "200 /200 AQ", tier chip "Profound", "In the top 1% of the
+catalog", animated AQ bar + tier blurb; Reception shows Audience 9.0 IMDb · Critic 95
+Metacritic · Critic 98% Rotten Tomatoes; "The breakdown" with three lenses; rationale +
+"How this was scored" sidecard; "In the same vein" grid of poster cards. `explore.html`
+sidebar order verified as Priorities → Tier → Type → Audience → Audience age (select) →
+Streaming (logos) → Dimension minimums (selects) → Acuity range → IMDb (rating select +
+vote chip bands) → Genre (search box); result count "15,883 titles"; first card = Breaking
+Bad (AQ 200, tier badge "Profound", ★9.5). Drove the drawer via CDP at 600px: opens
+(transform→0, scrim visible, body locked, "Show 15,883 titles"), closes via ✕ / scrim /
+Show-N; applying Tier + IMDb 8.0 + 10k+ votes set the trigger badge to "3" and filtered to
+1,113 titles; A–Z sort reordered to "'Allo 'Allo!"; enabling priorities showed the
+"★ re-ranked to your priorities" tag. Server stopped after checks.
+
+### Implementer attestation (v14 — motion / entrance animations)
+
+Date: 2026-06-21. I confirm I did not access the reference product (no read of
+`/Users/bryanroscoe/Developer/tvintelligentsia`, no fetch, no web search for it); all work was
+done solely from `dist/`.
+
+Added a tasteful entrance/motion layer to the existing static design:
+
+- **Reusable entrance mechanism (DRY).** New CSS `.acu-motion .acu-anim` (start: `opacity:0`,
+  `translateY(16px) scale(0.985)`) → `.is-in` (natural position), eased with
+  `cubic-bezier(0.22,1,0.36,1)` over 0.6s with a per-element `--d` stagger delay. In `app.js` a
+  single `IntersectionObserver` (`animObserver`) adds `.is-in` when an element enters view
+  (above-the-fold marks fire immediately); helpers `animate()` / `animateStagger()` / `initMotion()`
+  wire it once in the boot sequence. After the transition the helper classes are stripped on
+  `transitionend` so card hover transitions are unaffected. `<html>` is flagged `.acu-motion` by JS
+  so the page stays fully visible with no JS; a 1.6s failsafe reveals anything an observer missed.
+- **Where it animates.** Home: hero eyebrow→headline→subtitle→search→CTAs (stagger), the Acuity
+  Instrument panel, the curve heading, the three methodology cards (stagger), the calibrated box,
+  distribution header, curve card, and the stat band — plus the top-of-the-curve cards staggered as
+  they enter view. Catalog: header + result cards (new cards stagger in; on "Show more" only the new
+  batch animates; capped for perf). Title: poster + hero column, AQ card, reception, breakdown,
+  rationale, related cards (stagger). Kids & Methodology: their hero/main blocks and grids.
+- **Marquee + pulse.** Confirmed the six hero poster columns scroll continuously and loop seamlessly
+  (`acuUp`/`acuDown` on duplicated content) and the accent pulse dot (`acuPulse`, now classed
+  `.acu-pulse`) animates.
+- **Title AQ reveal.** On render the big AQ number counts up 0→value (ease-out cubic, ~0.72s) and the
+  AQ bar fills from 0; the three dimension bars fill from 0 (existing CSS width transition). Once per
+  load.
+- **Reduced motion.** `@media (prefers-reduced-motion: reduce)` forces `.acu-anim` to its final state
+  (no transform/transition) and disables the marquee and pulse; `countUp()` writes the final number
+  immediately.
+
+Engineering: no inline `<script>` bodies, no inline `on*=` handlers (observer/listeners only),
+relative paths preserved; the mobile filter drawer was deliberately left un-animated so the
+off-canvas `translateX` transform is never overridden; data rendering, filters, search, sort, and
+the drawer are unchanged.
+
+Self-verification: `node --check dist/app.js` passes; `grep` finds no inline `on*=` handlers or
+inline `<script>` bodies. Served `dist/` on :8924 and drove headless Chrome 149 over the DevTools
+Protocol (Node global WebSocket). Home: `.acu-motion` applied to `<html>`, 22 `.acu-anim` marks; a
+below-the-fold block started hidden (`opacity:0`, no `.is-in`, `transition: opacity, transform`)
+while the hero revealed to `opacity:1`; the marquee column transform advanced between samples
+(`matrix(... -24.5)` → `-26.4`); pulse `animation-name: acuPulse`; 6 featured cards present. Title
+(`schindlers-list-1993`): AQ number sampled mid-flight at "65" then settled to "200"; the AQ bar
+fill measured 0px → 302 → 488 → 573 → 616 → 657px across a sample burst (smooth ease-out); dim bar
+filled; 5 related cards. With `prefers-reduced-motion: reduce` emulated: home hero `opacity:1`,
+`transform:none`, marquee `animation-name:none`; title AQ rendered "200" immediately. Server and
+Chrome stopped after checks.

@@ -56,14 +56,14 @@
 
       <div style="position:relative; z-index:2; max-width:1240px; margin:0 auto; padding:74px 32px 64px; display:flex; flex-wrap:wrap; gap:56px; align-items:center;">
         <div style="flex:1.15; min-width:380px;">
-          <div style="display:flex; align-items:center; gap:9px; margin-bottom:26px;">
-            <span style="width:7px; height:7px; border-radius:50%; background:var(--acc); animation:acuPulse 1.8s ease-in-out infinite;"></span>
+          <div class="acu-anim" data-d="0" style="display:flex; align-items:center; gap:9px; margin-bottom:26px;">
+            <span class="acu-pulse" style="width:7px; height:7px; border-radius:50%; background:var(--acc); animation:acuPulse 1.8s ease-in-out infinite;"></span>
             <span style="font-family:var(--mono); font-size:11px; letter-spacing:2.4px; color:#8f8a9e; text-transform:uppercase;">The Acuity Quotient · a fixed 0&ndash;200 scale</span>
           </div>
-          <h1 style="font-family:var(--serif); font-weight:400; font-size:68px; line-height:0.99; letter-spacing:-0.5px; margin:0 0 24px; color:var(--text-bright); text-wrap:balance;">Every title gives<br>something back.<br><span style="font-style:italic; color:var(--acc);">Acuity</span> tells you how&nbsp;much.</h1>
-          <p style="font-size:17px; line-height:1.62; color:var(--muted); max-width:520px; margin:0 0 32px;">Streaming is built to measure one thing: how long it can hold you. Acuity measures the opposite &mdash; how much a film or series actually returns to your mind. One honest number, scored the same way for every title, so an evening of your attention is never spent on noise.</p>
+          <h1 class="acu-anim" data-d="70" style="font-family:var(--serif); font-weight:400; font-size:68px; line-height:0.99; letter-spacing:-0.5px; margin:0 0 24px; color:var(--text-bright); text-wrap:balance;">Every title gives<br>something back.<br><span style="font-style:italic; color:var(--acc);">Acuity</span> tells you how&nbsp;much.</h1>
+          <p class="acu-anim" data-d="140" style="font-size:17px; line-height:1.62; color:var(--muted); max-width:520px; margin:0 0 32px;">Streaming is built to measure one thing: how long it can hold you. Acuity measures the opposite &mdash; how much a film or series actually returns to your mind. One honest number, scored the same way for every title, so an evening of your attention is never spent on noise.</p>
 
-          <div style="position:relative; max-width:480px; margin-bottom:22px;">
+          <div class="acu-anim" data-d="210" style="position:relative; max-width:480px; margin-bottom:22px;">
             <div style="display:flex; align-items:center; gap:11px; background:var(--surface-2); border:1px solid var(--line-strong); border-radius:9px; padding:13px 15px;">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8f8a9e" stroke-width="2" style="flex:none;" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg>
               <input data-hero-input type="search" placeholder="Search any title — Severance, Arrival, The Wire…" aria-label="Search titles" autocomplete="off" style="flex:1; background:transparent; border:none; outline:none; color:var(--text); font-family:var(--sans); font-size:14.5px;">
@@ -72,7 +72,7 @@
             <div data-hero-results role="listbox" aria-label="Search results" hidden style="position:absolute; top:calc(100% + 8px); left:0; right:0; z-index:30; background:#13111b; border:1px solid var(--line-strong); border-radius:10px; padding:6px; box-shadow:0 24px 60px rgba(0,0,0,0.55); overflow:hidden;"></div>
           </div>
 
-          <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+          <div class="acu-anim" data-d="280" style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
             <a href="#method" style="font-size:14px; font-weight:600; color:#0d0c12; background:var(--acc); padding:13px 22px; border-radius:7px;">How scoring works</a>
             <a href="./explore.html" style="font-size:14px; font-weight:500; color:#c8c3d4; background:transparent; border:1px solid var(--line-strong); padding:13px 22px; border-radius:7px;">Browse the catalog</a>
           </div>
@@ -80,7 +80,7 @@
         </div>
 
         <!-- INSTRUMENT -->
-        <div style="flex:1; min-width:330px;">
+        <div class="acu-anim" data-d="200" style="flex:1; min-width:330px;">
           <div style="background:linear-gradient(180deg,var(--surface-3),#131019); border:1px solid var(--line-strong); border-radius:16px; padding:20px; box-shadow:0 40px 90px rgba(0,0,0,0.55);">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
               <span style="font-family:var(--mono); font-size:10px; letter-spacing:2px; color:#8f8a9e; text-transform:uppercase;">Acuity Instrument</span>
@@ -125,7 +125,7 @@
 
     <!-- TOP OF THE CURVE -->
     <section id="curve" style="max-width:1240px; margin:0 auto; padding:60px 32px 70px;">
-      <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:34px;">
+      <div class="acu-anim" style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:34px;">
         <div>
           <span style="font-family:var(--mono); font-size:11px; letter-spacing:2.4px; color:var(--acc); text-transform:uppercase;">The top of the curve</span>
           <h2 style="font-family:var(--serif); font-weight:400; font-size:44px; line-height:1.04; margin:12px 0 0; color:var(--text-bright);">Where ideas, knowledge,<br>and craft all run high at once.</h2>
@@ -139,30 +139,30 @@
     <section id="method" style="border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:#0a0910;">
       <div style="max-width:1240px; margin:0 auto; padding:72px 32px;">
         <span style="font-family:var(--mono); font-size:11px; letter-spacing:2.4px; color:var(--acc); text-transform:uppercase;">The method · consistent for every title</span>
-        <h2 style="font-family:var(--serif); font-weight:400; font-size:46px; line-height:1.02; margin:14px 0 8px; color:var(--text-bright);">Three lenses.<br>One honest number.</h2>
-        <p style="font-size:16px; color:var(--muted); max-width:560px; line-height:1.6; margin:0 0 44px;">Every score reads how much a title gives back across three lenses, then resolves to a single number on a fixed 0&ndash;200 scale. The same three lenses, applied to every title &mdash; no editorial gospel, no studio thumb on the scale.</p>
+        <h2 class="acu-anim" style="font-family:var(--serif); font-weight:400; font-size:46px; line-height:1.02; margin:14px 0 8px; color:var(--text-bright);">Three lenses.<br>One honest number.</h2>
+        <p class="acu-anim" data-d="80" style="font-size:16px; color:var(--muted); max-width:560px; line-height:1.6; margin:0 0 44px;">Every score reads how much a title gives back across three lenses, then resolves to a single number on a fixed 0&ndash;200 scale. The same three lenses, applied to every title &mdash; no editorial gospel, no studio thumb on the scale.</p>
 
         <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin-bottom:34px;">
-          <div style="background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:22px;">
+          <div class="acu-anim" data-d="0" style="background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:22px;">
             <div style="display:flex; align-items:baseline; justify-content:space-between;"><span style="font-family:var(--serif); font-size:26px; color:var(--text-bright);">Depth</span><span style="font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--acc); text-transform:uppercase;">Primary</span></div>
             <p style="font-size:14px; line-height:1.55; color:#948fa3; margin:12px 0 0;">How much the work asks of your attention &mdash; ideas, ambiguity, structure, the thinking it demands while you watch.</p>
           </div>
-          <div style="background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:22px;">
+          <div class="acu-anim" data-d="80" style="background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:22px;">
             <div style="display:flex; align-items:baseline; justify-content:space-between;"><span style="font-family:var(--serif); font-size:26px; color:var(--text-bright);">Insight</span><span style="font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--acc); text-transform:uppercase;">Secondary</span></div>
             <p style="font-size:14px; line-height:1.55; color:#948fa3; margin:12px 0 0;">What you carry out of it &mdash; knowledge, perspective, a way of seeing the world you didn't have going in.</p>
           </div>
-          <div style="background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:22px;">
+          <div class="acu-anim" data-d="160" style="background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:22px;">
             <div style="display:flex; align-items:baseline; justify-content:space-between;"><span style="font-family:var(--serif); font-size:26px; color:var(--text-bright);">Craft</span><span style="font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--acc); text-transform:uppercase;">Supporting</span></div>
             <p style="font-size:14px; line-height:1.55; color:#948fa3; margin:12px 0 0;">How well it's made &mdash; writing, performance, image and sound working in service of the idea, not decorating it.</p>
           </div>
         </div>
 
-        <div style="background:var(--surface); border:1px solid var(--line-strong); border-radius:11px; padding:20px 22px; margin-bottom:46px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <div class="acu-anim" style="background:var(--surface); border:1px solid var(--line-strong); border-radius:11px; padding:20px 22px; margin-bottom:46px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
           <span style="font-family:var(--mono); font-size:10px; letter-spacing:2px; color:var(--acc); text-transform:uppercase; border:1px solid var(--accent-line); padding:5px 10px; border-radius:5px; flex:none;">Calibrated, not published</span>
           <span style="font-size:14.5px; color:var(--muted); line-height:1.55; flex:1; min-width:240px;">The three lenses are weighted and combined into one number, tuned against thousands of titles. We keep the exact weighting in-house &mdash; a score you can trust shouldn't be a one-line equation anyone can reverse-engineer or game.</span>
         </div>
 
-        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:20px;">
+        <div class="acu-anim" style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:20px;">
           <div style="max-width:580px;">
             <span style="font-family:var(--mono); font-size:10.5px; letter-spacing:2px; color:#8f8a9e; text-transform:uppercase;">The distribution</span>
             <h3 style="font-family:var(--serif); font-weight:400; font-size:36px; line-height:1.04; margin:10px 0 12px; color:var(--text-bright);">A deliberately flattened curve.</h3>
@@ -174,7 +174,7 @@
           </div>
         </div>
 
-        <div style="position:relative; background:var(--surface); border:1px solid var(--line-strong); border-radius:14px; padding:26px 22px 16px;">
+        <div class="acu-anim" data-d="60" style="position:relative; background:var(--surface); border:1px solid var(--line-strong); border-radius:14px; padding:26px 22px 16px;">
           <div data-curve-tip hidden style="position:absolute; top:12px; transform:translateX(-50%); z-index:5; background:var(--bg); border:1px solid var(--acc); border-radius:8px; padding:7px 11px; pointer-events:none; white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,0.5);"></div>
           <div data-curve style="display:flex; align-items:flex-end; gap:2px; height:228px;"></div>
           <div style="display:flex; justify-content:space-between; margin-top:11px; padding:0 1px;">
@@ -195,7 +195,7 @@
 
     <!-- STATS -->
     <section style="border-top:1px solid var(--line); background:#0a0910;">
-      <div style="max-width:1240px; margin:0 auto; padding:56px 32px; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:24px;">
+      <div class="acu-anim" style="max-width:1240px; margin:0 auto; padding:56px 32px; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:24px;">
         <div style="text-align:center;"><div data-stat-titles style="font-family:var(--mono); font-size:46px; font-weight:600; color:var(--text-bright); line-height:1;">&mdash;</div><div style="font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:#8f8a9e; text-transform:uppercase; margin-top:8px;">Titles scored</div></div>
         <div style="text-align:center;"><div style="font-family:var(--mono); font-size:46px; font-weight:600; color:var(--text-bright); line-height:1;">3</div><div style="font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:#8f8a9e; text-transform:uppercase; margin-top:8px;">Weighted lenses</div></div>
         <div style="text-align:center;"><div style="font-family:var(--mono); font-size:46px; font-weight:600; color:var(--text-bright); line-height:1;">9</div><div style="font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:#8f8a9e; text-transform:uppercase; margin-top:8px;">Sub-signals</div></div>

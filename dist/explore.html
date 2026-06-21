@@ -23,7 +23,7 @@
         <a href="./methodology.html">Methodology</a>
       </nav>
       <span class="nav-spacer"></span>
-      <a class="nav-cta desktop" href="./methodology.html">How scoring works</a>
+      <a class="nav-cta desktop" href="./explore.html">Browse the catalog</a>
       <button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
     </div>
     <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile" hidden>
@@ -35,33 +35,86 @@
 
   <main id="main" data-explore>
     <div class="wrap explore-head">
-      <p class="eyebrow">The index</p>
-      <h1>Every title, on one scale.</h1>
+      <p class="eyebrow acu-anim" data-d="0">The index</p>
+      <h1 class="acu-anim" data-d="70">Every title, on one scale.</h1>
     </div>
 
     <div class="wrap">
-      <button class="btn btn-ghost filter-toggle" id="filterToggle" type="button">Filters ▾</button>
       <div class="explore-layout">
+
+        <!-- off-canvas scrim (mobile drawer) -->
+        <div class="filter-scrim" id="filterScrim" hidden></div>
 
         <aside class="filters" id="filterPanel" aria-label="Filters">
           <div class="filters-head">
             <span class="filters-label">Filters</span>
             <button class="reset-link" id="resetFilters" type="button">Clear all</button>
+            <button class="filter-close" id="filterClose" type="button" aria-label="Close filters">✕</button>
           </div>
 
-          <!-- ===== BASIC (default) ===== -->
+          <!-- ===== WEIGHT YOUR PRIORITIES — pinned at top ===== -->
+          <div class="filter-block collapsible weight-block" id="weightBlock">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Weight your priorities <button class="reset-link" id="weightReset" type="button" hidden>Reset</button></h3>
+            <div class="fb-body">
+              <p class="filter-hint">Tune the three lenses and we re-rank the whole catalog to your taste.</p>
+              <label class="svc-opt weight-on" for="weightOn">
+                <input type="checkbox" id="weightOn">
+                <span>Use my priorities</span>
+              </label>
+              <div class="weights" id="weightControls">
+                <div class="weight-row dim cog">
+                  <div class="wr-top"><span class="wr-name">Depth</span><span class="wr-pct" data-pct="cog">40%</span></div>
+                  <input type="range" min="0" max="100" step="5" value="40" id="wCog" aria-label="Depth weight">
+                </div>
+                <div class="weight-row dim edu">
+                  <div class="wr-top"><span class="wr-name">Insight</span><span class="wr-pct" data-pct="edu">25%</span></div>
+                  <input type="range" min="0" max="100" step="5" value="25" id="wEdu" aria-label="Insight weight">
+                </div>
+                <div class="weight-row dim ent">
+                  <div class="wr-top"><span class="wr-name">Craft</span><span class="wr-pct" data-pct="ent">35%</span></div>
+                  <input type="range" min="0" max="100" step="5" value="35" id="wEnt" aria-label="Craft and execution weight">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== TIER ===== -->
           <div class="filter-block collapsible">
             <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Tier</h3>
             <div class="chips" id="tierChips" role="group" aria-label="Filter by tier"></div>
           </div>
+
+          <!-- ===== TYPE ===== -->
           <div class="filter-block collapsible">
             <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Type</h3>
             <div class="chips" id="typeChips" role="group" aria-label="Filter by type"></div>
           </div>
+
+          <!-- ===== AUDIENCE ===== -->
           <div class="filter-block collapsible">
-            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Genre</h3>
-            <div class="chips" id="genreChips" role="group" aria-label="Filter by genre"></div>
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Audience</h3>
+            <div class="fb-body">
+              <button class="chip kids-chip" id="kidsToggle" type="button" aria-pressed="false">Kids &amp; family only</button>
+            </div>
           </div>
+
+          <!-- ===== AUDIENCE AGE (select) ===== -->
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Audience age</h3>
+            <div class="fb-body">
+              <label class="select-label" for="maxAge">Suitable for age</label>
+              <select class="sort" id="maxAge" aria-label="Suitable for audience age">
+                <option value="">Any age</option>
+                <option value="6">6 and under</option>
+                <option value="8">8 and under</option>
+                <option value="10">10 and under</option>
+                <option value="13">13 and under</option>
+                <option value="16">16 and under</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ===== MY STREAMING SERVICES ===== -->
           <div class="filter-block collapsible">
             <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">My streaming services <span class="count-tag" id="svcCount"></span></h3>
             <div class="fb-body">
@@ -73,98 +126,78 @@
               <button class="reset-link svc-show-all" id="svcShowAll" type="button" hidden>Show all services</button>
             </div>
           </div>
-          <div class="filter-block kids-block">
-            <button class="chip kids-chip" id="kidsToggle" type="button" aria-pressed="false">Kids &amp; family only</button>
+
+          <!-- ===== DIMENSION MINIMUMS (selects) ===== -->
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Dimension minimums</h3>
+            <div class="fb-body dimmin-selects">
+              <label class="select-row dim cog"><span class="select-label">Depth</span>
+                <select class="sort" id="minCog" aria-label="Minimum depth">
+                  <option value="0">Any</option><option value="40">40+</option><option value="60">60+</option><option value="80">80+</option>
+                </select></label>
+              <label class="select-row dim edu"><span class="select-label">Insight</span>
+                <select class="sort" id="minEdu" aria-label="Minimum insight">
+                  <option value="0">Any</option><option value="40">40+</option><option value="60">60+</option><option value="80">80+</option>
+                </select></label>
+              <label class="select-row dim ent"><span class="select-label">Craft</span>
+                <select class="sort" id="minEnt" aria-label="Minimum craft">
+                  <option value="0">Any</option><option value="40">40+</option><option value="60">60+</option><option value="80">80+</option>
+                </select></label>
+            </div>
           </div>
 
-          <!-- ===== ADVANCED (collapsed behind a disclosure) ===== -->
-          <button class="adv-toggle" id="advToggle" type="button" aria-expanded="false" aria-controls="advWrap">Advanced filters</button>
-          <div class="adv-wrap" id="advWrap" hidden>
-
-            <div class="filter-block collapsible">
-              <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Acuity score range</h3>
-              <div class="range-row fb-body">
-                <input type="number" id="iqMin" min="0" max="200" placeholder="0" aria-label="Minimum Acuity Quotient" inputmode="numeric">
-                <span>to</span>
-                <input type="number" id="iqMax" min="0" max="200" placeholder="200" aria-label="Maximum Acuity Quotient" inputmode="numeric">
-              </div>
+          <!-- ===== ACUITY SCORE RANGE ===== -->
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Acuity score range</h3>
+            <div class="range-row fb-body">
+              <input type="number" id="iqMin" min="0" max="200" placeholder="0" aria-label="Minimum Acuity Quotient" inputmode="numeric">
+              <span>to</span>
+              <input type="number" id="iqMax" min="0" max="200" placeholder="200" aria-label="Maximum Acuity Quotient" inputmode="numeric">
             </div>
+          </div>
 
-            <div class="filter-block collapsible">
-              <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Audience age</h3>
-              <div class="fb-body">
-                <div class="dimmin-row age-row">
-                  <div class="dm-top"><span class="dm-name">Suitable for age</span><span class="dm-val" id="maxAgeVal">any</span></div>
-                  <input type="range" min="0" max="19" step="1" value="19" id="maxAge" aria-label="Maximum audience age">
-                </div>
-              </div>
+          <!-- ===== IMDb (rating select + vote chip bands) ===== -->
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">IMDb</h3>
+            <div class="fb-body">
+              <label class="select-label" for="minRating">Rating</label>
+              <select class="sort" id="minRating" aria-label="Minimum IMDb rating">
+                <option value="0">Any</option>
+                <option value="6">6.0+</option>
+                <option value="7">7.0+</option>
+                <option value="7.5">7.5+</option>
+                <option value="8">8.0+</option>
+                <option value="8.5">8.5+</option>
+                <option value="9">9.0+</option>
+              </select>
+              <span class="select-label votes-head">Minimum votes</span>
+              <div class="chips" id="votesChips" role="group" aria-label="Minimum IMDb votes"></div>
             </div>
+          </div>
 
-            <div class="filter-block collapsible weight-block" id="weightBlock">
-              <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Weight your priorities <button class="reset-link" id="weightReset" type="button" hidden>Reset</button></h3>
-              <div class="fb-body">
-                <label class="svc-opt weight-on" for="weightOn">
-                  <input type="checkbox" id="weightOn">
-                  <span>Use my priorities</span>
-                </label>
-                <div class="weights" id="weightControls">
-                  <div class="weight-row dim cog">
-                    <div class="wr-top"><span class="wr-name">Depth</span><span class="wr-pct" data-pct="cog">40%</span></div>
-                    <input type="range" min="0" max="100" step="5" value="40" id="wCog" aria-label="Depth weight">
-                  </div>
-                  <div class="weight-row dim edu">
-                    <div class="wr-top"><span class="wr-name">Insight</span><span class="wr-pct" data-pct="edu">25%</span></div>
-                    <input type="range" min="0" max="100" step="5" value="25" id="wEdu" aria-label="Insight weight">
-                  </div>
-                  <div class="weight-row dim ent">
-                    <div class="wr-top"><span class="wr-name">Craft</span><span class="wr-pct" data-pct="ent">35%</span></div>
-                    <input type="range" min="0" max="100" step="5" value="35" id="wEnt" aria-label="Craft and execution weight">
-                  </div>
-                </div>
+          <!-- ===== GENRE (with search) ===== -->
+          <div class="filter-block collapsible">
+            <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Genre</h3>
+            <div class="fb-body">
+              <div class="svc-search">
+                <input type="search" id="genreSearch" placeholder="Search genres…" aria-label="Search genres" autocomplete="off">
               </div>
+              <div class="chips" id="genreChips" role="group" aria-label="Filter by genre"></div>
             </div>
+          </div>
 
-            <div class="filter-block collapsible">
-              <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">Dimension minimums</h3>
-              <div class="fb-body">
-                <div class="dimmin-row dim cog">
-                  <div class="dm-top"><span class="dm-name">Depth</span><span class="dm-val" id="minCogVal">any</span></div>
-                  <input type="range" min="0" max="100" step="5" value="0" id="minCog" aria-label="Minimum depth">
-                </div>
-                <div class="dimmin-row dim edu">
-                  <div class="dm-top"><span class="dm-name">Insight</span><span class="dm-val" id="minEduVal">any</span></div>
-                  <input type="range" min="0" max="100" step="5" value="0" id="minEdu" aria-label="Minimum insight">
-                </div>
-                <div class="dimmin-row dim ent">
-                  <div class="dm-top"><span class="dm-name">Craft</span><span class="dm-val" id="minEntVal">any</span></div>
-                  <input type="range" min="0" max="100" step="5" value="0" id="minEnt" aria-label="Minimum craft">
-                </div>
-              </div>
-            </div>
-
-            <div class="filter-block collapsible">
-              <h3 class="fb-toggle" role="button" tabindex="0" aria-expanded="true">IMDb</h3>
-              <div class="fb-body">
-                <div class="dimmin-row">
-                  <div class="dm-top"><span class="dm-name">Rating</span><span class="dm-val" id="minRatingVal">any</span></div>
-                  <input type="range" min="0" max="10" step="0.5" value="0" id="minRating" aria-label="Minimum IMDb rating">
-                </div>
-                <label class="votes-label" for="minVotes">Minimum votes</label>
-                <select class="sort votes-select" id="minVotes" aria-label="Minimum IMDb votes">
-                  <option value="0">Any</option>
-                  <option value="1000">1k+</option>
-                  <option value="10000">10k+</option>
-                  <option value="50000">50k+</option>
-                  <option value="100000">100k+</option>
-                  <option value="500000">500k+</option>
-                </select>
-              </div>
-            </div>
-
+          <!-- sticky apply bar (mobile drawer only) -->
+          <div class="filters-apply">
+            <button class="btn btn-primary" id="filterApply" type="button">Show titles</button>
           </div>
         </aside>
 
         <section aria-label="Results">
+          <button class="btn btn-ghost filter-toggle" id="filterToggle" type="button">
+            <span class="ft-icon" aria-hidden="true">≡</span> Filters
+            <span class="filter-badge" id="filterBadge" hidden></span>
+          </button>
+
           <div class="search-bar" role="search">
             <span class="icon" aria-hidden="true">⌕</span>
             <input type="search" id="searchInput" placeholder="Search titles… (Esc to clear)" aria-label="Search titles" autocomplete="off">
@@ -190,7 +223,7 @@
           </div>
 
           <div class="active-filters" id="activeFilters" aria-label="Active filters"></div>
-          <div class="grid" id="resultGrid"></div>
+          <div class="grid grid-poster" id="resultGrid"></div>
           <div class="load-more" id="loadMoreWrap"></div>
         </section>
       </div>
