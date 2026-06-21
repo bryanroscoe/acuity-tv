@@ -44,3 +44,8 @@ python3 -m http.server 8911 --directory dist   # http://localhost:8911
 - No inline scripts/handlers → a strict CSP is enforceable (`dist/_headers`).
 - All-relative paths → hosts cleanly from any subdirectory on GitHub Pages.
 - No secrets in the client; nothing dynamic to attack (fully static).
+
+## Hosting note
+`dist/_headers` (CSP, X-Frame-Options, etc.) is a Netlify/Cloudflare Pages feature and is **not
+applied by GitHub Pages**. The public surface is fully static with no secrets, so practical risk is
+low; for enforced security headers, deploy `dist/` to Netlify or Cloudflare Pages instead.

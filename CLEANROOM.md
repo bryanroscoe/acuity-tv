@@ -91,3 +91,11 @@ accessed the original** implements solely from that spec.
   inline styles, zero inline `on*` handlers, and zero inline `<script>` blocks.
 
 ---
+
+### Deployment (orchestrator)
+- **Date:** 2026-06-21
+- Repo `github.com/bryanroscoe/acuity-tv` made public (with user authorization) and deployed to
+  GitHub Pages at **https://bryanroscoe.github.io/acuity-tv/** via the Actions workflow.
+- The orchestrator contributed only: the fact-sourced dataset (IMDb), the scoring engine
+  (`build/score.py`), deployment plumbing, and verification. It authored no product expression
+  (HTML/CSS/copy/brand) — that was the isolated Implementer's work from the spec.
