@@ -43,7 +43,9 @@ export const MAJOR_SERVICES = ['Netflix','Prime Video','Max','Hulu','Disney+','A
 export const EXTRA_SERVICES = ['Peacock','Paramount+','Tubi','Criterion','MUBI','Starz','AMC+','BritBox'];
 
 // ---- TMDB poster resolution (hotlinked, never stored) ----
-const TMDB_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4NjE3NWE0N2IzY2FhZjExZjMyMWVjNTYxYmQwNjQzZSIsIm5iZiI6MTc4MjA1ODEwMy43OTEwMDAxLCJzdWIiOiI2YTM4MGM3NzZkMDU0MjUxZjgyODRlMTciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.CPqBPrUXZ-2Sa7HEtFdf5mKQttd6g1mSm2nG0CabcNs';
+// Token removed 2026-11-16 (it was a live credential). Design export only: the shipped site
+// (dist/) uses build-time poster paths and never calls TMDB from the browser.
+const TMDB_TOKEN = '';
 const PCACHE_KEY = 'acuity_posters_v1';
 let _pcache = null;
 function pcache(){ if(_pcache) return _pcache; try { _pcache = JSON.parse(localStorage.getItem(PCACHE_KEY) || '{}'); } catch(e){ _pcache = {}; } return _pcache; }
@@ -55,6 +57,7 @@ export async function resolvePoster(rec){
   const c = pcache();
   if(Object.prototype.hasOwnProperty.call(c, rec.slug)) return c[rec.slug];
   let full = null;
+  if(!TMDB_TOKEN){ c[rec.slug] = null; savePcache(); return null; }
   try {
     const kind = rec.type === 'film' ? 'movie' : 'tv';
     const url = 'https://api.themoviedb.org/3/search/' + kind + '?query=' + encodeURIComponent(rec.n) + '&include_adult=false';
