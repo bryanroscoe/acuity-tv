@@ -3,8 +3,8 @@
 ALWAYS run this after score.py — score.py only writes the base scored fields.
     python3 build/score.py && python3 build/reattach.py
 """
-import json
-ROOT = "/Users/bryanroscoe/Developer/tvi-rebuild"
+import json, os
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root
 cat = json.load(open(f"{ROOT}/build/catalog.json"))
 pc  = json.load(open(f"{ROOT}/build/poster_cache.json"))      # imdb -> poster_path
 rc  = json.load(open(f"{ROOT}/build/providers_cache.json"))   # imdb -> [provider names]

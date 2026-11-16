@@ -5,7 +5,7 @@ Uses the cached TMDB id/type; token stays in .tmdb_token, never deployed."""
 import urllib.request, urllib.error, json, os, time, threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-ROOT = "/Users/bryanroscoe/Developer/tvi-rebuild"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root
 TOK  = open(f"{ROOT}/.tmdb_token").read().strip()
 cat  = json.load(open(f"{ROOT}/build/catalog.json"))
 idc  = json.load(open(f"{ROOT}/build/tmdb_id_cache.json"))           # imdb -> [tmdb_id, type]

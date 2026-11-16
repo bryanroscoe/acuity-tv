@@ -9,11 +9,12 @@ distribution (an "IQ"-like scale that is, by construction, an actual bell curve)
 
 No values from the original product are used. See CLEANROOM.md.
 """
-import gzip, json, math, re, statistics
+import gzip, json, math, os, re, statistics
 from statistics import NormalDist
 
-DATA = "/Users/bryanroscoe/Developer/tvi-rebuild/data"
-OUT  = "/Users/bryanroscoe/Developer/tvi-rebuild/build"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root
+DATA = os.path.join(ROOT, "data")
+OUT  = os.path.join(ROOT, "build")
 N_MOVIES, N_SERIES, N_KIDS = 9000, 4500, 3000   # much bigger catalog + dedicated kids bucket
 MIN_VOTES = 500
 

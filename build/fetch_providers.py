@@ -9,7 +9,7 @@ Token stays in .tmdb_token; never written to catalog or deployed.
 import urllib.request, urllib.error, json, os, time, threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-ROOT = "/Users/bryanroscoe/Developer/tvi-rebuild"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root
 TOK  = open(f"{ROOT}/.tmdb_token").read().strip()
 cat  = json.load(open(f"{ROOT}/build/catalog.json"))
 ID_F = f"{ROOT}/build/tmdb_id_cache.json"     # imdb_id -> [tmdb_id, type]

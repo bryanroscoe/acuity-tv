@@ -6,7 +6,7 @@ Output cache: build/omdb_cache.json  -> { imdb_id: {mc, rt, imdb} }  (mc/rt 0-10
 import urllib.request, json, os, time, re, threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-ROOT = "/Users/bryanroscoe/Developer/tvi-rebuild"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root
 KEY  = open(f"{ROOT}/.omdb_key").read().strip()
 DAILY_BUDGET = 16000                     # paid key — cover the whole catalog (resumable via cache)
 cat = json.load(open(f"{ROOT}/build/catalog.json"))

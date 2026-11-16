@@ -5,7 +5,7 @@ The token is NEVER written to the catalog or the deployed site."""
 import urllib.request, urllib.error, json, time, os, threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-ROOT = "/Users/bryanroscoe/Developer/tvi-rebuild"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root
 TOK  = open(f"{ROOT}/.tmdb_token").read().strip()
 cat  = json.load(open(f"{ROOT}/build/catalog.json"))
 CACHE_F = f"{ROOT}/build/poster_cache.json"
